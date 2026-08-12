@@ -20,7 +20,8 @@ export const DefineMandate: React.FC = () => {
     isLoading,
     isComplete,
     sendMessage,
-    updateSummaryFieldDirectly
+    updateSummaryFieldDirectly,
+    saveDraft
   } = useResearchAgent();
 
   const [inputText, setInputText] = useState('');
@@ -340,6 +341,7 @@ export const DefineMandate: React.FC = () => {
               <Button
                 variant="outline"
                 onClick={() => {
+                  saveDraft();
                   setShowToast(true);
                   setTimeout(() => setShowToast(false), 3000);
                 }}
