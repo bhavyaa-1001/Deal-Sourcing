@@ -2,6 +2,7 @@ import React from 'react';
 import { HelpCircle, Briefcase } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 import { useTheme } from '../../hooks/useTheme';
+import { mockMandate } from '../../data/mockMandates';
 
 interface HeaderProps {
   themeState: ReturnType<typeof useTheme>;
@@ -36,10 +37,41 @@ export const Header: React.FC<HeaderProps> = ({ themeState }) => {
           <ThemeToggle themeState={themeState} />
 
           {/* Demo Playback Area */}
-          <div className="flex items-center gap-2 px-4 py-2 border border-default rounded-full bg-slate-50 dark:bg-slate-900 text-primary text-base font-bold select-none cursor-default">
+          <button
+            onClick={() => {
+              if (window.confirm("Do you want to run the Demo Playback? This will automatically pre-fill the mandate with demo data and redirect you to the company discovery page.")) {
+                // Write fully completed mockMandate to localStorage
+                localStorage.setItem('dealsourcing_mandate', JSON.stringify({
+                  ...mockMandate,
+                  status: 'Approved' // mark approved
+                }));
+                // Acknowledge strategy automatically too to speed up the demo
+                localStorage.setItem('dealsourcing_research_strategy', JSON.stringify({
+                  id: 'strategy-101',
+                  mandateId: 'mandate-101',
+                  status: 'Approved',
+                  sources: [
+                    { id: 'src-1', name: 'Plastics Industry Pipe Association Members', type: 'Industry Directory', status: 'VALIDATED' },
+                    { id: 'src-2', name: 'Vinyl Council of Australia Members', type: 'Industry Directory', status: 'VALIDATED' },
+                    { id: 'src-3', name: 'Association of Rotational Moulders Australasia', type: 'Industry Directory', status: 'VALIDATED' },
+                    { id: 'src-4', name: 'Australian Plastics Industry Association', type: 'Industry Association', status: 'VALIDATED' },
+                    { id: 'src-5', name: 'PIMA Trade Directory', type: 'Trade Directory', status: 'VALIDATED' }
+                  ],
+                  gaps: [
+                    { id: 'financial-transparency', description: 'Limited financial disclosure...', acknowledged: true },
+                    { id: 'ownership-succession', description: 'Succession status of founder...', acknowledged: true }
+                  ],
+                  lastUpdated: new Date().toISOString()
+                }));
+                // Redirect to discover page
+                window.location.href = '/discover';
+              }
+            }}
+            className="group flex items-center gap-2 px-4 py-2 border border-default rounded-full bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-primary text-base font-bold select-none cursor-pointer transition-all hover:scale-105"
+          >
             <span className="h-2 w-2 rounded-full bg-brand-primary animate-ping shrink-0" />
-            <span>Demo Playback</span>
-          </div>
+            <span>Demo Playback (Autofill)</span>
+          </button>
 
           {/* Reset Flow Button */}
           <button

@@ -1,16 +1,32 @@
 import type { Mandate } from '../types';
-import { mockMandate } from '../data/mockMandates';
 
 const STORAGE_KEY = 'dealsourcing_mandate';
 
-// Initialize localStorage with mock data if not already present
+const defaultCleanMandate: Mandate = {
+  id: 'mandate-101',
+  title: 'Deal Sourcing Mandate',
+  status: 'Draft',
+  rawInput: '',
+  objective: 'Define the acquisition strategy based on inputs.',
+  geography: 'Not specified',
+  targetIndustry: 'Not specified',
+  targetActivity: 'Not specified',
+  revenueRange: { min: 0, max: 0, label: 'Not specified' },
+  employeeRange: { min: 0, max: 0, label: 'Not specified' },
+  ownershipPreference: 'Not specified',
+  successionPreference: 'Not specified',
+  industryExclusions: [],
+  otherRequirements: '',
+  lastUpdated: new Date().toISOString(),
+};
+
 const initMandate = (): Mandate => {
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored) {
     return JSON.parse(stored);
   }
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(mockMandate));
-  return mockMandate;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultCleanMandate));
+  return defaultCleanMandate;
 };
 
 // Helper for simulated delay
