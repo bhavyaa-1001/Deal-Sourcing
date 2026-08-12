@@ -27,9 +27,6 @@ export const useResearchAgent = () => {
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
-        if (parsed.messages && Array.isArray(parsed.messages)) {
-          return parsed.messages;
-        }
         if (parsed.status === 'Approved') {
           return [
             {
@@ -52,7 +49,7 @@ export const useResearchAgent = () => {
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
-        if (parsed.targetIndustry || parsed.geography) {
+        if (parsed.status === 'Approved') {
           return mapStorageToCriteria(parsed);
         }
       } catch (e) {
@@ -67,9 +64,6 @@ export const useResearchAgent = () => {
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
-        if (parsed.quickPrompts && Array.isArray(parsed.quickPrompts)) {
-          return parsed.quickPrompts;
-        }
         if (parsed.status === 'Approved') {
           return [];
         }
@@ -80,21 +74,7 @@ export const useResearchAgent = () => {
     return researchAgentApi.getInitialState().quickPrompts;
   });
 
-  const [activeField, setActiveField] = useState<keyof MandateCriteria | null>(() => {
-    const stored = localStorage.getItem('dealsourcing_mandate');
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        if (parsed.activeField !== undefined) {
-          return parsed.activeField;
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    return null;
-  });
-
+  const [activeField, setActiveField] = useState<keyof MandateCriteria | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const [isComplete, setIsComplete] = useState<boolean>(() => {
@@ -102,9 +82,6 @@ export const useResearchAgent = () => {
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
-        if (parsed.isComplete !== undefined) {
-          return parsed.isComplete;
-        }
         if (parsed.status === 'Approved') {
           return true;
         }
@@ -163,45 +140,6 @@ export const useResearchAgent = () => {
     setIsLoading(false);
   }, []);
 
-  const saveDraft = useCallback(() => {
-    const stored = localStorage.getItem('dealsourcing_mandate');
-    let currentStatus = 'Draft';
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        currentStatus = parsed.status || 'Draft';
-      } catch (e) {
-        console.error(e);
-      }
-    }
-
-    const mandateObj = {
-      id: 'mandate-101',
-      title: 'Deal Sourcing Mandate',
-      status: currentStatus,
-      rawInput: `Plastics Manufacturing in Australia. Size: ${mandate.companySize}. Revenue: ${mandate.revenueRange}.`,
-      objective: `Acquire target matching ${mandate.targetIndustry} in ${mandate.geography}`,
-      geography: mandate.geography,
-      targetIndustry: mandate.targetIndustry,
-      targetActivity: mandate.primaryActivities,
-      revenueRange: { min: 15000000, max: 50000000, label: mandate.revenueRange },
-      employeeRange: { min: 50, max: 150, label: mandate.companySize },
-      ownershipPreference: mandate.ownershipProfile,
-      successionPreference: mandate.successionPreference,
-      industryExclusions: mandate.exclusions !== 'Not specified' ? [mandate.exclusions] : [],
-      otherRequirements: '',
-      lastUpdated: new Date().toISOString(),
-
-      // Session context fields
-      messages,
-      isComplete,
-      activeField,
-      quickPrompts
-    };
-    
-    localStorage.setItem('dealsourcing_mandate', JSON.stringify(mandateObj));
-  }, [mandate, messages, isComplete, activeField, quickPrompts]);
-
   const updateSummaryFieldDirectly = useCallback((field: keyof MandateCriteria, value: string) => {
     setMandate(prev => {
       const next = { ...prev, [field]: value };
@@ -241,7 +179,6 @@ export const useResearchAgent = () => {
     isComplete,
     sendMessage,
     resetConversation,
-    saveDraft,
     updateSummaryFieldDirectly
   };
 };

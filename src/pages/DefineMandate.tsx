@@ -5,7 +5,7 @@ import type { LayoutContextType } from '../components/layout/AppLayout';
 import Button from '../components/ui/Button';
 import ProgressBar from '../components/ui/ProgressBar';
 import Badge from '../components/ui/Badge';
-import { Send, Paperclip, Check, Edit2, ChevronDown, ChevronUp, ArrowRight, Bot, User, CheckCircle2 } from 'lucide-react';
+import { Send, Paperclip, Check, Edit2, ChevronDown, ChevronUp, ArrowRight, Bot, User } from 'lucide-react';
 import type { MandateCriteria } from '../api/researchAgent';
 
 export const DefineMandate: React.FC = () => {
@@ -20,15 +20,13 @@ export const DefineMandate: React.FC = () => {
     isLoading,
     isComplete,
     sendMessage,
-    updateSummaryFieldDirectly,
-    saveDraft
+    updateSummaryFieldDirectly
   } = useResearchAgent();
 
   const [inputText, setInputText] = useState('');
   const [editingField, setEditingField] = useState<keyof MandateCriteria | null>(null);
   const [editValue, setEditValue] = useState('');
   const [mobileSummaryOpen, setMobileSummaryOpen] = useState(false);
-  const [showToast, setShowToast] = useState(false);
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
@@ -324,7 +322,7 @@ export const DefineMandate: React.FC = () => {
               })}
             </div>
 
-            {/* Footer timestamp & Actions */}
+            {/* Footer Actions */}
             <div className="border-t border-slate-100 dark:border-slate-800 pt-4 flex flex-col gap-3">
               <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 italic">
                 Last updated: Just now
@@ -338,17 +336,6 @@ export const DefineMandate: React.FC = () => {
               >
                 Looks good, continue to Research Strategy
               </Button>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  saveDraft();
-                  setShowToast(true);
-                  setTimeout(() => setShowToast(false), 3000);
-                }}
-                className="w-full"
-              >
-                Save Draft
-              </Button>
             </div>
 
           </div>
@@ -356,14 +343,6 @@ export const DefineMandate: React.FC = () => {
         </div>
 
       </div>
-
-      {/* Success Save Draft Toast Alert */}
-      {showToast && (
-        <div className="fixed bottom-6 right-6 z-50 bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-lg flex items-center gap-2 animate-fadeIn border border-emerald-500 text-base font-semibold">
-          <CheckCircle2 className="h-5 w-5" />
-          <span>Mandate draft saved successfully!</span>
-        </div>
-      )}
 
     </div>
   );
