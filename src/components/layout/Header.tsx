@@ -20,9 +20,6 @@ export const Header: React.FC<HeaderProps> = ({ themeState }) => {
             <h1 className="text-xl font-extrabold text-primary tracking-tight leading-none m-0">
               DEAL SOURCING
             </h1>
-            <p className="text-xs text-secondary font-medium tracking-wider uppercase mt-0.5">
-              Deal Sourcing Platform
-            </p>
           </div>
         </div>
 

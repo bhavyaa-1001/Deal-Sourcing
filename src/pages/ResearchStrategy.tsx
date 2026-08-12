@@ -75,10 +75,10 @@ export const ResearchStrategy: React.FC = () => {
     <div className="flex flex-col gap-6 text-left">
       {/* Title & Description */}
       <div>
-        <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+        <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
           Research Strategy
         </h2>
-        <p className="text-lg text-slate-500 mt-2">
+        <p className="text-lg text-slate-500 dark:text-slate-400 mt-2">
           Review the strategy our research agent will use to identify potential acquisition targets.
         </p>
       </div>
@@ -96,43 +96,43 @@ export const ResearchStrategy: React.FC = () => {
         
         {/* Left Panel: Target Details & Approach (60% width) */}
         <div className="lg:col-span-7 flex flex-col gap-6">
-          <Card className="p-6 border border-slate-200 bg-white shadow-sm flex flex-col gap-6">
+          <Card className="p-6 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex flex-col gap-6">
             
             {/* 1. Target Market */}
-            <div className="border-b border-slate-100 pb-4">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
+            <div className="border-b border-slate-100 dark:border-slate-800 pb-4">
+              <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
                 Target Market
               </span>
-              <span className="text-xl font-bold text-slate-800 block mt-1.5">
+              <span className="text-xl font-bold text-slate-800 dark:text-slate-200 block mt-1.5">
                 {savedMandate?.targetIndustry || 'Plastics Manufacturing'}
               </span>
             </div>
 
             {/* 2. Geography */}
-            <div className="border-b border-slate-100 pb-4">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
+            <div className="border-b border-slate-100 dark:border-slate-800 pb-4">
+              <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
                 Geography
               </span>
-              <span className="text-xl font-bold text-slate-800 block mt-1.5">
+              <span className="text-xl font-bold text-slate-800 dark:text-slate-200 block mt-1.5">
                 {savedMandate?.geography || 'Australia'}
               </span>
             </div>
 
             {/* 3. Company Profile */}
-            <div className="border-b border-slate-100 pb-4">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
+            <div className="border-b border-slate-100 dark:border-slate-800 pb-4">
+              <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
                 Company Profile Constraints
               </span>
-              <div className="grid grid-cols-2 gap-4 mt-2 bg-slate-50 p-4 rounded-lg border border-slate-100">
+              <div className="grid grid-cols-2 gap-4 mt-2 bg-slate-50 dark:bg-slate-950/20 p-4 rounded-lg border border-slate-100 dark:border-slate-800">
                 <div>
-                  <span className="text-xs text-slate-400 font-bold uppercase tracking-wide">Revenue Range</span>
-                  <span className="text-base font-bold text-slate-800 block mt-0.5">
+                  <span className="text-xs text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wide">Revenue Range</span>
+                  <span className="text-base font-bold text-slate-800 dark:text-slate-200 block mt-0.5">
                     {savedMandate?.revenueRange?.label || '$15M – $50M AUD'}
                   </span>
                 </div>
                 <div>
-                  <span className="text-xs text-slate-400 font-bold uppercase tracking-wide">Employee Count</span>
-                  <span className="text-base font-bold text-slate-800 block mt-0.5">
+                  <span className="text-xs text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wide">Employee Count</span>
+                  <span className="text-base font-bold text-slate-800 dark:text-slate-200 block mt-0.5">
                     {savedMandate?.employeeRange?.label || '50 – 150 employees'}
                   </span>
                 </div>
@@ -141,31 +141,31 @@ export const ResearchStrategy: React.FC = () => {
 
             {/* 4. Research Approach */}
             <div>
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">
+              <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-2">
                 Research Approach
               </span>
-              <p className="text-base text-slate-600 leading-relaxed mb-3">
+              <p className="text-base text-slate-605 dark:text-slate-400 leading-relaxed mb-3">
                 Our agent will deploy targeted search scripts, analyze structured registry filings, and query verified manufacturing registers to compile matching targets:
               </p>
-              <ul className="space-y-2 text-base text-slate-700 font-semibold pl-1">
+              <ul className="space-y-2 text-base text-slate-700 dark:text-slate-300 font-semibold pl-1">
                 <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-blue-600 dark:bg-blue-500" />
                   Industry directories (e.g. Manufacturing registers)
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-blue-600 dark:bg-blue-500" />
                   National company registries (ASIC data sets)
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-blue-600 dark:bg-blue-500" />
                   Manufacturing trade associations and lists
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-blue-600 dark:bg-blue-500" />
                   Public filings and corporate disclosures
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-blue-600 dark:bg-blue-500" />
                   Specialist business brokerage registers & networks
                 </li>
               </ul>
@@ -178,17 +178,17 @@ export const ResearchStrategy: React.FC = () => {
         <div className="lg:col-span-5 flex flex-col gap-6">
           
           {/* Research Sources card */}
-          <Card className="p-6 border border-slate-200 bg-white shadow-sm flex flex-col gap-4">
-            <h3 className="text-base font-bold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-3">
-              <Database className="h-5 w-5 text-slate-500" />
+          <Card className="p-6 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex flex-col gap-4">
+            <h3 className="text-base font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+              <Database className="h-5 w-5 text-slate-500 dark:text-slate-400" />
               Research Sources
             </h3>
             <div className="flex flex-col gap-3">
               {strategy.sources.map((src) => (
-                <div key={src.id} className="flex justify-between items-center p-3 border border-slate-100 bg-slate-50/50 rounded-lg">
+                <div key={src.id} className="flex justify-between items-center p-3 border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/20 rounded-lg">
                   <div className="text-left">
-                    <span className="text-sm font-bold text-slate-800 block">{src.name}</span>
-                    <span className="text-xs text-slate-500 mt-0.5 block">Coverage: {src.type}</span>
+                    <span className="text-sm font-bold text-slate-800 dark:text-slate-200 block">{src.name}</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 block">Coverage: {src.type}</span>
                   </div>
                   <Badge variant={src.status === 'VALIDATED' ? 'success' : 'neutral'} className="text-xs font-bold px-2 py-0.5 border-none uppercase">
                     {src.status === 'VALIDATED' ? 'Validated' : 'Pending'}
@@ -199,12 +199,12 @@ export const ResearchStrategy: React.FC = () => {
           </Card>
 
           {/* Gaps Acknowledgement card */}
-          <Card className="p-6 border border-slate-200 bg-white shadow-sm flex flex-col gap-4">
-            <h3 className="text-base font-bold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-3">
+          <Card className="p-6 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex flex-col gap-4">
+            <h3 className="text-base font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
               <AlertTriangle className="h-5 w-5 text-amber-500" />
               Acknowledge Research Gaps
             </h3>
-            <p className="text-sm text-slate-500 leading-relaxed">
+            <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
               Please review and acknowledge the identified data gaps in Australian private plastics data before proceeding.
             </p>
             <div className="flex flex-col gap-4 mt-2">
@@ -214,22 +214,22 @@ export const ResearchStrategy: React.FC = () => {
                   onClick={() => toggleGap(gap.id)}
                   className={`w-full flex items-start gap-3 p-3.5 border rounded-lg text-left transition-all cursor-pointer select-none
                     ${gap.acknowledged 
-                      ? 'border-emerald-200 bg-emerald-50/20 text-slate-800' 
-                      : 'border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50/50 text-slate-700'
+                      ? 'border-emerald-200 dark:border-emerald-800/40 bg-emerald-50/20 dark:bg-emerald-950/10 text-slate-800 dark:text-slate-200' 
+                      : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50/50 dark:hover:bg-slate-850/50 text-slate-700 dark:text-slate-300'
                     }
                   `}
                 >
                   <div className={`h-5 w-5 rounded border flex items-center justify-center shrink-0 mt-0.5 transition-all
                     ${gap.acknowledged 
                       ? 'bg-emerald-600 border-emerald-600 text-white' 
-                      : 'border-slate-350 bg-white text-transparent'
+                      : 'border-slate-350 dark:border-slate-700 bg-white dark:bg-slate-900 text-transparent'
                     }
                   `}>
                     <Check className="h-3.5 w-3.5 stroke-[3px]" />
                   </div>
                   <div>
-                    <span className="text-sm font-bold block capitalize">{gap.id.replace('-', ' ')}</span>
-                    <span className="text-xs text-slate-500 block mt-1 leading-relaxed">{gap.description}</span>
+                    <span className="text-sm font-bold block capitalize text-slate-800 dark:text-slate-200">{gap.id.replace('-', ' ')}</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400 block mt-1 leading-relaxed">{gap.description}</span>
                   </div>
                 </button>
               ))}
@@ -241,7 +241,7 @@ export const ResearchStrategy: React.FC = () => {
       </div>
 
       {/* Footer Stepper Controls */}
-      <div className="border-t border-slate-200 pt-6 flex items-center justify-between mt-4">
+      <div className="border-t border-slate-200 dark:border-slate-800 pt-6 flex items-center justify-between mt-4">
         <Button
           variant="outline"
           onClick={handleBack}

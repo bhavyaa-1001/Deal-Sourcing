@@ -18,12 +18,12 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ themeState }) => {
       {theme === 'light' ? (
         <>
           <Sun className="h-5 w-5 text-amber-500" />
-          <span>☀ Light</span>
+          <span>Light</span>
         </>
       ) : (
         <>
           <Moon className="h-5 w-5 text-indigo-400" />
-          <span>🌙 Dark</span>
+          <span>Dark</span>
         </>
       )}
     </button>
