@@ -53,14 +53,14 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({
         </div>
         <div className="shrink-0 flex flex-col items-end gap-1.5">
           {getFitBadge(company.fitLevel)}
-          <span className="text-sm font-bold text-brand-primary">
-            {company.confidenceScore}% Confidence
+          <span className="text-sm font-bold text-slate-700 dark:text-slate-300">
+            {company.confidenceScore}% Match
           </span>
         </div>
       </div>
 
       {/* 2. Structured Metrics Block */}
-      <div className="grid grid-cols-3 gap-3 bg-slate-50 dark:bg-slate-900/40 p-4 rounded border border-default">
+      <div className="grid grid-cols-3 gap-3 bg-slate-50 dark:bg-slate-900/30 p-4 rounded-md border border-default">
         <div>
           <span className="text-xs font-bold text-slate-500 dark:text-slate-450 uppercase tracking-wider block">Revenue</span>
           <span className="text-lg font-extrabold text-primary block mt-1">

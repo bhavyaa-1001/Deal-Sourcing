@@ -36,7 +36,7 @@ export const CompanyFilters: React.FC<CompanyFiltersProps> = ({
   );
 
   return (
-    <div className="w-full flex flex-col gap-4 bg-card border border-default rounded-lg p-5 shadow-premium text-left">
+    <div className="w-full flex flex-col gap-4 bg-card border border-default rounded-lg p-5 shadow-sm text-left">
       {/* 1. Main Search & Core Controls */}
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
         {/* Search Input */}
@@ -49,7 +49,7 @@ export const CompanyFilters: React.FC<CompanyFiltersProps> = ({
             value={filters.search}
             onChange={handleSearchChange}
             placeholder="Search companies by name, activity, location, key terms..."
-            className="w-full pl-10 pr-4 py-3 text-base rounded border border-default bg-card text-primary focus-ring focus:border-brand-primary transition-all duration-200 min-h-[46px]"
+            className="w-full pl-10 pr-4 py-3 text-base rounded-md border border-default bg-card text-primary focus-ring focus:border-brand-primary transition-all duration-200 min-h-[46px]"
           />
         </div>
 

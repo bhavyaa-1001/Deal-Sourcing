@@ -31,10 +31,10 @@ export const CompanyTable: React.FC<CompanyTableProps> = ({
   };
 
   return (
-    <div className="w-full overflow-x-auto rounded-lg border border-default shadow-premium bg-card">
+    <div className="w-full overflow-x-auto rounded-lg border border-default shadow-sm bg-card">
       <table className="w-full border-collapse text-left text-base">
         <thead>
-          <tr className="bg-slate-50 dark:bg-slate-900 border-b border-default text-primary font-bold text-sm uppercase tracking-wider">
+          <tr className="bg-slate-50/70 dark:bg-slate-900/60 border-b border-default text-primary font-bold text-sm uppercase tracking-wider">
             <th className="px-6 py-4.5">Company Name</th>
             <th className="px-6 py-4.5">Location</th>
             <th className="px-6 py-4.5">Industry</th>
@@ -85,7 +85,7 @@ export const CompanyTable: React.FC<CompanyTableProps> = ({
                 <td className="px-6 py-5">
                   <div className="flex items-center gap-2">
                     {getFitBadge(company.fitLevel)}
-                    <span className="text-sm font-bold text-brand-primary">
+                    <span className="text-sm font-bold text-slate-700 dark:text-slate-350">
                       {company.confidenceScore}%
                     </span>
                   </div>

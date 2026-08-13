@@ -74,25 +74,25 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
                     {/* Circle Indicator */}
                     <span
                       className={`
-                        w-10 h-10 rounded-full flex items-center justify-center font-bold text-base border-2
+                        w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm border
                         transition-all duration-200 shrink-0
                         ${isCompleted
-                          ? 'bg-brand-success-light text-emerald-900 border-brand-success dark:bg-emerald-950/40 dark:text-emerald-400'
+                          ? 'bg-brand-success-light text-emerald-800 border-brand-success dark:bg-emerald-950/20 dark:text-emerald-400'
                           : isActive
                             ? 'bg-brand-primary text-white border-brand-primary shadow-sm'
-                            : 'bg-slate-100 text-slate-500 border-slate-300 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'
+                            : 'bg-slate-50 text-slate-450 border-slate-200 dark:bg-slate-900 dark:text-slate-500 dark:border-slate-800'
                         }
                       `}
                     >
-                      {isCompleted ? <Check className="h-5 w-5 stroke-[3px]" /> : step.number}
+                      {isCompleted ? <Check className="h-4 w-4 stroke-[3px]" /> : step.number}
                     </span>
 
                     {/* Step Label */}
                     <span className="flex flex-col pr-2 text-left">
-                      <span className={`text-base font-bold leading-tight ${isActive ? 'text-brand-primary' : 'text-slate-800 dark:text-slate-200 font-semibold'}`}>
+                      <span className={`text-sm font-bold leading-tight ${isActive ? 'text-brand-primary' : 'text-slate-850 dark:text-slate-200 font-semibold'}`}>
                         {step.label}
                       </span>
-                      <span className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium leading-none">
+                      <span className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 font-medium leading-none">
                         {step.description}
                       </span>
                     </span>
@@ -102,12 +102,12 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
                   {idx !== STEPS.length - 1 && (
                     <div
                       className={`
-                        flex-1 h-[2px] mx-4 rounded-full transition-colors duration-300
+                        flex-1 h-[1.5px] mx-2.5 rounded-full transition-colors duration-300
                         ${isCompleted 
                           ? 'bg-brand-success' 
                           : isStepUnlocked(step.number + 1) 
-                            ? 'bg-brand-primary/50' 
-                            : 'bg-slate-200 dark:bg-slate-700'
+                            ? 'bg-brand-primary/40' 
+                            : 'bg-slate-200 dark:bg-slate-800'
                         }
                       `}
                     />

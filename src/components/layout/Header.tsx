@@ -10,15 +10,15 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ themeState }) => {
   return (
-    <header className="w-full bg-card border-b border-default sticky top-0 z-40 shadow-premium transition-all duration-200">
+    <header className="w-full bg-card border-b border-default sticky top-0 z-40 shadow-sm transition-all duration-200">
       <div className="max-w-7xl mx-auto px-4 md:px-6 min-h-[64px] md:h-18 flex flex-wrap md:flex-nowrap items-center justify-between gap-3 py-3 md:py-0">
         {/* Left: Logo & Product Name */}
-        <div className="flex items-center gap-2">
-          <div className="bg-brand-primary text-white p-2 rounded-md flex items-center justify-center shrink-0">
+        <div className="flex items-center gap-2.5">
+          {/* <div className="bg-brand-primary text-white p-2 rounded-md flex items-center justify-center shrink-0">
             <Briefcase className="h-5 w-5 md:h-6 md:w-6" />
-          </div>
-          <div>
-            <h1 className="text-lg md:text-xl font-extrabold text-primary tracking-tight leading-none m-0">
+          </div> */}
+          <div className="text-left">
+            <h1 className="text-base md:text-lg font-bold text-primary tracking-tight leading-none m-0">
               DEAL SOURCING
             </h1>
           </div>

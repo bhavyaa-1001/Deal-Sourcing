@@ -1,4 +1,4 @@
-// SEAL SOURCING - Research Agent Mock Service
+// DEAL SOURCING - Research Agent Mock Service
 // Conceptual layer to simulate chat conversation and mandate extraction.
 // This structure will be easy to replace with a real Python backend API later.
 

@@ -4,8 +4,7 @@ import useResearchAgent from '../hooks/useResearchAgent';
 import type { LayoutContextType } from '../components/layout/AppLayout';
 import Button from '../components/ui/Button';
 import ProgressBar from '../components/ui/ProgressBar';
-import Badge from '../components/ui/Badge';
-import { Send, Paperclip, Check, Edit2, ChevronDown, ChevronUp, ArrowRight, Bot, User } from 'lucide-react';
+import { Send, Paperclip, Check, Edit2, ChevronDown, ChevronUp, ArrowRight } from 'lucide-react';
 import type { MandateCriteria } from '../api/researchAgent';
 
 export const DefineMandate: React.FC = () => {
@@ -95,16 +94,16 @@ export const DefineMandate: React.FC = () => {
   const getStatusBadge = (field: keyof MandateCriteria) => {
     const val = mandate[field];
     if (val === 'Not specified') {
-      return <Badge variant="neutral" className="text-xs uppercase scale-95 border-none">To be confirmed</Badge>;
+      return <span className="text-xs font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">To be confirmed</span>;
     }
     if (activeField === field) {
-      return <Badge variant="primary" className="text-xs uppercase scale-95 border-none">Considering</Badge>;
+      return <span className="text-xs font-bold text-brand-primary uppercase tracking-wider">Considering</span>;
     }
     return (
-      <Badge variant="success" className="text-xs uppercase scale-95 border-none flex items-center gap-1">
-        <Check className="h-3 w-3 stroke-[3px]" />
+      <span className="text-xs font-bold text-brand-success uppercase tracking-wider flex items-center gap-1">
+        <Check className="h-3.5 w-3.5 stroke-[3px]" />
         Confirmed
-      </Badge>
+      </span>
     );
   };
 
@@ -140,46 +139,46 @@ export const DefineMandate: React.FC = () => {
           </div>
 
           {/* Messages Log Panel */}
-          <div ref={chatContainerRef} className="flex-1 px-6 py-5 overflow-y-auto max-h-[420px] min-h-[350px] flex flex-col gap-5 bg-white dark:bg-slate-900">
+          <div ref={chatContainerRef} className="flex-1 px-6 py-5 overflow-y-auto max-h-[420px] min-h-[350px] flex flex-col gap-6 bg-white dark:bg-slate-900">
             {messages.map((msg) => {
               const isAgent = msg.sender === 'agent';
               return (
                 <div
                   key={msg.id}
-                  className={`flex gap-3 max-w-[85%] ${isAgent ? 'self-start text-left' : 'self-end flex-row-reverse text-right'}`}
+                  className={`flex flex-col max-w-[85%] ${isAgent ? 'self-start items-start text-left' : 'self-end items-end text-right'}`}
                 >
-                  {/* Avatar box */}
-                  <div className={`h-9 w-9 rounded-full shrink-0 flex items-center justify-center border ${isAgent ? 'bg-blue-50 dark:bg-blue-950/40 border-blue-100 dark:border-blue-900 text-blue-600 dark:text-blue-400' : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300'}`}>
-                    {isAgent ? <Bot className="h-5 w-5" /> : <User className="h-5 w-5" />}
-                  </div>
+                  {/* Sender Tag Label */}
+                  <span className="text-[10px] font-bold tracking-wider text-slate-400 dark:text-slate-500 uppercase mb-1">
+                    {isAgent ? 'RESEARCH AGENT' : 'YOUR INPUT'}
+                  </span>
 
-                  {/* Bubble text wrapper */}
-                  <div className="flex flex-col gap-1">
-                    <div
-                      className={`px-4.5 py-3 rounded-2xl text-base leading-relaxed whitespace-pre-line border
-                        ${isAgent 
-                          ? 'bg-slate-50 dark:bg-slate-950/30 text-slate-800 dark:text-slate-200 border-slate-100 dark:border-slate-800 rounded-tl-none' 
-                          : 'bg-blue-50/75 dark:bg-blue-950/20 text-slate-900 dark:text-slate-100 border-blue-100/50 dark:border-blue-900 rounded-tr-none'
-                        }
-                      `}
-                    >
-                      {msg.text}
-                    </div>
-                    <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 px-1 mt-0.5 block">
-                      {msg.timestamp}
-                    </span>
+                  {/* Rectangular Content Box */}
+                  <div
+                    className={`px-4 py-2.5 rounded-md text-base leading-relaxed whitespace-pre-line border
+                      ${isAgent 
+                        ? 'bg-slate-50 dark:bg-slate-950/20 text-slate-800 dark:text-slate-200 border-slate-250/60 dark:border-slate-800' 
+                        : 'bg-blue-50/30 dark:bg-blue-950/15 text-slate-900 dark:text-slate-100 border-blue-100 dark:border-blue-900/40'
+                      }
+                    `}
+                  >
+                    {msg.text}
                   </div>
+                  
+                  {/* Timestamp */}
+                  <span className="text-[10px] text-slate-400 dark:text-slate-500 mt-1 block">
+                    {msg.timestamp}
+                  </span>
                 </div>
               );
             })}
 
             {/* Agent Typing Indicator */}
             {isLoading && (
-              <div className="flex gap-3 self-start max-w-[80%] items-center animate-pulse">
-                <div className="h-9 w-9 rounded-full shrink-0 flex items-center justify-center border bg-blue-50 dark:bg-blue-950/40 border-blue-100 dark:border-blue-900 text-blue-600 dark:text-blue-400">
-                  <Bot className="h-5 w-5" />
-                </div>
-                <div className="bg-slate-50 dark:bg-slate-950/30 border border-slate-100 dark:border-slate-800 text-slate-500 dark:text-slate-400 text-sm px-4.5 py-3 rounded-2xl rounded-tl-none">
+              <div className="flex flex-col self-start max-w-[80%] items-start animate-pulse">
+                <span className="text-[10px] font-bold tracking-wider text-slate-400 dark:text-slate-500 uppercase mb-1">
+                  RESEARCH AGENT
+                </span>
+                <div className="bg-slate-50 dark:bg-slate-950/20 border border-slate-250/60 dark:border-slate-800 text-slate-500 dark:text-slate-400 text-sm px-4 py-2.5 rounded-md">
                   Research Agent is typing...
                 </div>
               </div>
@@ -188,13 +187,13 @@ export const DefineMandate: React.FC = () => {
 
           {/* Quick suggestions area */}
           {quickPrompts.length > 0 && (
-            <div className="px-6 py-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50/20 dark:bg-slate-900/10 flex flex-wrap gap-2 animate-fadeIn">
+            <div className="px-6 py-3 border-t border-default bg-slate-50/20 dark:bg-slate-900/10 flex flex-wrap gap-2 animate-fadeIn">
               {quickPrompts.map((p) => (
                 <button
                   key={p}
                   onClick={() => handlePromptClick(p)}
                   disabled={isLoading}
-                  className="px-3.5 py-2 text-sm font-semibold text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 hover:border-blue-300 dark:hover:border-blue-700 hover:bg-blue-50/40 dark:hover:bg-blue-950/20 rounded-full transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-slate-900"
+                  className="px-3 py-1.5 text-sm font-semibold text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 hover:border-blue-300 dark:hover:border-blue-700 hover:bg-blue-50/40 dark:hover:bg-blue-950/20 rounded-md transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-slate-900"
                 >
                   {p}
                 </button>
@@ -203,7 +202,7 @@ export const DefineMandate: React.FC = () => {
           )}
 
           {/* Chat Form Input panel */}
-          <form onSubmit={handleSend} className="px-6 py-4.5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-900/20 flex items-center gap-3">
+          <form onSubmit={handleSend} className="px-6 py-4 border-t border-default bg-slate-50/40 dark:bg-slate-900/20 flex items-center gap-3">
             <div className="relative flex-1">
               <input
                 type="text"
@@ -211,7 +210,7 @@ export const DefineMandate: React.FC = () => {
                 onChange={(e) => setInputText(e.target.value)}
                 disabled={isLoading}
                 placeholder="Type your answer or describe your requirements..."
-                className="w-full pl-4 pr-10 py-3.5 text-base border border-slate-200 dark:border-slate-750 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 disabled:bg-slate-50 dark:disabled:bg-slate-900 disabled:text-slate-400"
+                className="w-full pl-4 pr-10 py-3 text-base border border-default bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-brand-primary disabled:bg-slate-50 dark:disabled:bg-slate-900 disabled:text-slate-400 min-h-[44px]"
               />
               <button
                 type="button"
@@ -224,7 +223,7 @@ export const DefineMandate: React.FC = () => {
             <button
               type="submit"
               disabled={!inputText.trim() || isLoading}
-              className="bg-brand-primary hover:bg-brand-primary-hover active:bg-brand-primary-dark text-white p-3.5 rounded-xl transition-all cursor-pointer shadow-sm disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center shrink-0"
+              className="bg-brand-primary hover:bg-brand-primary-hover active:bg-brand-primary-dark text-white p-3 rounded-md transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center shrink-0 min-h-[44px] min-w-[44px]"
               aria-label="Send message to agent"
             >
               <Send className="h-5 w-5" />
