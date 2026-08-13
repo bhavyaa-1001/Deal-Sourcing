@@ -13,17 +13,17 @@ export const Badge: React.FC<BadgeProps> = ({
   ...props
 }) => {
   const styles = {
-    primary: 'bg-brand-primary-light text-brand-primary-dark border-brand-primary-hover',
-    success: 'bg-brand-success-light text-brand-success border-brand-success',
-    warning: 'bg-brand-warning-light text-brand-warning border-brand-warning',
-    danger: 'bg-brand-danger-light text-brand-danger border-brand-danger',
-    neutral: 'bg-slate-100 text-slate-700 border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
+    primary: 'bg-white text-brand-primary border-brand-primary dark:bg-slate-900 dark:border-brand-primary-light/30',
+    success: 'bg-white text-brand-success border-brand-success dark:bg-slate-900 dark:border-brand-success/30',
+    warning: 'bg-white text-brand-warning border-brand-warning dark:bg-slate-900 dark:border-brand-warning/30',
+    danger: 'bg-white text-brand-danger border-brand-danger dark:bg-slate-900 dark:border-brand-danger/30',
+    neutral: 'bg-white text-slate-500 border-slate-300 dark:bg-slate-900 dark:text-slate-400 dark:border-slate-800'
   };
 
   return (
     <span
       className={`
-        inline-flex items-center px-3 py-1 rounded text-sm font-semibold border
+        inline-flex items-center px-3 py-1 rounded text-sm font-bold border min-h-[32px]
         ${styles[variant]}
         ${className}
       `}

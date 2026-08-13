@@ -2,7 +2,7 @@ import React from 'react';
 import type { Company } from '../../types';
 import Card from '../ui/Card';
 import Badge from '../ui/Badge';
-import { MapPin, Briefcase, Database, Plus, Check } from 'lucide-react';
+import { Database, Plus, Check } from 'lucide-react';
 import Button from '../ui/Button';
 
 interface CompanyCardProps {
@@ -32,68 +32,66 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({
   };
 
   return (
-    <Card hoverable className="text-left flex flex-col gap-5 border border-default">
+    <Card className="text-left flex flex-col gap-4 border border-default bg-card rounded shadow-none p-5">
       {/* 1. Header: Name & Fit */}
       <div className="flex justify-between items-start gap-4">
-        <div>
-          <h3 className="text-xl font-bold text-primary tracking-tight leading-snug">
+        <div className="min-w-0">
+          <h3 className="text-xl font-bold text-primary tracking-tight leading-tight block truncate">
             {company.name}
           </h3>
-          <div className="flex flex-wrap items-center gap-2 mt-1 text-base text-secondary font-semibold">
-            <span className="flex items-center gap-1">
-              <MapPin className="h-4.5 w-4.5" />
-              {company.location}
-            </span>
-            <span className="text-slate-300 dark:text-slate-700">|</span>
-            <span className="flex items-center gap-1">
-              <Briefcase className="h-4.5 w-4.5" />
-              {company.industry}
-            </span>
+          <div className="text-sm text-secondary mt-1.5 font-semibold flex items-center gap-1.5">
+            <span>{company.location}</span>
+            <span>•</span>
+            <span>{company.industry}</span>
           </div>
         </div>
         <div className="shrink-0 flex flex-col items-end gap-1.5">
           {getFitBadge(company.fitLevel)}
-          <span className="text-sm font-bold text-slate-700 dark:text-slate-300">
+          <span className="text-sm font-bold text-[#9A8056] mt-0.5">
             {company.confidenceScore}% Match
           </span>
         </div>
       </div>
 
+      <div className="border-t border-default/70 my-1" />
+
       {/* 2. Structured Metrics Block */}
-      <div className="grid grid-cols-3 gap-3 bg-slate-50 dark:bg-slate-900/30 p-4 rounded-md border border-default">
+      <div className="grid grid-cols-3 gap-3 text-sm">
         <div>
-          <span className="text-xs font-bold text-slate-500 dark:text-slate-450 uppercase tracking-wider block">Revenue</span>
-          <span className="text-lg font-extrabold text-primary block mt-1">
+          <span className="text-xs font-bold text-slate-450 uppercase tracking-wider block">Revenue</span>
+          <span className="text-base font-bold text-primary block mt-0.5">
             {company.revenueRange}
           </span>
         </div>
         <div>
-          <span className="text-xs font-bold text-slate-500 dark:text-slate-450 uppercase tracking-wider block">Employees</span>
-          <span className="text-lg font-extrabold text-primary block mt-1">
+          <span className="text-xs font-bold text-slate-450 uppercase tracking-wider block">Employees</span>
+          <span className="text-base font-bold text-primary block mt-0.5">
             {company.employeeRange}
           </span>
         </div>
         <div>
-          <span className="text-xs font-bold text-slate-500 dark:text-slate-450 uppercase tracking-wider block">Ownership</span>
-          <span className="text-lg font-extrabold text-primary block mt-1 truncate">
+          <span className="text-xs font-bold text-slate-450 uppercase tracking-wider block">Ownership</span>
+          <span className="text-base font-bold text-primary block mt-0.5 truncate">
             {company.ownership.replace(' (Founder Owned)', '')}
           </span>
         </div>
       </div>
 
+      <div className="border-t border-default/70 my-1" />
+
       {/* 3. Fit Description Rationale */}
-      <div className="flex-1 text-base text-primary border-l-2 border-slate-200 dark:border-slate-700 pl-3">
-        <span className="font-bold text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">
+      <div className="flex-1 text-sm">
+        <span className="font-bold text-xs text-slate-450 uppercase tracking-wider block mb-1">
           Acquisition Alignment
         </span>
-        <p className="text-secondary leading-relaxed line-clamp-3">
+        <p className="text-base text-secondary leading-relaxed line-clamp-3">
           {company.whyItMatches}
         </p>
       </div>
 
       {/* 4. Footer info */}
-      <div className="flex items-center gap-1.5 text-sm text-secondary border-t border-default pt-3">
-        <Database className="h-4 w-4 shrink-0 text-slate-400" />
+      <div className="flex items-center gap-1.5 text-sm text-slate-500 border-t border-default/60 pt-2.5">
+        <Database className="h-3.5 w-3.5 shrink-0" />
         <span className="truncate">Source: {company.sourceName}</span>
       </div>
 
@@ -101,18 +99,18 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({
       <div className="grid grid-cols-2 gap-3 mt-1">
         <Button
           variant="outline"
-          size="md"
+          size="sm"
           onClick={onView}
         >
           View Company
         </Button>
         <Button
           variant={isShortlisted ? 'success' : 'secondary'}
-          size="md"
+          size="sm"
           onClick={onToggleShortlist}
-          leftIcon={isShortlisted ? <Check className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
+          leftIcon={isShortlisted ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
         >
-          {isShortlisted ? 'Shortlisted' : 'Add to Shortlist'}
+          {isShortlisted ? 'Shortlisted' : 'Add Shortlist'}
         </Button>
       </div>
     </Card>

@@ -373,7 +373,7 @@ Best regards,
 
       {/* 1. Summary Metrics Panel */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
-        <Card className="flex items-center gap-4 border-l-4 border-l-brand-primary">
+        <Card className="flex items-center gap-4">
           <div className="p-3 bg-brand-primary-light rounded-full text-brand-primary-dark">
             <FolderCheck className="h-6 w-6" />
           </div>
@@ -387,7 +387,7 @@ Best regards,
           </div>
         </Card>
 
-        <Card className="flex items-center gap-4 border-l-4 border-l-brand-success">
+        <Card className="flex items-center gap-4">
           <div className="p-3 bg-brand-success-light rounded-full text-brand-success">
             <CheckCircle2 className="h-6 w-6" />
           </div>
@@ -401,7 +401,7 @@ Best regards,
           </div>
         </Card>
 
-        <Card className="flex items-center gap-4 border-l-4 border-l-brand-warning">
+        <Card className="flex items-center gap-4">
           <div className="p-3 bg-brand-warning-light rounded-full text-brand-warning">
             <AlertCircle className="h-6 w-6" />
           </div>
@@ -415,7 +415,7 @@ Best regards,
           </div>
         </Card>
 
-        <Card className="flex items-center gap-4 border-l-4 border-l-slate-400">
+        <Card className="flex items-center gap-4">
           <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-500">
             <Ban className="h-6 w-6" />
           </div>
@@ -486,7 +486,7 @@ Best regards,
 
                       {/* Company Name */}
                       <td className="px-6 py-5 font-bold">
-                        <span className="text-primary text-base">{company.name}</span>
+                        <span className="text-primary text-base md:text-lg">{company.name}</span>
                       </td>
 
                       {/* Location */}
@@ -557,7 +557,7 @@ Best regards,
 
           {/* Floating Compare & Enrichment Action Bar below table */}
           {selectedForCompare.length >= 1 && (
-            <div className="mt-6 p-5 border border-blue-200 dark:border-blue-900 bg-blue-50/50 dark:bg-blue-950/20 rounded-xl flex flex-col lg:flex-row items-center justify-between gap-4 animate-fadeIn text-left">
+            <div className="mt-6 p-5 border border-default bg-slate-50 dark:bg-slate-900/30 rounded flex flex-col lg:flex-row items-center justify-between gap-4 animate-fadeIn text-left">
               <span className="text-base text-slate-800 dark:text-slate-200 font-bold">
                 {selectedForCompare.length} {selectedForCompare.length === 1 ? 'candidate' : 'candidates'} selected.
               </span>
@@ -577,19 +577,19 @@ Best regards,
                     setActiveEnrichId(selectedForCompare[0]);
                     setEnrichModalOpen(true);
                   }}
-                  leftIcon={<Sparkles className="h-5 w-5 text-amber-500 shrink-0" />}
-                  className="min-h-[46px] px-5 bg-gradient-to-r from-blue-600 to-indigo-650 hover:from-blue-700 hover:to-indigo-700 text-white border-none"
+                  leftIcon={<Sparkles className="h-5 w-5 text-brand-warning shrink-0" />}
+                  className="min-h-[46px] px-5"
                 >
                   Enrich & Script Outreach
                 </Button>
-
+                
                 {/* Compare Button */}
                 {selectedForCompare.length >= 2 && (
                   <Button
-                    variant="primary"
+                    variant="success"
                     onClick={() => setCompareModalOpen(true)}
                     leftIcon={<Layers className="h-5 w-5 shrink-0" />}
-                    className="min-h-[46px] px-5 bg-emerald-600 hover:bg-emerald-700 text-white border-none"
+                    className="min-h-[46px] px-5"
                   >
                     Compare Selected ({selectedForCompare.length})
                   </Button>

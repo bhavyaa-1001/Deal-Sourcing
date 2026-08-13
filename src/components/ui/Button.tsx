@@ -22,16 +22,16 @@ export const Button: React.FC<ButtonProps> = ({
   const baseStyles = 'inline-flex items-center justify-center font-semibold rounded-md transition-colors focus-ring cursor-pointer disabled:cursor-not-allowed disabled:opacity-50';
   
   const variants = {
-    primary: 'bg-brand-primary text-white hover:bg-brand-primary-hover active:bg-brand-primary-dark',
-    secondary: 'bg-slate-100 text-slate-800 hover:bg-slate-200 active:bg-slate-300 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600',
-    success: 'bg-brand-success text-white hover:bg-green-700 active:bg-green-800',
-    danger: 'bg-brand-danger text-white hover:bg-red-700 active:bg-red-800',
+    primary: 'bg-brand-primary text-white hover:bg-brand-primary-hover active:bg-brand-primary-dark border border-brand-primary',
+    secondary: 'bg-white text-slate-800 border border-default hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700',
+    success: 'bg-white text-brand-success border border-brand-success hover:bg-brand-success-light dark:bg-slate-900 dark:hover:bg-brand-success-light/20',
+    danger: 'bg-white text-brand-danger border border-brand-danger hover:bg-brand-danger-light dark:bg-slate-900 dark:hover:bg-brand-danger-light/20',
     outline: 'border border-default bg-transparent text-primary hover:bg-slate-50 dark:hover:bg-slate-800'
   };
 
   const sizes = {
-    sm: 'px-4 py-2 text-sm min-h-[38px]',
-    md: 'px-5 py-3 text-base min-h-[46px]', // 16px font and larger targets for 50+ users
+    sm: 'px-4 py-2 text-sm md:text-[15px] min-h-[44px]',
+    md: 'px-5 py-3 text-base min-h-[48px]',
     lg: 'px-7 py-4 text-lg min-h-[54px]'
   };
 

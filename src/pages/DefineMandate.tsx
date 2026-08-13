@@ -111,10 +111,10 @@ export const DefineMandate: React.FC = () => {
     <div className="flex flex-col gap-6 text-left">
       {/* Page Title & Subtitle */}
       <div className="mb-2">
-        <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+        <h2 className="text-3xl font-bold md:text-[32px] text-primary tracking-tight">
           Define Your Acquisition Mandate
         </h2>
-        <p className="text-lg text-slate-500 dark:text-slate-400 mt-2">
+        <p className="text-base md:text-lg text-secondary mt-2 leading-relaxed">
           Chat with our Research Agent to define what kind of business you want to acquire.
         </p>
       </div>
@@ -123,16 +123,17 @@ export const DefineMandate: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         {/* Left Side: Clean Chat Workspace (65% width) */}
-        <div className="lg:col-span-8 flex flex-col border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden bg-white dark:bg-slate-900 shadow-sm min-h-[580px]">
-          {/* Chat Workspace Header */}
-          <div className="flex justify-between items-center px-6 py-4.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/20">
+        <div className="lg:col-span-8 border border-default rounded bg-white dark:bg-slate-900 flex flex-col min-h-[500px] overflow-hidden">
+          
+          {/* Header Panel */}
+          <div className="px-6 py-4.5 border-b border-default bg-slate-50/50 dark:bg-slate-900/50 flex items-center justify-between">
             <div>
-              <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">Research Agent Workspace</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Active mandate definition session</p>
+              <h3 className="text-base font-bold text-primary">Research Agent</h3>
+              <p className="text-xs text-secondary mt-0.5">Define alignment parameters dynamically via interactive logging.</p>
             </div>
             <button
               onClick={() => alert("The Research Agent analyzes your text inputs, structures them into 8 key criteria dimensions, and verifies matching target companies.")}
-              className="text-sm font-semibold text-slate-600 dark:text-slate-350 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-850 px-3 py-1.5 rounded-lg transition-colors cursor-pointer bg-white dark:bg-slate-900"
+              className="text-sm font-semibold text-slate-650 dark:text-slate-350 border border-default hover:bg-slate-50 dark:hover:bg-slate-850 px-3.5 py-2 rounded transition-colors cursor-pointer bg-white dark:bg-slate-900 min-h-[38px]"
             >
               How it works
             </button>
@@ -148,13 +149,13 @@ export const DefineMandate: React.FC = () => {
                   className={`flex flex-col max-w-[85%] ${isAgent ? 'self-start items-start text-left' : 'self-end items-end text-right'}`}
                 >
                   {/* Sender Tag Label */}
-                  <span className="text-[10px] font-bold tracking-wider text-slate-400 dark:text-slate-500 uppercase mb-1">
+                  <span className="text-[13px] font-bold tracking-wider text-slate-500 dark:text-slate-400 uppercase mb-1">
                     {isAgent ? 'RESEARCH AGENT' : 'YOUR INPUT'}
                   </span>
 
                   {/* Rectangular Content Box */}
                   <div
-                    className={`px-4 py-2.5 rounded-md text-base leading-relaxed whitespace-pre-line border
+                    className={`px-4 py-2.5 rounded-md text-base md:text-[17px] leading-relaxed whitespace-pre-line border
                       ${isAgent 
                         ? 'bg-slate-50 dark:bg-slate-950/20 text-slate-800 dark:text-slate-200 border-slate-250/60 dark:border-slate-800' 
                         : 'bg-blue-50/30 dark:bg-blue-950/15 text-slate-900 dark:text-slate-100 border-blue-100 dark:border-blue-900/40'
@@ -175,10 +176,10 @@ export const DefineMandate: React.FC = () => {
             {/* Agent Typing Indicator */}
             {isLoading && (
               <div className="flex flex-col self-start max-w-[80%] items-start animate-pulse">
-                <span className="text-[10px] font-bold tracking-wider text-slate-400 dark:text-slate-500 uppercase mb-1">
+                <span className="text-[13px] font-bold tracking-wider text-slate-500 dark:text-slate-400 uppercase mb-1">
                   RESEARCH AGENT
                 </span>
-                <div className="bg-slate-50 dark:bg-slate-950/20 border border-slate-250/60 dark:border-slate-800 text-slate-500 dark:text-slate-400 text-sm px-4 py-2.5 rounded-md">
+                <div className="bg-slate-50 dark:bg-slate-950/20 border border-slate-250/60 dark:border-slate-800 text-slate-500 dark:text-slate-400 text-base px-4 py-2.5 rounded-md">
                   Research Agent is typing...
                 </div>
               </div>
@@ -193,7 +194,7 @@ export const DefineMandate: React.FC = () => {
                   key={p}
                   onClick={() => handlePromptClick(p)}
                   disabled={isLoading}
-                  className="px-3 py-1.5 text-sm font-semibold text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 hover:border-blue-300 dark:hover:border-blue-700 hover:bg-blue-50/40 dark:hover:bg-blue-950/20 rounded-md transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-slate-900"
+                  className="px-3.5 py-2 text-sm md:text-[15px] font-semibold text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 hover:border-blue-300 dark:hover:border-blue-700 hover:bg-blue-50/40 dark:hover:bg-blue-950/20 rounded-md transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-slate-900 min-h-[38px]"
                 >
                   {p}
                 </button>
@@ -210,11 +211,11 @@ export const DefineMandate: React.FC = () => {
                 onChange={(e) => setInputText(e.target.value)}
                 disabled={isLoading}
                 placeholder="Type your answer or describe your requirements..."
-                className="w-full pl-4 pr-10 py-3 text-base border border-default bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-brand-primary disabled:bg-slate-50 dark:disabled:bg-slate-900 disabled:text-slate-400 min-h-[44px]"
+                className="w-full pl-4 pr-10 py-3 text-base border border-default bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-brand-primary disabled:bg-slate-50 dark:disabled:bg-slate-900 disabled:text-slate-400 min-h-[48px]"
               />
               <button
                 type="button"
-                className="absolute right-3 inset-y-0 flex items-center text-slate-400 hover:text-slate-600 dark:text-slate-400 dark:hover:text-slate-200 cursor-pointer"
+                className="absolute right-3 inset-y-0 flex items-center text-slate-400 hover:text-slate-650 dark:text-slate-400 dark:hover:text-slate-200 cursor-pointer"
                 onClick={() => alert("Upload criteria document attachment (feature placeholder)")}
               >
                 <Paperclip className="h-5 w-5" />
@@ -223,7 +224,7 @@ export const DefineMandate: React.FC = () => {
             <button
               type="submit"
               disabled={!inputText.trim() || isLoading}
-              className="bg-brand-primary hover:bg-brand-primary-hover active:bg-brand-primary-dark text-white p-3 rounded-md transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center shrink-0 min-h-[44px] min-w-[44px]"
+              className="bg-brand-primary hover:bg-brand-primary-hover active:bg-brand-primary-dark text-white p-3 rounded-md transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center shrink-0 min-h-[48px] min-w-[48px]"
               aria-label="Send message to agent"
             >
               <Send className="h-5 w-5" />
@@ -240,21 +241,21 @@ export const DefineMandate: React.FC = () => {
           {/* Mobile Accordion Toggle Trigger */}
           <button
             onClick={() => setMobileSummaryOpen(!mobileSummaryOpen)}
-            className="w-full flex lg:hidden items-center justify-between p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl font-bold text-slate-800 dark:text-slate-200 text-base"
+            className="w-full flex lg:hidden items-center justify-between p-4 bg-slate-50 dark:bg-slate-900 border border-default rounded font-bold text-slate-800 dark:text-slate-200 text-base"
           >
-            <span>Live Mandate Summary ({confirmedCount}/8 Complete)</span>
+            <span>Acquisition Mandate ({confirmedCount}/8 Complete)</span>
             {mobileSummaryOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
           </button>
 
           {/* Summary Panel Card content */}
-          <div className={`bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm flex flex-col gap-6 text-left ${mobileSummaryOpen ? 'block' : 'hidden lg:flex'}`}>
+          <div className={`bg-white dark:bg-slate-900 border border-default rounded p-6 shadow-none flex flex-col gap-5 text-left ${mobileSummaryOpen ? 'block' : 'hidden lg:flex'}`}>
             <div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">MANDATE SUMMARY</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Live interpretation of your acquisition criteria.</p>
+              <h3 className="text-sm font-bold text-slate-550 dark:text-slate-400 uppercase tracking-wider">ACQUISITION MANDATE</h3>
+              <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Live interpretation of your acquisition criteria.</p>
             </div>
 
             {/* Checklist progress meter */}
-            <div className="flex flex-col gap-1 bg-slate-50/50 dark:bg-slate-950/20 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
+            <div className="flex flex-col gap-1 bg-slate-50/50 dark:bg-slate-950/20 p-4 rounded border border-default">
               <ProgressBar
                 value={confirmedCount}
                 max={8}
@@ -264,7 +265,7 @@ export const DefineMandate: React.FC = () => {
             </div>
 
             {/* Criteria List */}
-            <div className="flex-1 flex flex-col gap-4 border-t border-slate-100 dark:border-slate-800 pt-4">
+            <div className="flex-1 flex flex-col gap-4 border-t border-default pt-4">
               {/* Field mapping array helper */}
               {([
                 { key: 'targetIndustry', label: 'Target Industry' },
@@ -278,9 +279,9 @@ export const DefineMandate: React.FC = () => {
               ] as const).map(({ key, label }) => {
                 const isEditing = editingField === key;
                 return (
-                  <div key={key} className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-3 last:border-0 last:pb-0">
+                  <div key={key} className="flex justify-between items-start border-b border-default pb-3 last:border-0 last:pb-0">
                     <div className="flex-1 pr-4 text-left">
-                      <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
+                      <span className="text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider block">
                         {label}
                       </span>
                       {isEditing ? (
@@ -289,26 +290,26 @@ export const DefineMandate: React.FC = () => {
                             type="text"
                             value={editValue}
                             onChange={(e) => setEditValue(e.target.value)}
-                            className="w-full px-2 py-1 text-sm border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            className="w-full px-2 py-1 text-sm border border-default bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-1 focus:ring-brand-primary"
                           />
                           <button
                             onClick={() => handleSaveEdit(key)}
-                            className="bg-emerald-500 text-white p-1 rounded hover:bg-emerald-600 transition-colors"
+                            className="bg-brand-success text-white p-1.5 rounded-md hover:bg-brand-success/80 transition-colors cursor-pointer"
                           >
-                            <Check className="h-4.5 w-4.5" />
+                            <Check className="h-4 w-4" />
                           </button>
                         </div>
                       ) : (
                         <div className="flex items-center gap-1.5 mt-1">
-                          <span className="text-base font-bold text-slate-800 dark:text-slate-200">
+                          <span className="text-sm font-bold text-primary leading-tight">
                             {mandate[key]}
                           </span>
                           <button
                             onClick={() => handleStartEdit(key)}
-                            className="text-slate-350 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-350 p-0.5 rounded transition-colors cursor-pointer"
+                            className="text-slate-350 dark:text-slate-500 hover:text-slate-650 dark:hover:text-slate-350 p-0.5 rounded transition-colors cursor-pointer"
                             aria-label={`Edit ${label}`}
                           >
-                            <Edit2 className="h-3.5 w-3.5" />
+                            <Edit2 className="h-3 w-3" />
                           </button>
                         </div>
                       )}

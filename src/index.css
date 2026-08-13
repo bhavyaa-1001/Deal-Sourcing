@@ -7,41 +7,41 @@
 @theme {
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   
-  --color-brand-primary: #1D4ED8;
-  --color-brand-primary-hover: #1E40AF;
-  --color-brand-primary-light: #F0F6FF;
-  --color-brand-primary-dark: #1E3A8A;
+  --color-brand-primary: #1C2B39;
+  --color-brand-primary-hover: #14212C;
+  --color-brand-primary-light: #EDF1F4;
+  --color-brand-primary-dark: #0B131A;
   
-  --color-brand-success: #15803D;
-  --color-brand-success-light: #F0FDF4;
+  --color-brand-success: #3F6B52;
+  --color-brand-success-light: #EDF3EE;
   
-  --color-brand-warning: #D97706;
-  --color-brand-warning-light: #FEF3C7;
+  --color-brand-warning: #927344;
+  --color-brand-warning-light: #F4EFE5;
   
-  --color-brand-danger: #B91C1C;
-  --color-brand-danger-light: #FEE2E2;
+  --color-brand-danger: #98554D;
+  --color-brand-danger-light: #F5ECEA;
 }
 
 @layer base {
   :root {
-    --bg-app: #F8F9FA;
+    --bg-app: #F3F1EC;
     --bg-card: #FFFFFF;
-    --text-primary: #172033;
-    --text-secondary: #475569;
-    --border-color: #E5E7EB;
-    --shadow-color: rgba(23, 32, 51, 0.015);
+    --text-primary: #1C2B39;
+    --text-secondary: #52606D;
+    --border-color: #D8D9D6;
+    --shadow-color: rgba(28, 43, 57, 0.01);
     
     font-size: 16px;
     line-height: 1.6;
   }
 
   .dark {
-    --bg-app: #0B0F19;
-    --bg-card: #151B2C;
-    --text-primary: #F8FAFC;
-    --text-secondary: #94A3B8;
-    --border-color: #1E293B;
-    --shadow-color: rgba(0, 0, 0, 0.2);
+    --bg-app: #111820;
+    --bg-card: #18222C;
+    --text-primary: #F3F4F6;
+    --text-secondary: #AEB7C0;
+    --border-color: #2B3640;
+    --shadow-color: rgba(0, 0, 0, 0.15);
   }
 
   body {

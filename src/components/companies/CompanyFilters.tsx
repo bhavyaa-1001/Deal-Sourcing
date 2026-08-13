@@ -49,7 +49,7 @@ export const CompanyFilters: React.FC<CompanyFiltersProps> = ({
             value={filters.search}
             onChange={handleSearchChange}
             placeholder="Search companies by name, activity, location, key terms..."
-            className="w-full pl-10 pr-4 py-3 text-base rounded-md border border-default bg-card text-primary focus-ring focus:border-brand-primary transition-all duration-200 min-h-[46px]"
+            className="w-full pl-10 pr-4 py-3 text-base rounded-md border border-default bg-card text-primary focus-ring focus:border-brand-primary transition-all duration-200 min-h-[48px]"
           />
         </div>
 
@@ -97,14 +97,14 @@ export const CompanyFilters: React.FC<CompanyFiltersProps> = ({
       >
         {/* Industry Filter */}
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="filter-industry" className="text-sm font-semibold text-secondary">
+          <label htmlFor="filter-industry" className="text-[15px] font-bold text-secondary">
             Industry
           </label>
           <select
             id="filter-industry"
             value={filters.industry}
             onChange={(e) => handleSelectChange('industry', e.target.value)}
-            className="px-3 py-2 text-base rounded border border-default bg-card text-primary focus-ring"
+            className="px-3 py-2.5 text-base rounded-md border border-default bg-card text-primary focus-ring min-h-[46px]"
           >
             <option value="">All Industries</option>
             {uniqueOptions.industries.map(ind => (
@@ -115,14 +115,14 @@ export const CompanyFilters: React.FC<CompanyFiltersProps> = ({
 
         {/* Location Filter */}
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="filter-location" className="text-sm font-semibold text-secondary">
+          <label htmlFor="filter-location" className="text-[15px] font-bold text-secondary">
             Location (State)
           </label>
           <select
             id="filter-location"
             value={filters.location}
             onChange={(e) => handleSelectChange('location', e.target.value)}
-            className="px-3 py-2 text-base rounded border border-default bg-card text-primary focus-ring"
+            className="px-3 py-2.5 text-base rounded-md border border-default bg-card text-primary focus-ring min-h-[46px]"
           >
             <option value="">All States</option>
             {uniqueOptions.locations.map(loc => (
@@ -133,14 +133,14 @@ export const CompanyFilters: React.FC<CompanyFiltersProps> = ({
 
         {/* Revenue Filter */}
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="filter-revenue" className="text-sm font-semibold text-secondary">
+          <label htmlFor="filter-revenue" className="text-[15px] font-bold text-secondary">
             Revenue Range
           </label>
           <select
             id="filter-revenue"
             value={filters.revenue}
             onChange={(e) => handleSelectChange('revenue', e.target.value)}
-            className="px-3 py-2 text-base rounded border border-default bg-card text-primary focus-ring"
+            className="px-3 py-2.5 text-base rounded-md border border-default bg-card text-primary focus-ring min-h-[46px]"
           >
             <option value="">Any Revenue</option>
             <option value="$5M – $15M">$5M – $15M</option>
@@ -154,14 +154,14 @@ export const CompanyFilters: React.FC<CompanyFiltersProps> = ({
 
         {/* Employee Filter */}
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="filter-employees" className="text-sm font-semibold text-secondary">
+          <label htmlFor="filter-employees" className="text-[15px] font-bold text-secondary">
             Employees Size
           </label>
           <select
             id="filter-employees"
             value={filters.employees}
             onChange={(e) => handleSelectChange('employees', e.target.value)}
-            className="px-3 py-2 text-base rounded border border-default bg-card text-primary focus-ring"
+            className="px-3 py-2.5 text-base rounded-md border border-default bg-card text-primary focus-ring min-h-[46px]"
           >
             <option value="">Any Size</option>
             <option value="20 – 35">20 – 35</option>
@@ -175,14 +175,14 @@ export const CompanyFilters: React.FC<CompanyFiltersProps> = ({
 
         {/* Ownership Filter */}
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="filter-ownership" className="text-sm font-semibold text-secondary">
+          <label htmlFor="filter-ownership" className="text-[15px] font-bold text-secondary">
             Ownership Structure
           </label>
           <select
             id="filter-ownership"
             value={filters.ownership}
             onChange={(e) => handleSelectChange('ownership', e.target.value)}
-            className="px-3 py-2 text-base rounded border border-default bg-card text-primary focus-ring"
+            className="px-3 py-2.5 text-base rounded-md border border-default bg-card text-primary focus-ring min-h-[46px]"
           >
             <option value="">Any Ownership</option>
             {uniqueOptions.ownerships.map(own => (
@@ -193,14 +193,14 @@ export const CompanyFilters: React.FC<CompanyFiltersProps> = ({
 
         {/* Fit Level Filter */}
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="filter-fit" className="text-sm font-semibold text-secondary">
+          <label htmlFor="filter-fit" className="text-[15px] font-bold text-secondary">
             Acquisition Fit
           </label>
           <select
             id="filter-fit"
             value={filters.fitLevel}
             onChange={(e) => handleSelectChange('fitLevel', e.target.value)}
-            className="px-3 py-2 text-base rounded border border-default bg-card text-primary focus-ring"
+            className="px-3 py-2.5 text-base rounded-md border border-default bg-card text-primary focus-ring min-h-[46px]"
           >
             <option value="">All fits</option>
             <option value="HIGH FIT">HIGH FIT</option>
@@ -211,14 +211,14 @@ export const CompanyFilters: React.FC<CompanyFiltersProps> = ({
 
         {/* Confidence Filter */}
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="filter-confidence" className="text-sm font-semibold text-secondary">
+          <label htmlFor="filter-confidence" className="text-[15px] font-bold text-secondary">
             Match Confidence
           </label>
           <select
             id="filter-confidence"
             value={filters.confidence}
             onChange={(e) => handleSelectChange('confidence', e.target.value)}
-            className="px-3 py-2 text-base rounded border border-default bg-card text-primary focus-ring"
+            className="px-3 py-2.5 text-base rounded-md border border-default bg-card text-primary focus-ring min-h-[46px]"
           >
             <option value="">Any Confidence</option>
             <option value="90">90%+ Match</option>

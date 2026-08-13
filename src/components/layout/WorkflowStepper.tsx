@@ -77,22 +77,22 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
                         w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm border
                         transition-all duration-200 shrink-0
                         ${isCompleted
-                          ? 'bg-brand-success-light text-emerald-800 border-brand-success dark:bg-emerald-950/20 dark:text-emerald-400'
+                          ? 'bg-brand-success-light text-brand-success border-brand-success dark:bg-emerald-950/20 dark:text-brand-success'
                           : isActive
                             ? 'bg-brand-primary text-white border-brand-primary shadow-sm'
-                            : 'bg-slate-50 text-slate-450 border-slate-200 dark:bg-slate-900 dark:text-slate-500 dark:border-slate-800'
+                            : 'bg-slate-50 text-slate-400 border-slate-200 dark:bg-slate-900 dark:text-slate-500 dark:border-slate-800'
                         }
                       `}
                     >
-                      {isCompleted ? <Check className="h-4 w-4 stroke-[3px]" /> : step.number}
+                      {isCompleted ? <Check className="h-4 w-4 stroke-[3px]" /> : `0${step.number}`}
                     </span>
 
                     {/* Step Label */}
                     <span className="flex flex-col pr-2 text-left">
-                      <span className={`text-sm font-bold leading-tight ${isActive ? 'text-brand-primary' : 'text-slate-850 dark:text-slate-200 font-semibold'}`}>
+                      <span className={`text-base font-bold leading-tight ${isActive ? 'text-brand-primary' : 'text-slate-850 dark:text-slate-200 font-semibold'}`}>
                         {step.label}
                       </span>
-                      <span className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 font-medium leading-none">
+                      <span className="text-xs md:text-sm text-slate-400 dark:text-slate-500 mt-0.5 font-medium leading-none">
                         {step.description}
                       </span>
                     </span>

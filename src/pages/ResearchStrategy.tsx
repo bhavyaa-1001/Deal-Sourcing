@@ -178,19 +178,19 @@ export const ResearchStrategy: React.FC = () => {
         <div className="lg:col-span-5 flex flex-col gap-6">
           
           {/* Research Sources card */}
-          <Card className="p-6 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex flex-col gap-4">
-            <h3 className="text-base font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
-              <Database className="h-5 w-5 text-slate-500 dark:text-slate-400" />
+          <Card className="p-6 border border-default bg-card shadow-none flex flex-col gap-4">
+            <h3 className="text-base font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2 border-b border-default pb-3">
+              <Database className="h-5 w-5 text-slate-450 dark:text-slate-500" />
               Research Sources
             </h3>
             <div className="flex flex-col gap-3">
               {strategy.sources.map((src) => (
-                <div key={src.id} className="flex justify-between items-center p-3 border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/20 rounded-lg">
+                <div key={src.id} className="flex justify-between items-center p-3 border border-default bg-white dark:bg-slate-900 rounded">
                   <div className="text-left">
                     <span className="text-sm font-bold text-slate-800 dark:text-slate-200 block">{src.name}</span>
                     <span className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 block">Coverage: {src.type}</span>
                   </div>
-                  <Badge variant={src.status === 'VALIDATED' ? 'success' : 'neutral'} className="text-xs font-bold px-2 py-0.5 border-none uppercase">
+                  <Badge variant={src.status === 'VALIDATED' ? 'success' : 'neutral'} className="text-xs font-bold px-2 py-0.5 uppercase">
                     {src.status === 'VALIDATED' ? 'Validated' : 'Pending'}
                   </Badge>
                 </div>
@@ -199,9 +199,9 @@ export const ResearchStrategy: React.FC = () => {
           </Card>
 
           {/* Gaps Acknowledgement card */}
-          <Card className="p-6 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex flex-col gap-4">
-            <h3 className="text-base font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
-              <AlertTriangle className="h-5 w-5 text-amber-500" />
+          <Card className="p-6 border border-default bg-card shadow-none flex flex-col gap-4">
+            <h3 className="text-base font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2 border-b border-default pb-3">
+              <AlertTriangle className="h-5 w-5 text-brand-warning" />
               Acknowledge Research Gaps
             </h3>
             <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
@@ -212,17 +212,17 @@ export const ResearchStrategy: React.FC = () => {
                 <button
                   key={gap.id}
                   onClick={() => toggleGap(gap.id)}
-                  className={`w-full flex items-start gap-3 p-3.5 border rounded-lg text-left transition-all cursor-pointer select-none
+                  className={`w-full flex items-start gap-3 p-3.5 border rounded text-left transition-all cursor-pointer select-none
                     ${gap.acknowledged 
-                      ? 'border-emerald-200 dark:border-emerald-800/40 bg-emerald-50/20 dark:bg-emerald-950/10 text-slate-800 dark:text-slate-200' 
-                      : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50/50 dark:hover:bg-slate-850/50 text-slate-700 dark:text-slate-300'
+                      ? 'border-brand-success/40 bg-brand-success-light dark:bg-brand-success-light/10 text-slate-800 dark:text-slate-200' 
+                      : 'border-default hover:border-slate-450 dark:hover:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50/50 dark:hover:bg-slate-850/50 text-slate-700 dark:text-slate-300'
                     }
                   `}
                 >
                   <div className={`h-5 w-5 rounded border flex items-center justify-center shrink-0 mt-0.5 transition-all
                     ${gap.acknowledged 
-                      ? 'bg-emerald-600 border-emerald-600 text-white' 
-                      : 'border-slate-350 dark:border-slate-700 bg-white dark:bg-slate-900 text-transparent'
+                      ? 'bg-brand-success border-brand-success text-white' 
+                      : 'border-slate-350 dark:border-slate-750 bg-white dark:bg-slate-900 text-transparent'
                     }
                   `}>
                     <Check className="h-3.5 w-3.5 stroke-[3px]" />

@@ -100,54 +100,54 @@ export const CompanyDiscovery: React.FC = () => {
 
       {/* 1. Metrics Cards (High level telemetry matching requirements) */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-left">
-        <Card className="flex items-center gap-4 border-l-4 border-l-slate-400">
-          <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-500">
-            <Database className="h-6 w-6" />
-          </div>
-          <div>
-            <span className="text-sm font-semibold text-secondary uppercase tracking-wider block">
+        <Card className="flex justify-between items-start p-5 border border-default bg-card rounded shadow-none">
+          <div className="flex flex-col gap-1.5 min-w-0 flex-1 pr-2">
+            <span className="text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider block">
               Discovered Targets
             </span>
-            <span className="text-2xl font-black text-primary block mt-0.5">
-              148 Companies
+            <span className="text-3xl font-bold text-primary block my-0.5">
+              148
             </span>
-            <span className="text-xs text-secondary block mt-0.5 font-medium">
-              Identified through crawlers & sources
+            <span className="text-xs text-secondary block leading-normal">
+              Companies identified through research sources
             </span>
+          </div>
+          <div className="p-2 bg-slate-50 dark:bg-slate-900 border border-default rounded text-slate-450 shrink-0">
+            <Database className="h-4.5 w-4.5" />
           </div>
         </Card>
         
-        <Card className="flex items-center gap-4 border-l-4 border-l-indigo-500">
-          <div className="p-3 bg-indigo-50 dark:bg-indigo-950/30 rounded-full text-indigo-500">
-            <Target className="h-6 w-6" />
-          </div>
-          <div>
-            <span className="text-sm font-semibold text-secondary uppercase tracking-wider block">
+        <Card className="flex justify-between items-start p-5 border border-default bg-card rounded shadow-none">
+          <div className="flex flex-col gap-1.5 min-w-0 flex-1 pr-2">
+            <span className="text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider block">
               Potential Fits
             </span>
-            <span className="text-2xl font-black text-primary block mt-0.5">
-              42 Candidates
+            <span className="text-3xl font-bold text-primary block my-0.5">
+              42
             </span>
-            <span className="text-xs text-secondary block mt-0.5 font-medium">
-              Validated against geography & activity
+            <span className="text-xs text-secondary block leading-normal">
+              Candidates matching initial criteria
             </span>
+          </div>
+          <div className="p-2 bg-slate-50 dark:bg-slate-900 border border-default rounded text-slate-450 shrink-0">
+            <Target className="h-4.5 w-4.5" />
           </div>
         </Card>
 
-        <Card className="flex items-center gap-4 border-l-4 border-l-brand-success">
-          <div className="p-3 bg-brand-success-light rounded-full text-brand-success">
-            <Award className="h-6 w-6" />
-          </div>
-          <div>
-            <span className="text-sm font-semibold text-secondary uppercase tracking-wider block">
+        <Card className="flex justify-between items-start p-5 border border-default bg-card rounded shadow-none">
+          <div className="flex flex-col gap-1.5 min-w-0 flex-1 pr-2">
+            <span className="text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider block">
               High Alignment
             </span>
-            <span className="text-2xl font-black text-primary block mt-0.5">
-              18 Targets
+            <span className="text-3xl font-bold text-primary block my-0.5">
+              18
             </span>
-            <span className="text-xs text-secondary block mt-0.5 font-medium">
-              90%+ match score and succession path
+            <span className="text-xs text-secondary block leading-normal">
+              Strong acquisition alignment targets
             </span>
+          </div>
+          <div className="p-2 bg-slate-50 dark:bg-slate-900 border border-default rounded text-slate-450 shrink-0">
+            <Award className="h-4.5 w-4.5" />
           </div>
         </Card>
       </div>
