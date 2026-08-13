@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { jsPDF } from 'jspdf';
 import { useCompanies } from '../hooks/useCompanies';
@@ -11,9 +11,9 @@ import LoadingState from '../components/ui/LoadingState';
 import Modal from '../components/ui/Modal';
 import Badge from '../components/ui/Badge';
 import {
-  ArrowLeft, CheckCircle2, FileDown, Layers, Lock, Unlock,
+  ArrowLeft, CheckCircle2, FileDown, Lock, Layers,
   FolderCheck, AlertCircle, Sparkles, Users,
-  Eye, EyeOff, RefreshCw
+  Eye, EyeOff, RefreshCw, ArrowRight, Send, Unlock
 } from 'lucide-react';
 
 export const ReviewResults: React.FC = () => {
@@ -27,11 +27,10 @@ export const ReviewResults: React.FC = () => {
     error,
     successMessage,
     toggleSelection,
+    clearSelection,
     enrichCompanies,
   } = useCompanies();
 
-  // Comparison state (select up to 4 for side-by-side view)
-  const [selectedForCompare, setSelectedForCompare] = useState<string[]>([]);
   const [compareModalOpen, setCompareModalOpen] = useState(false);
 
   // Detail modal state
@@ -49,14 +48,24 @@ export const ReviewResults: React.FC = () => {
   const displayCompanies = allCompaniesRaw.length > 0 ? allCompaniesRaw : companies;
   const activeCompany = displayCompanies.find(c => c.id === selectedCompanyId) || null;
 
+  // Auto-select when companies first load
+  useEffect(() => {
+    if (displayCompanies.length > 0 && selectedIds.length === 0) {
+      const allIds = displayCompanies.map(c => c.id);
+      allIds.forEach(id => toggleSelection(id));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [displayCompanies.length]);
+
+  const comparisonTargets = useMemo(() =>
+    displayCompanies.filter(c => selectedIds.includes(c.id)),
+    [displayCompanies, selectedIds]
+  );
+
   // Companies selected for enrichment payment
   const selectedCompanies = displayCompanies.filter(c => selectedIds.includes(c.id));
   // Not-yet-enriched selected companies
   const unenrichedSelected = selectedCompanies.filter(c => !enrichedIds.includes(c.id));
-
-  const comparisonTargets = useMemo(() => {
-    return displayCompanies.filter(c => selectedForCompare.includes(c.id));
-  }, [displayCompanies, selectedForCompare]);
 
   const metrics = useMemo(() => {
     const total = displayCompanies.length;
@@ -65,14 +74,6 @@ export const ReviewResults: React.FC = () => {
     const selected = selectedIds.length;
     return { total, highFit, enriched, selected };
   }, [displayCompanies, enrichedIds, selectedIds]);
-
-  const handleToggleCompare = (id: string) => {
-    setSelectedForCompare(prev => {
-      if (prev.includes(id)) return prev.filter(x => x !== id);
-      if (prev.length >= 4) return prev;
-      return [...prev, id];
-    });
-  };
 
   const handleEnrichConfirm = async (ids: string[]) => {
     await enrichCompanies(ids);
@@ -161,23 +162,9 @@ export const ReviewResults: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-8">
-      {/* Title */}
-      <div className="text-left flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-3xl font-extrabold text-primary tracking-tight">Review Acquisition Candidates</h2>
-          <p className="text-lg text-secondary mt-2">
-            Select companies below and unlock enriched contact data — founder info, email, phone, and LinkedIn.
-          </p>
-        </div>
-        <Button
-          variant="outline"
-          onClick={handleExport}
-          leftIcon={<FileDown className="h-5 w-5" />}
-          className="self-start md:self-auto"
-          id="export-pdf-btn"
-        >
-          Export PDF Dossier
-        </Button>
+      {/* Title — heading only, no subtitle */}
+      <div className="text-left">
+        <h2 className="text-3xl font-extrabold text-primary tracking-tight">Review Acquisition Candidates</h2>
       </div>
 
       {/* Toasts */}
@@ -217,7 +204,7 @@ export const ReviewResults: React.FC = () => {
         </Card>
 
         <Card className="flex items-center gap-4 p-5">
-          <div className="p-3 bg-amber-100 dark:bg-amber-900/30 rounded-full text-amber-700 dark:text-amber-400 shrink-0">
+          <div className="p-3 bg-amber-100 dark:bg-amber-900/30 rounded-full text-amber-700 dark:amber-400 shrink-0">
             <AlertCircle className="h-6 w-6" />
           </div>
           <div>
@@ -267,79 +254,52 @@ export const ReviewResults: React.FC = () => {
           <table className="w-full border-collapse text-left text-sm md:text-base">
             <thead>
               <tr className="bg-slate-50 dark:bg-slate-900 border-b border-default text-primary font-bold text-xs md:text-sm uppercase tracking-wider">
-                <th className="px-2.5 py-3 w-10 text-center">Select</th>
-                <th className="px-2.5 py-3 w-10 text-center">Compare</th>
+                <th className="px-3 py-3 w-14 text-center text-[10px] font-bold text-secondary uppercase tracking-wide">Select</th>
                 <th className="px-3 py-3">Company</th>
                 <th className="px-3 py-3">Location</th>
                 <th className="px-3 py-3">Fit Score</th>
                 <th className="px-3 py-3">Revenue</th>
                 <th className="px-3 py-3">Employees</th>
-                <th className="px-3 py-3">Enrichment</th>
                 <th className="px-3 py-3 text-right pr-5">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-default text-primary">
               {displayCompanies.map(company => {
                 const isSelected = selectedIds.includes(company.id);
-                const isCompareSelected = selectedForCompare.includes(company.id);
                 const isEnriched = company.enrichmentStatus === 'enriched' || enrichedIds.includes(company.id);
                 const isProcessing = company.enrichmentStatus === 'processing';
                 const isExpanded = expandedCompanyIds.includes(company.id);
 
                 return (
                   <React.Fragment key={company.id}>
-                    {/* Main Company Row */}
                     <tr
                       id={`company-row-${company.id}`}
                       className={`hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors duration-150 ${isSelected ? 'bg-blue-50/30 dark:bg-blue-950/10' : ''}`}
                     >
-                      {/* Select for enrichment */}
-                      <td className="px-2.5 py-3.5 text-center">
-                        {isEnriched ? (
-                          <Unlock className="h-4.5 w-4.5 text-green-500 mx-auto" />
-                        ) : (
-                          <button
-                            onClick={() => toggleSelection(company.id)}
-                            disabled={isProcessing}
-                            className="focus-ring rounded p-0.5 cursor-pointer inline-flex items-center justify-center"
-                            aria-label={`Select ${company.name} for enrichment`}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={isSelected}
-                              onChange={() => {}}
-                              className="h-4.5 w-4.5 text-brand-primary rounded border-default focus-ring cursor-pointer"
-                            />
-                          </button>
-                        )}
-                      </td>
-
-                      {/* Compare checkbox */}
-                      <td className="px-2.5 py-3.5 text-center">
+                      <td className="px-3 py-3.5 text-center">
+                        {/* Single checkbox: selects + adds to compare in one click */}
                         <button
-                          onClick={() => handleToggleCompare(company.id)}
+                          onClick={() => toggleSelection(company.id)}
+                          disabled={isProcessing}
                           className="focus-ring rounded p-0.5 cursor-pointer inline-flex items-center justify-center"
-                          aria-label={`Select ${company.name} for comparison`}
+                          aria-label={`Select ${company.name}`}
                         >
                           <input
                             type="checkbox"
-                            checked={isCompareSelected}
+                            checked={isSelected}
                             onChange={() => {}}
-                            className="h-4.5 w-4.5 text-indigo-600 rounded border-default focus-ring cursor-pointer"
+                            className="h-4 w-4 accent-blue-600 rounded border-default cursor-pointer"
                           />
                         </button>
                       </td>
 
-                      {/* Company */}
                       <td className="px-3 py-3.5 font-bold">
                         <span className="text-primary text-sm md:text-base">{company.name}</span>
                         <span className="text-xs text-secondary block mt-0.5 font-semibold">{company.industry}</span>
                       </td>
 
-                      {/* Location */}
                       <td className="px-3 py-3.5 text-secondary font-semibold text-xs md:text-sm">{company.location}</td>
 
-                      {/* Fit */}
                       <td className="px-3 py-3.5">
                         <div className="flex items-center gap-1">
                           {company.fitLevel === 'HIGH FIT' && <Badge variant="success" className="text-[10px] px-1 py-0.5">HIGH</Badge>}
@@ -349,24 +309,10 @@ export const ReviewResults: React.FC = () => {
                         </div>
                       </td>
 
-                      {/* Revenue */}
                       <td className="px-3 py-3.5 font-bold text-slate-800 dark:text-slate-200 text-xs md:text-sm whitespace-nowrap">{company.revenueRange}</td>
 
-                      {/* Employees */}
                       <td className="px-3 py-3.5 text-secondary font-semibold text-xs md:text-sm">{company.employeeRange}</td>
 
-                      {/* Enrichment Status */}
-                      <td className="px-3 py-3.5">
-                        {isEnriched ? (
-                          <Badge variant="success" className="text-[10px] px-1.5 py-0.5">ENRICHED</Badge>
-                        ) : isProcessing ? (
-                          <Badge variant="warning" className="text-[10px] px-1.5 py-0.5">ENRICHING...</Badge>
-                        ) : (
-                          <Badge variant="neutral" className="text-[10px] px-1.5 py-0.5">LOCKED</Badge>
-                        )}
-                      </td>
-
-                      {/* Actions */}
                       <td className="px-3 py-3.5 text-right pr-5">
                         <div className="inline-flex gap-1.5 justify-end items-center">
                           <Button
@@ -394,13 +340,11 @@ export const ReviewResults: React.FC = () => {
                       </td>
                     </tr>
 
-                    {/* Inline Enriched Company Intelligence section */}
                     {isExpanded && (
                       <tr id={`enrich-details-${company.id}`} className="bg-slate-50/45 dark:bg-slate-900/10">
-                        <td colSpan={9} className="px-6 py-6 border-b border-default">
+                        <td colSpan={7} className="px-6 py-6 border-b border-default">
                           <div className="flex flex-col gap-6 text-left animate-fadeIn">
                             
-                            {/* Section Header */}
                             <div className="flex items-center justify-between border-b border-default pb-3">
                               <div className="flex items-center gap-2">
                                 <span className="text-sm font-extrabold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
@@ -417,12 +361,9 @@ export const ReviewResults: React.FC = () => {
                               )}
                             </div>
 
-                            {/* Info Layout */}
                             {isEnriched && company.enrichmentData ? (
                               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {/* Column 1: FOUNDER & PRIMARY CONTACT */}
                                 <div className="flex flex-col gap-5">
-                                  {/* FOUNDER */}
                                   <div className="bg-card border border-default p-4 rounded-lg">
                                     <h5 className="text-xs font-bold text-slate-450 uppercase tracking-wider mb-2 border-b border-default pb-1">
                                       Founder
@@ -435,8 +376,6 @@ export const ReviewResults: React.FC = () => {
                                       </p>
                                     </div>
                                   </div>
-
-                                  {/* PRIMARY CONTACT */}
                                   <div className="bg-card border border-default p-4 rounded-lg">
                                     <h5 className="text-xs font-bold text-slate-450 uppercase tracking-wider mb-2 border-b border-default pb-1">
                                       Primary Contact
@@ -448,9 +387,7 @@ export const ReviewResults: React.FC = () => {
                                   </div>
                                 </div>
 
-                                {/* Column 2: MANAGEMENT TEAM & CONTACT INFORMATION */}
                                 <div className="flex flex-col gap-5">
-                                  {/* MANAGEMENT TEAM */}
                                   <div className="bg-card border border-default p-4 rounded-lg">
                                     <h5 className="text-xs font-bold text-slate-450 uppercase tracking-wider mb-2 border-b border-default pb-1">
                                       Management Team
@@ -461,8 +398,6 @@ export const ReviewResults: React.FC = () => {
                                       ))}
                                     </ul>
                                   </div>
-
-                                  {/* CONTACT INFORMATION */}
                                   <div className="bg-card border border-default p-4 rounded-lg">
                                     <h5 className="text-xs font-bold text-slate-450 uppercase tracking-wider mb-2 border-b border-default pb-1">
                                       Contact Information
@@ -490,9 +425,7 @@ export const ReviewResults: React.FC = () => {
                                   </div>
                                 </div>
 
-                                {/* Column 3: COMPANY INFORMATION & SUCCESSION / ACQUISITION NOTES */}
                                 <div className="flex flex-col gap-5">
-                                  {/* COMPANY INFORMATION */}
                                   <div className="bg-card border border-default p-4 rounded-lg">
                                     <h5 className="text-xs font-bold text-slate-450 uppercase tracking-wider mb-2 border-b border-default pb-1">
                                       Company Information
@@ -512,8 +445,6 @@ export const ReviewResults: React.FC = () => {
                                       </div>
                                     </div>
                                   </div>
-
-                                  {/* SUCCESSION / ACQUISITION NOTES */}
                                   <div className="bg-card border border-default p-4 rounded-lg">
                                     <h5 className="text-xs font-bold text-slate-450 uppercase tracking-wider mb-2 border-b border-default pb-1">
                                       Succession / Acquisition Notes
@@ -543,9 +474,7 @@ export const ReviewResults: React.FC = () => {
                               </div>
                             ) : (
                               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {/* Column 1: FOUNDER & PRIMARY CONTACT */}
                                 <div className="flex flex-col gap-5">
-                                  {/* FOUNDER */}
                                   <div className="bg-card border border-default p-4 rounded-lg opacity-70">
                                     <h5 className="text-xs font-bold text-slate-455 uppercase tracking-wider mb-2 border-b border-default pb-1">
                                       Founder
@@ -556,8 +485,6 @@ export const ReviewResults: React.FC = () => {
                                       <p className="text-xs italic">Unlock with enrichment</p>
                                     </div>
                                   </div>
-
-                                  {/* PRIMARY CONTACT */}
                                   <div className="bg-card border border-default p-4 rounded-lg opacity-70">
                                     <h5 className="text-xs font-bold text-slate-455 uppercase tracking-wider mb-2 border-b border-default pb-1">
                                       Primary Contact
@@ -569,9 +496,7 @@ export const ReviewResults: React.FC = () => {
                                   </div>
                                 </div>
 
-                                {/* Column 2: MANAGEMENT TEAM & CONTACT INFORMATION */}
                                 <div className="flex flex-col gap-5">
-                                  {/* MANAGEMENT TEAM */}
                                   <div className="bg-card border border-default p-4 rounded-lg opacity-70">
                                     <h5 className="text-xs font-bold text-slate-455 uppercase tracking-wider mb-2 border-b border-default pb-1">
                                       Management Team
@@ -581,8 +506,6 @@ export const ReviewResults: React.FC = () => {
                                       <p className="text-xs italic">Unlock with enrichment</p>
                                     </div>
                                   </div>
-
-                                  {/* CONTACT INFORMATION */}
                                   <div className="bg-card border border-default p-4 rounded-lg opacity-70">
                                     <h5 className="text-xs font-bold text-slate-455 uppercase tracking-wider mb-2 border-b border-default pb-1">
                                       Contact Information
@@ -596,9 +519,7 @@ export const ReviewResults: React.FC = () => {
                                   </div>
                                 </div>
 
-                                {/* Column 3: COMPANY INFORMATION & NOTES */}
                                 <div className="flex flex-col gap-5">
-                                  {/* COMPANY INFORMATION */}
                                   <div className="bg-card border border-default p-4 rounded-lg">
                                     <h5 className="text-xs font-bold text-slate-455 uppercase tracking-wider mb-2 border-b border-default pb-1">
                                       Company Information
@@ -618,8 +539,6 @@ export const ReviewResults: React.FC = () => {
                                       </div>
                                     </div>
                                   </div>
-
-                                  {/* SUCCESSION / ACQUISITION NOTES */}
                                   <div className="bg-card border border-default p-4 rounded-lg">
                                     <h5 className="text-xs font-bold text-slate-455 uppercase tracking-wider mb-2 border-b border-default pb-1">
                                       Succession / Acquisition Notes
@@ -655,61 +574,94 @@ export const ReviewResults: React.FC = () => {
           </table>
         </div>
 
-        {/* Compare action bar */}
-        {selectedForCompare.length >= 2 && (
+        {/* Compare action bar — appears when 2+ companies are checked */}
+        {selectedIds.length >= 2 && (
           <div className="p-4 border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg flex items-center justify-between gap-4 animate-fadeIn">
             <span className="text-base text-indigo-800 dark:text-indigo-300 font-bold flex items-center gap-2">
               <Layers className="h-5 w-5" />
-              {selectedForCompare.length} companies selected for comparison
+              {selectedIds.length} companies selected for comparison
             </span>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={() => setSelectedForCompare([])}>Clear</Button>
+              <Button variant="outline" size="sm" onClick={() => clearSelection()}>Clear</Button>
               <Button variant="success" size="sm" onClick={() => setCompareModalOpen(true)} leftIcon={<Layers className="h-4 w-4" />}>
-                Compare ({selectedForCompare.length})
+                Compare ({selectedIds.length})
               </Button>
             </div>
           </div>
         )}
 
-        {/* Enrichment CTA bar */}
-        <div className={`p-5 rounded-lg border flex flex-col sm:flex-row items-center justify-between gap-4 ${unenrichedSelected.length > 0 ? 'bg-brand-primary-light border-brand-primary' : 'bg-slate-50 dark:bg-slate-900/30 border-default'}`}>
-          <div className="flex items-center gap-3">
-            <div className={`p-2.5 rounded-full ${unenrichedSelected.length > 0 ? 'bg-brand-primary text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-500'}`}>
-              <Users className="h-5 w-5" />
+        <div
+          className={`relative overflow-hidden rounded-xl border transition-all duration-300 ${
+            unenrichedSelected.length > 0
+              ? 'border-blue-300 dark:border-blue-700 shadow-lg shadow-blue-100 dark:shadow-blue-900/20'
+              : 'border-default'
+          }`}
+        >
+          <div
+            className={`absolute inset-0 ${
+              unenrichedSelected.length > 0
+                ? 'bg-gradient-to-r from-blue-600/10 via-indigo-600/8 to-purple-600/10 dark:from-blue-900/30 dark:via-indigo-900/20 dark:to-purple-900/30'
+                : 'bg-slate-50 dark:bg-slate-900/30'
+            }`}
+          />
+          <div className="relative flex flex-col sm:flex-row items-center justify-between gap-4 p-5">
+            <div className="flex items-center gap-4">
+              <div
+                className={`relative p-3 rounded-xl shrink-0 ${
+                  unenrichedSelected.length > 0
+                    ? 'bg-gradient-to-br from-blue-500 to-indigo-600 shadow-md shadow-blue-200 dark:shadow-blue-900/40'
+                    : 'bg-slate-200 dark:bg-slate-700'
+                }`}
+              >
+                <Users className={`h-5 w-5 ${unenrichedSelected.length > 0 ? 'text-white' : 'text-slate-500'}`} />
+                {unenrichedSelected.length > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 h-4 w-4 rounded-full bg-amber-400 text-[9px] font-black text-slate-900 flex items-center justify-center shadow">
+                    {unenrichedSelected.length}
+                  </span>
+                )}
+              </div>
+              <div className="text-left">
+                <p className={`text-base font-bold ${unenrichedSelected.length > 0 ? 'text-blue-800 dark:text-blue-200' : 'text-secondary'}`}>
+                  {unenrichedSelected.length > 0
+                    ? `${unenrichedSelected.length} ${unenrichedSelected.length === 1 ? 'company' : 'companies'} ready for enrichment`
+                    : 'Select companies above to enrich them'}
+                </p>
+                <p className="text-xs text-secondary mt-0.5">
+                  {unenrichedSelected.length > 0
+                    ? `Total cost: ₹${(unenrichedSelected.length * 500).toLocaleString('en-IN')} — unlocks founder info, emails & LinkedIn`
+                    : 'Tick the top checkbox in each row to add companies to the enrichment queue'}
+                </p>
+              </div>
             </div>
-            <div className="text-left">
-              <p className={`text-base font-bold ${unenrichedSelected.length > 0 ? 'text-brand-primary-dark dark:text-brand-primary' : 'text-secondary'}`}>
-                {unenrichedSelected.length > 0
-                  ? `${unenrichedSelected.length} ${unenrichedSelected.length === 1 ? 'company' : 'companies'} ready for enrichment`
-                  : 'Select companies above to enrich them'}
-              </p>
-              <p className="text-xs text-secondary mt-0.5">
-                {unenrichedSelected.length > 0
-                  ? `Total cost: ₹${(unenrichedSelected.length * 500).toLocaleString('en-IN')}`
-                  : 'Tick the checkbox column to add companies to enrichment queue'}
-              </p>
-            </div>
+
+            <button
+              disabled={unenrichedSelected.length === 0}
+              onClick={() => setEnrichModalOpen(true)}
+              id="enrich-selected-btn"
+              className={`
+                relative shrink-0 min-w-[220px] flex items-center justify-center gap-2.5
+                px-6 py-3 rounded-xl font-bold text-sm transition-all duration-200
+                focus:outline-none focus:ring-2 focus:ring-offset-2
+                ${unenrichedSelected.length > 0
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-200 dark:shadow-blue-900/40 focus:ring-blue-500 cursor-pointer active:scale-95'
+                  : 'bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed'
+                }
+              `}
+            >
+              <Lock className="h-4 w-4 shrink-0" />
+              {unenrichedSelected.length > 0
+                ? `Enrich ${unenrichedSelected.length} Selected ${unenrichedSelected.length === 1 ? 'Company' : 'Companies'}`
+                : 'Enrich Selected Companies'}
+            </button>
           </div>
-          <Button
-            variant="primary"
-            disabled={unenrichedSelected.length === 0}
-            onClick={() => setEnrichModalOpen(true)}
-            leftIcon={<Lock className="h-5 w-5" />}
-            className="shrink-0 min-w-[220px]"
-            id="enrich-selected-btn"
-          >
-            Enrich {unenrichedSelected.length > 0 ? `${unenrichedSelected.length} Selected` : 'Selected Companies'}
-          </Button>
         </div>
       </div>
 
-      {/* Company Detail Modal */}
       <CompanyDetails
         company={activeCompany}
         isOpen={selectedCompanyId !== null}
         onClose={() => setSelectedCompanyId(null)}
         onEnrich={(id) => {
-          // Single-company enrichment from detail modal
           if (!enrichedIds.includes(id)) {
             toggleSelection(id);
             setSelectedCompanyId(null);
@@ -731,7 +683,6 @@ export const ReviewResults: React.FC = () => {
         <CompanyComparison companies={comparisonTargets} />
       </Modal>
 
-      {/* Enrichment Payment Modal */}
       <EnrichmentPaymentModal
         isOpen={enrichModalOpen}
         companies={unenrichedSelected}
@@ -739,8 +690,8 @@ export const ReviewResults: React.FC = () => {
         onConfirm={handleEnrichConfirm}
       />
 
-      {/* Page Footer Navigation */}
-      <div className="border-t border-default pt-6 flex items-center justify-between mt-4">
+      {/* ── Page Footer Navigation — Export PDF + Continue to Outreach live here ── */}
+      <div className="border-t border-default pt-6 flex items-center justify-between mt-4 flex-wrap gap-3">
         <Button
           variant="outline"
           onClick={handleBack}
@@ -749,6 +700,35 @@ export const ReviewResults: React.FC = () => {
         >
           Back
         </Button>
+
+        <div className="flex items-center gap-3 flex-wrap">
+          <Button
+            variant="outline"
+            onClick={handleExport}
+            leftIcon={<FileDown className="h-5 w-5" />}
+            id="export-pdf-btn"
+          >
+            Export PDF Dossier
+          </Button>
+
+          <div className="flex flex-col items-end gap-1">
+            <Button
+              variant="primary"
+              onClick={() => navigate('/outreach')}
+              disabled={selectedIds.length === 0}
+              leftIcon={<Send className="h-4 w-4" />}
+              rightIcon={<ArrowRight className="h-4 w-4" />}
+              id="continue-to-outreach-btn"
+            >
+              Continue to Outreach
+            </Button>
+            {selectedIds.length === 0 && (
+              <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">
+                Select at least one company first
+              </span>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

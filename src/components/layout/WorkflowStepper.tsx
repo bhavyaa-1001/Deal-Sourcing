@@ -13,7 +13,8 @@ const STEPS: Step[] = [
   { number: 1, label: 'Define Mandate', description: 'Describe what you want to acquire', path: '/mandate' },
   { number: 2, label: 'Research Strategy', description: 'See how we will find deals', path: '/research' },
   { number: 3, label: 'Discover Companies', description: 'Explore matching opportunities', path: '/discover' },
-  { number: 4, label: 'Review Results', description: 'Shortlist and compare deals', path: '/review' }
+  { number: 4, label: 'Review Results', description: 'Shortlist and compare deals', path: '/review' },
+  { number: 5, label: 'Outreach', description: 'Create personalized messages for selected contacts', path: '/outreach' },
 ];
 
 interface WorkflowStepperProps {
@@ -37,7 +38,8 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
     if (stepNum === 1) return true;
     if (stepNum === 2) return mandateApproved;
     if (stepNum === 3) return mandateApproved && researchApproved;
-    if (stepNum === 4) return mandateApproved && researchApproved; // Shortlist review unlocked when discovery is unlocked
+    if (stepNum === 4) return mandateApproved && researchApproved;
+    if (stepNum === 5) return mandateApproved && researchApproved;
     return false;
   };
 
@@ -49,7 +51,7 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
 
   return (
     <div className="w-full bg-card border-b border-default sticky top-[72px] z-30 shadow-sm transition-all duration-200">
-      <div className="max-w-7xl mx-auto px-6 py-4">
+      <div className="max-w-7xl mx-auto px-6 py-2.5">
         {/* Desktop and Tablet Stepper Layout */}
         <nav aria-label="Progress Stepper" className="hidden md:block">
           <ol className="flex items-center justify-between w-full">
@@ -67,14 +69,14 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
                     onClick={() => handleStepClick(step)}
                     disabled={!isUnlocked}
                     className={`
-                      flex items-center gap-3 text-left focus-ring rounded p-2 transition-colors cursor-pointer
+                      flex items-center gap-2 text-left focus-ring rounded px-2 py-1.5 transition-colors cursor-pointer
                       disabled:cursor-not-allowed disabled:opacity-50 hover:bg-slate-100/50 dark:hover:bg-slate-800/30 shrink-0
                     `}
                   >
                     {/* Circle Indicator */}
                     <span
                       className={`
-                        w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm border
+                        w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs border
                         transition-all duration-200 shrink-0
                         ${isCompleted
                           ? 'bg-brand-success-light text-brand-success border-brand-success dark:bg-emerald-950/20 dark:text-brand-success'
@@ -84,25 +86,20 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
                         }
                       `}
                     >
-                      {isCompleted ? <Check className="h-4 w-4 stroke-[3px]" /> : `0${step.number}`}
+                      {isCompleted ? <Check className="h-3.5 w-3.5 stroke-[3px]" /> : `0${step.number}`}
                     </span>
 
-                    {/* Step Label */}
-                    <span className="flex flex-col pr-2 text-left">
-                      <span className={`text-base font-bold leading-tight ${isActive ? 'text-brand-primary' : 'text-slate-850 dark:text-slate-200 font-semibold'}`}>
-                        {step.label}
-                      </span>
-                      <span className="text-xs md:text-sm text-slate-400 dark:text-slate-500 mt-0.5 font-medium leading-none">
-                        {step.description}
-                      </span>
+                    {/* Step Label only — no description to keep it airy */}
+                    <span className={`text-sm font-semibold leading-tight whitespace-nowrap ${isActive ? 'text-brand-primary' : 'text-slate-700 dark:text-slate-300'}`}>
+                      {step.label}
                     </span>
                   </button>
                   
-                  {/* Premium connecting line between stages */}
+                  {/* Connecting line */}
                   {idx !== STEPS.length - 1 && (
                     <div
                       className={`
-                        flex-1 h-[1.5px] mx-2.5 rounded-full transition-colors duration-300
+                        flex-1 h-[1.5px] mx-1.5 rounded-full transition-colors duration-300
                         ${isCompleted 
                           ? 'bg-brand-success' 
                           : isStepUnlocked(step.number + 1) 
@@ -123,7 +120,7 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
           <div className="flex items-center justify-between mb-2">
             <div>
               <span className="text-xs font-bold uppercase tracking-wider text-brand-primary">
-                Step {currentStep} of 4
+                Step {currentStep} of 5
               </span>
               <h2 className="text-lg font-bold text-primary tracking-tight">
                 {STEPS[currentStep - 1]?.label}
@@ -141,7 +138,7 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
               </button>
               <button
                 onClick={() => handleStepClick(STEPS[currentStep])}
-                disabled={currentStep === 4 || !isStepUnlocked(currentStep + 1)}
+                disabled={currentStep === 5 || !isStepUnlocked(currentStep + 1)}
                 className="px-3 py-1.5 text-sm font-semibold rounded border border-default bg-card text-primary disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Next
@@ -153,7 +150,7 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
           <div className="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
             <div
               className="bg-brand-primary h-full transition-all duration-300"
-              style={{ width: `${(currentStep / 4) * 100}%` }}
+              style={{ width: `${(currentStep / 5) * 100}%` }}
             />
           </div>
         </div>

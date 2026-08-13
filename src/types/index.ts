@@ -143,3 +143,22 @@ export interface CompanyFilter {
   confidence: string;
 }
 
+// ─── Outreach ─────────────────────────────────────────────────────────────────
+
+export type OutreachChannel = 'email' | 'linkedin';
+
+export type OutreachScriptType = 'professional' | 'founder' | 'direct';
+
+export interface OutreachScript {
+  type: OutreachScriptType;
+  label: string;
+  subject: string;
+  body: string;
+}
+
+export interface OutreachSet {
+  companyId: string;
+  channel: OutreachChannel;
+  scripts: OutreachScript[];
+  generatedAt: string;
+}

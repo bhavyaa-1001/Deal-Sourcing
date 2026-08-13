@@ -4,6 +4,7 @@ import DefineMandate from './pages/DefineMandate';
 import ResearchStrategy from './pages/ResearchStrategy';
 import CompanyDiscovery from './pages/CompanyDiscovery';
 import ReviewResults from './pages/ReviewResults';
+import Outreach from './pages/Outreach';
 import { MandateHistoryProvider } from './context/MandateHistoryContext';
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
             <Route path="/research" element={<ResearchStrategy />} />
             <Route path="/discover" element={<CompanyDiscovery />} />
             <Route path="/review" element={<ReviewResults />} />
+            <Route path="/outreach" element={<Outreach />} />
             
             {/* Fallback 404 Route */}
             <Route path="*" element={<Navigate to="/mandate" replace />} />
