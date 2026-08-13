@@ -7,8 +7,6 @@ import {
   getCompanyEnrichment,
 } from '../api/enrichment';
 
-const SELECTED_KEY = 'dealsourcing_selected_ids';
-
 const initialFilters: CompanyFilter = {
   search: '',
   industry: '',
@@ -21,6 +19,9 @@ const initialFilters: CompanyFilter = {
 };
 
 export const useCompanies = () => {
+  const activeMandateId = localStorage.getItem('dealsourcing_mandates_active_id') || 'mandate-101';
+  const SELECTED_KEY = `dealsourcing_selected_ids_${activeMandateId}`;
+
   const [companies, setCompanies] = useState<Company[]>([]);
   const [enrichedIds, setEnrichedIds] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -33,7 +34,7 @@ export const useCompanies = () => {
 
   // Selection state (for Review Results enrichment)
   const [selectedIds, setSelectedIds] = useState<string[]>(() => {
-    const stored = localStorage.getItem(SELECTED_KEY);
+    const stored = localStorage.getItem(`dealsourcing_selected_ids_${activeMandateId}`);
     return stored ? JSON.parse(stored) : [];
   });
 
@@ -55,10 +56,16 @@ export const useCompanies = () => {
     fetchCompanies();
   }, [fetchCompanies]);
 
+  // Load selection state when active mandate changes
+  useEffect(() => {
+    const stored = localStorage.getItem(SELECTED_KEY);
+    setSelectedIds(stored ? JSON.parse(stored) : []);
+  }, [SELECTED_KEY]);
+
   // Persist selected IDs
   useEffect(() => {
     localStorage.setItem(SELECTED_KEY, JSON.stringify(selectedIds));
-  }, [selectedIds]);
+  }, [selectedIds, SELECTED_KEY]);
 
   // ─── Selection controls ───────────────────────────────────────────────────
 

@@ -1,8 +1,8 @@
-import React, { useState, useMemo, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
 import { useCompanies } from '../hooks/useCompanies';
 import { useMandate } from '../hooks/useMandate';
-import { generateOutreachScripts, regenerateOutreachMessage } from '../api/outreach';
+import { generateOutreachScripts, regenerateOutreachMessage, generateOutreachScriptsSync } from '../api/outreach';
 import type {
   OutreachChannel,
   OutreachScriptType,
@@ -208,7 +208,11 @@ const MessageCard: React.FC<MessageCardProps> = ({
 // ── Main page ─────────────────────────────────────────────────────────────────
 const Outreach: React.FC = () => {
   const navigate = useNavigate();
-  const { companies, allCompaniesRaw, enrichedIds, selectedIds, loading: companiesLoading } = useCompanies();
+  const { search } = useLocation();
+  const queryParams = useMemo(() => new URLSearchParams(search), [search]);
+  const urlCompanyId = queryParams.get('companyId');
+
+  const { companies, allCompaniesRaw, enrichedIds, selectedIds, loading: companiesLoading, toggleSelection } = useCompanies();
   const activeMandateId = localStorage.getItem('dealsourcing_mandates_active_id') || 'mandate-101';
   const { mandate, loading: mandateLoading } = useMandate(activeMandateId);
 
@@ -218,10 +222,26 @@ const Outreach: React.FC = () => {
     [displayCompanies, selectedIds]
   );
 
-  const [activeCompanyId, setActiveCompanyId] = useState<string | null>(() => {
-    const enrichedFirst = selectedCompanies.find(c => enrichedIds.includes(c.id));
-    return enrichedFirst?.id ?? selectedCompanies[0]?.id ?? null;
-  });
+  const { refreshSavedOutreach } = useOutletContext<any>() || {};
+
+  const [activeCompanyId, setActiveCompanyId] = useState<string | null>(null);
+
+  // Sync activeCompanyId from url parameter or select default
+  useEffect(() => {
+    if (urlCompanyId) {
+      setActiveCompanyId(urlCompanyId);
+    } else if (!activeCompanyId && selectedCompanies.length > 0) {
+      const enrichedFirst = selectedCompanies.find(c => enrichedIds.includes(c.id));
+      setActiveCompanyId(enrichedFirst?.id ?? selectedCompanies[0]?.id ?? null);
+    }
+  }, [urlCompanyId, selectedCompanies, enrichedIds, activeCompanyId]);
+
+  // Ensure urlCompanyId is selected/checked in this mandate
+  useEffect(() => {
+    if (urlCompanyId && !selectedIds.includes(urlCompanyId)) {
+      toggleSelection(urlCompanyId);
+    }
+  }, [urlCompanyId, selectedIds, toggleSelection]);
   const [channel, setChannel] = useState<OutreachChannel>('email');
   const [activeScriptType, setActiveScriptType] = useState<OutreachScriptType>('professional');
   const [outreachSets, setOutreachSets] = useState<Record<string, OutreachSet>>({});
@@ -230,11 +250,43 @@ const Outreach: React.FC = () => {
   const [generatingStep, setGeneratingStep] = useState('');
   const [regenerating, setRegenerating] = useState(false);
   const [researchOpen, setResearchOpen] = useState(false);
+  const [saveDropdownOpen, setSaveDropdownOpen] = useState(false);
 
   const activeCompany    = displayCompanies.find(c => c.id === activeCompanyId) ?? null;
   const isActiveEnriched = activeCompanyId ? enrichedIds.includes(activeCompanyId) : false;
   const activeOutreachSet = activeCompanyId ? outreachSets[activeCompanyId] : undefined;
   const hasScripts       = !!activeOutreachSet?.scripts?.length;
+
+  // Auto-generate scripts for all selected companies so they appear automatically (simulating backend generation)
+  useEffect(() => {
+    if (selectedCompanies.length > 0) {
+      const finalMandate = mandate || {
+        id: activeMandateId,
+        title: 'Plastics Manufacturing Mandate',
+        status: 'Approved',
+        rawInput: '',
+        objective: 'Search for plastics businesses',
+        geography: 'Australia',
+        targetIndustry: 'Plastics Manufacturing',
+      };
+      setOutreachSets(prev => {
+        let changed = false;
+        const next = { ...prev };
+        selectedCompanies.forEach(c => {
+          if (!next[c.id] && enrichedIds.includes(c.id)) {
+            next[c.id] = {
+              companyId: c.id,
+              channel: 'email',
+              scripts: generateOutreachScriptsSync(c, finalMandate, 'email'),
+              generatedAt: new Date().toISOString()
+            };
+            changed = true;
+          }
+        });
+        return changed ? next : prev;
+      });
+    }
+  }, [selectedCompanies, mandate, enrichedIds, activeMandateId]);
 
   const getScript = useCallback((type: OutreachScriptType): OutreachScript | null => {
     if (!hasScripts || !activeCompanyId) return null;
@@ -249,34 +301,93 @@ const Outreach: React.FC = () => {
     setResearchOpen(false);
   }, []);
 
-  const handleGenerate = useCallback(async () => {
+  const handleSaveAction = (actionType: 'single-new' | 'single-add' | 'full-new' | 'full-overwrite') => {
     if (!activeCompany) return;
+
+    const savedKey = 'dealsourcing_saved_outreach';
+    const stored = localStorage.getItem(savedKey);
+    let list: any[] = [];
+    if (stored) {
+      try {
+        list = JSON.parse(stored);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
     const finalMandate = mandate || {
       id: activeMandateId,
       title: 'Plastics Manufacturing Mandate',
-      status: 'Approved',
-      rawInput: '',
-      objective: 'Search for plastics businesses',
-      geography: 'Australia',
-      targetIndustry: 'Plastics Manufacturing',
     };
-    setGenerating(true);
-    setGeneratingStep(STEP_LABELS.researching);
-    try {
-      const scripts = await generateOutreachScripts(
-        activeCompany, finalMandate, channel,
-        (step) => setGeneratingStep(STEP_LABELS[step] ?? '')
-      );
-      setOutreachSets(prev => ({
-        ...prev,
-        [activeCompany.id]: { companyId: activeCompany.id, channel, scripts, generatedAt: new Date().toISOString() },
-      }));
-      setActiveScriptType('professional');
-    } finally {
-      setGenerating(false);
-      setGeneratingStep('');
+
+    const buildProspectItem = (comp: any) => {
+      const set = outreachSets[comp.id] || {
+        scripts: generateOutreachScriptsSync(comp, finalMandate, 'email')
+      };
+      return {
+        companyId: comp.id,
+        companyName: comp.name,
+        contactName: comp.enrichmentData?.contactPerson || comp.enrichmentData?.founderName || comp.name,
+        scripts: set.scripts.map(s => ({
+          type: s.type,
+          label: s.label,
+          subject: editedScripts[comp.id]?.[s.type]?.subject || s.subject,
+          body: editedScripts[comp.id]?.[s.type]?.body || s.body,
+        }))
+      };
+    };
+
+    if (actionType === 'single-new') {
+      const prospectName = activeCompany.enrichmentData?.contactPerson || activeCompany.name;
+      const newItem = {
+        id: `save-${Date.now()}`,
+        title: `Outreach - ${prospectName} (${new Date().toLocaleDateString()})`,
+        savedAt: new Date().toISOString(),
+        mandateId: activeMandateId,
+        prospects: [buildProspectItem(activeCompany)]
+      };
+      list.unshift(newItem);
+      alert(`Saved outreach for ${prospectName} as a new entry!`);
+    } else if (actionType === 'single-add') {
+      if (list.length === 0) {
+        handleSaveAction('single-new');
+        return;
+      }
+      const lastItem = list[0];
+      if (!lastItem.prospects.some((p: any) => p.companyId === activeCompany.id)) {
+        lastItem.prospects.push(buildProspectItem(activeCompany));
+        lastItem.savedAt = new Date().toISOString();
+        alert(`Added ${activeCompany.name} to "${lastItem.title}"!`);
+      } else {
+        alert(`${activeCompany.name} is already in the current save!`);
+      }
+    } else if (actionType === 'full-new') {
+      const newItem = {
+        id: `save-${Date.now()}`,
+        title: `Full Analysis - ${selectedCompanies.length} targets (${new Date().toLocaleDateString()})`,
+        savedAt: new Date().toISOString(),
+        mandateId: activeMandateId,
+        prospects: selectedCompanies.map(c => buildProspectItem(c))
+      };
+      list.unshift(newItem);
+      alert(`Saved full analysis with ${selectedCompanies.length} prospects!`);
+    } else if (actionType === 'full-overwrite') {
+      if (list.length === 0) {
+        handleSaveAction('full-new');
+        return;
+      }
+      const lastItem = list[0];
+      lastItem.prospects = selectedCompanies.map(c => buildProspectItem(c));
+      lastItem.savedAt = new Date().toISOString();
+      lastItem.title = `Full Analysis - ${selectedCompanies.length} targets (Updated)`;
+      alert(`Overwrote current save "${lastItem.title}" with full analysis!`);
     }
-  }, [activeCompany, mandate, channel, activeMandateId]);
+
+    localStorage.setItem(savedKey, JSON.stringify(list));
+    if (refreshSavedOutreach) {
+      refreshSavedOutreach();
+    }
+  };
 
   const handleRegenerate = useCallback(async (type: OutreachScriptType) => {
     if (!activeCompany) return;
@@ -346,12 +457,79 @@ const Outreach: React.FC = () => {
   return (
     <div className="flex flex-col gap-6 text-left">
 
-      {/* Page heading */}
-      <div>
-        <h2 className="text-3xl font-extrabold text-primary tracking-tight">Outreach Plan</h2>
-        <p className="text-base text-secondary mt-1">
-          Ultra-personalized messages for each selected prospect, based on in-depth research.
-        </p>
+      {/* Page heading with save actions dropdown */}
+      <div className="flex justify-between items-start gap-4 flex-wrap">
+        <div>
+          <h2 className="text-3xl font-extrabold text-primary tracking-tight">Outreach Plan</h2>
+          <p className="text-base text-secondary mt-1">
+            Ultra-personalized messages for each selected prospect, based on in-depth research.
+          </p>
+        </div>
+
+        {/* Dropdown save container */}
+        <div className="relative shrink-0 z-40">
+          <button
+            onClick={() => setSaveDropdownOpen(v => !v)}
+            className="flex items-center gap-1.5 px-3 py-2 border border-default bg-card hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-semibold rounded-lg text-primary cursor-pointer transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
+            title="Save options"
+          >
+            {/* Standard save icon and chevron */}
+            <svg className="h-4 w-4 text-[#A855F7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20" />
+            </svg>
+            <ChevronDown className="h-4 w-4 text-[#A855F7]" />
+          </button>
+
+          {saveDropdownOpen && (
+            <>
+              {/* Overlay click catcher */}
+              <div className="fixed inset-0 z-40" onClick={() => setSaveDropdownOpen(false)} />
+              
+              <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-slate-900 border border-default rounded-xl shadow-xl z-50 py-1.5 text-left divide-y divide-default animate-fadeIn">
+                <div className="py-1">
+                  <button
+                    onClick={() => { handleSaveAction('single-new'); setSaveDropdownOpen(false); }}
+                    className="w-full px-4 py-2 text-xs font-semibold text-primary hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 cursor-pointer text-left"
+                  >
+                    <svg className="h-4 w-4 text-[#A855F7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 13h6m-3-3v6m-9 1V4a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                    </svg>
+                    Save this prospect only (new save)
+                  </button>
+                  <button
+                    onClick={() => { handleSaveAction('single-add'); setSaveDropdownOpen(false); }}
+                    className="w-full px-4 py-2 text-xs font-semibold text-primary hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 cursor-pointer text-left"
+                  >
+                    <svg className="h-4 w-4 text-[#A855F7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Add this prospect to current save
+                  </button>
+                </div>
+                <div className="py-1">
+                  <button
+                    onClick={() => { handleSaveAction('full-new'); setSaveDropdownOpen(false); }}
+                    className="w-full px-4 py-2 text-xs font-semibold text-primary hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 cursor-pointer text-left"
+                  >
+                    <svg className="h-4 w-4 text-[#A855F7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                    </svg>
+                    Save full analysis (new save)
+                  </button>
+                  <button
+                    onClick={() => { handleSaveAction('full-overwrite'); setSaveDropdownOpen(false); }}
+                    className="w-full px-4 py-2 text-xs font-semibold text-primary hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 cursor-pointer text-left"
+                  >
+                    <svg className="h-4 w-4 text-[#A855F7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17m-6 3a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    Overwrite current save with full analysis
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {/* ── Contact tabs ─────────────────────────────────────────────────── */}
@@ -400,7 +578,7 @@ const Outreach: React.FC = () => {
           </Button>
         </div>
       ) : (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 animate-fadeIn">
 
           {/* Contact card */}
           <div className="border border-default rounded-xl px-5 py-4 bg-card flex items-center gap-4">
@@ -476,86 +654,35 @@ const Outreach: React.FC = () => {
             </div>
           </div>
 
-          {/* ── Scripts area ─────────────────────────────────────────────── */}
-          {!hasScripts ? (
-            <div className="border border-default rounded-xl p-10 flex flex-col items-center gap-5 text-center bg-card">
-              {generating ? (
-                <div className="flex flex-col items-center gap-4 py-4">
-                  <div className="flex gap-1.5">
-                    {[0, 1, 2].map(i => (
-                      <span
-                        key={i}
-                        className="w-2.5 h-2.5 rounded-full bg-brand-primary animate-bounce"
-                        style={{ animationDelay: `${i * 0.15}s` }}
-                      />
-                    ))}
-                  </div>
-                  <p className="text-secondary font-semibold text-base">{generatingStep}</p>
-                </div>
-              ) : (
-                <>
-                  <div className="p-4 bg-brand-primary-light dark:bg-blue-950/30 rounded-full">
-                    <Sparkles className="h-8 w-8 text-brand-primary" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-primary mb-1.5">Generate Outreach Messages</h3>
-                    <p className="text-secondary text-sm max-w-sm">
-                      Personalized messages for {activeCompany.enrichmentData?.contactPerson || activeCompany.name} using their profile
-                      and your acquisition mandate.
-                    </p>
-                  </div>
-
-                  {/* Channel toggle */}
-                  <div className="flex items-center gap-2 p-1 rounded-lg border border-default bg-slate-50 dark:bg-slate-900/50">
-                    {(['email', 'linkedin'] as OutreachChannel[]).map(ch => (
-                      <button
-                        key={ch}
-                        onClick={() => setChannel(ch)}
-                        className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md text-sm font-semibold transition-all ${
-                          channel === ch
-                            ? 'bg-card shadow text-primary border border-default'
-                            : 'text-secondary hover:text-primary'
-                        }`}
-                      >
-                        {ch === 'email' ? <Mail className="h-3.5 w-3.5" /> : <Link2 className="h-3.5 w-3.5" />}
-                        {ch === 'email' ? 'Email' : 'LinkedIn'}
-                      </button>
-                    ))}
-                  </div>
-
-                  <Button variant="primary" onClick={handleGenerate} leftIcon={<Sparkles className="h-4 w-4" />}>
-                    Generate Outreach
-                  </Button>
-                </>
-              )}
-            </div>
-          ) : (
-            /* ── Generated scripts — one card per script ─────────────────── */
+          {/* ── Generated scripts (displayed automatically without generate button) ── */}
+          {hasScripts && activeOutreachSet && (
             <div className="flex flex-col gap-4">
-              {activeOutreachSet!.scripts.map(script => {
+              {activeOutreachSet.scripts.map(script => {
                 const scriptObj = getScript(script.type);
                 if (!scriptObj) return null;
 
-                // Determine icon and label per type
                 let iconKey = 'email';
                 let cardLabel = script.label;
                 let angleNote: string | undefined;
                 let ctaNote: string | undefined;
+                let cardChannel: OutreachChannel = 'email';
 
                 if (script.type === 'professional') {
                   iconKey = 'email';
                   cardLabel = 'Email';
+                  cardChannel = 'email';
                 } else if (script.type === 'direct') {
                   iconKey = 'linkedin';
                   cardLabel = 'LinkedIn Message';
+                  cardChannel = 'linkedin';
                   angleNote = `${activeCompany.name}'s public announcements and recent activities.`;
                 } else if (script.type === 'founder') {
                   iconKey = 'followup';
                   cardLabel = 'Follow-up Email';
-                  angleNote = `Angle: Different angle — personal founder-to-founder connection.`;
+                  cardChannel = 'email';
+                  angleNote = `Angle: Different angle on geographic fit and cross-border venture exposure rather than AI theme overlap.`;
                 }
 
-                // Extract CTA from body if present (last line that starts with CTA: pattern)
                 const bodyLines = scriptObj.body.split('\n');
                 const ctaLine = bodyLines.find(l => l.toLowerCase().startsWith('cta:') || l.toLowerCase().includes('worth a') || l.toLowerCase().includes('intro call'));
                 if (ctaLine) ctaNote = `CTA: ${ctaLine.replace(/^CTA:\s*/i, '')}`;
@@ -564,7 +691,7 @@ const Outreach: React.FC = () => {
                   <MessageCard
                     key={script.type}
                     script={scriptObj}
-                    channel={activeOutreachSet!.channel}
+                    channel={cardChannel}
                     label={cardLabel}
                     angleNote={angleNote}
                     ctaNote={ctaNote}

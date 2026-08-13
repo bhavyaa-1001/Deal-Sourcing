@@ -10,7 +10,19 @@ import Button from '../ui/Button';
 import { FileText, Settings, Search, CheckSquare, Trash2 } from 'lucide-react';
 import { useMandateHistory } from '../../context/MandateHistoryContext';
 
-const SidebarContent: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
+interface SidebarContentProps {
+  onClose?: () => void;
+  savedOutreachList: any[];
+  onSelectSaved: (item: any) => void;
+  onDeleteSaved: (id: string) => void;
+}
+
+const SidebarContent: React.FC<SidebarContentProps> = ({
+  onClose,
+  savedOutreachList,
+  onSelectSaved,
+  onDeleteSaved
+}) => {
   const { mandates, activeId, selectMandate, createNewMandate, deleteMandate } = useMandateHistory();
   const navigate = useNavigate();
 
@@ -26,8 +38,46 @@ const SidebarContent: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
     if (onClose) onClose();
   };
 
+  const handleSavedProspectClick = (mandateId: string, companyId: string) => {
+    let originalMandateId = mandateId;
+    
+    // If mandateId is missing or invalid, scan recent mandates to see where this company is selected/enriched
+    const mandateExists = mandates.some(m => m.id === originalMandateId);
+    if (!originalMandateId || !mandateExists) {
+      for (const m of mandates) {
+        try {
+          const selectedStored = localStorage.getItem(`dealsourcing_selected_ids_${m.id}`);
+          if (selectedStored) {
+            const ids = JSON.parse(selectedStored);
+            if (ids.includes(companyId)) {
+              originalMandateId = m.id;
+              break;
+            }
+          }
+          const enrichedStored = localStorage.getItem(`dealsourcing_enriched_ids_${m.id}`);
+          if (enrichedStored) {
+            const ids = JSON.parse(enrichedStored);
+            if (ids.includes(companyId)) {
+              originalMandateId = m.id;
+              break;
+            }
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+
+    const currentActiveId = localStorage.getItem('dealsourcing_mandates_active_id') || 'mandate-101';
+    const targetMandateId = mandates.some(m => m.id === originalMandateId) ? originalMandateId : currentActiveId;
+    
+    selectMandate(targetMandateId);
+    navigate(`/outreach?companyId=${companyId}`);
+    if (onClose) onClose();
+  };
+
   return (
-    <div className="flex flex-col h-full text-left">
+    <div className="flex flex-col h-full text-left select-none">
       <div className="mb-4">
         <span className="text-[13px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
           MANDATES
@@ -45,7 +95,7 @@ const SidebarContent: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
         RECENT MANDATES
       </span>
 
-      <div className="flex-1 overflow-y-auto flex flex-col gap-3 pr-1">
+      <div className="flex flex-col gap-3 pr-1">
         {mandates.map((m) => {
           const isActive = m.id === activeId;
           const dateStr = new Date(m.createdAt).toLocaleDateString([], {
@@ -61,7 +111,7 @@ const SidebarContent: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
               key={m.id}
               className={`group relative w-full p-4 rounded-md border text-left transition-all flex flex-col gap-1.5
                 ${isActive
-                  ? 'border-brand-primary bg-slate-50 dark:bg-slate-800 text-primary shadow-sm'
+                  ? 'border-brand-primary bg-purple-50/50 dark:bg-purple-950/20 text-primary shadow-md'
                   : 'border-default bg-card text-secondary hover:bg-slate-50/50 dark:hover:bg-slate-800/40'
                 }
               `}
@@ -71,10 +121,15 @@ const SidebarContent: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
                 onClick={() => handleSelect(m.id)}
                 className="flex-1 cursor-pointer"
               >
-                <div className="flex justify-between items-start gap-2 pr-6">
-                  <span className={`font-bold text-[15px] leading-tight block truncate text-primary ${isActive ? 'font-extrabold' : ''}`}>
+                <div className="flex justify-between items-center gap-2 pr-6">
+                  <span className={`font-bold text-[15px] leading-tight block truncate text-primary ${isActive ? 'font-extrabold text-brand-primary' : ''}`}>
                     {m.title}
                   </span>
+                  {isActive && (
+                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-brand-primary-light text-brand-primary border border-brand-primary/20 font-extrabold uppercase shrink-0">
+                      Selected
+                    </span>
+                  )}
                 </div>
 
                 <div className="text-xs text-secondary mt-0.5 leading-snug pr-6">
@@ -119,6 +174,60 @@ const SidebarContent: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
           );
         })}
       </div>
+
+      {/* SAVED OUTREACH section */}
+      <div className="mt-6 mb-2 border-t border-default pt-5">
+        <span className="text-[13px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-3">
+          SAVED OUTREACH
+        </span>
+        <div className="flex flex-col gap-2.5 pr-1">
+          {savedOutreachList.length === 0 ? (
+            <span className="text-xs text-slate-455 italic block py-1.5">No saved outreach yet.</span>
+          ) : (
+            savedOutreachList.map((item) => (
+              <div
+                key={item.id}
+                className="w-full flex flex-col gap-1.5 p-3 rounded border border-default bg-card hover:bg-slate-50/50 dark:hover:bg-slate-800/40 text-xs font-semibold transition-all"
+              >
+                <div className="flex items-center justify-between gap-2 border-b border-default pb-1.5 select-none">
+                  <div
+                    className="flex-1 text-left truncate text-primary font-bold text-[13px]"
+                    title={item.title}
+                  >
+                    {item.title}
+                  </div>
+                  
+                  <button
+                    onClick={() => {
+                      if (window.confirm(`Are you sure you want to delete this saved outreach: "${item.title}"?`)) {
+                        onDeleteSaved(item.id);
+                      }
+                    }}
+                    className="p-1 rounded text-slate-400 hover:text-red-500 dark:hover:text-red-400 cursor-pointer transition-opacity"
+                    title="Delete saved outreach"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+
+                {/* Nested clickable prospects list */}
+                <div className="flex flex-col gap-1 pl-1">
+                  {item.prospects && item.prospects.map((p: any) => (
+                    <button
+                      key={p.companyId}
+                      onClick={() => handleSavedProspectClick(item.mandateId || 'mandate-101', p.companyId)}
+                      className="w-full text-left py-1 text-[11px] font-semibold text-secondary hover:text-brand-primary focus:outline-none cursor-pointer truncate flex items-center gap-1.5"
+                    >
+                      <span className="w-1 h-1 rounded-full bg-[#A855F7] shrink-0" />
+                      <span className="truncate">{p.contactName} ({p.companyName})</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
     </div>
   );
 };
@@ -136,6 +245,42 @@ export const AppLayout: React.FC = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     return localStorage.getItem('dealsourcing_sidebar_collapsed') === 'true';
   });
+
+  // Saved outreach list state
+  const [savedOutreachList, setSavedOutreachList] = useState<any[]>([]);
+  const [selectedSavedItem, setSelectedSavedItem] = useState<any | null>(null);
+
+  const loadSavedOutreach = useCallback(() => {
+    const stored = localStorage.getItem('dealsourcing_saved_outreach');
+    if (stored) {
+      try {
+        setSavedOutreachList(JSON.parse(stored));
+      } catch (e) {
+        console.error(e);
+      }
+    } else {
+      setSavedOutreachList([]);
+    }
+  }, []);
+
+  const deleteSavedOutreach = useCallback((id: string) => {
+    const stored = localStorage.getItem('dealsourcing_saved_outreach');
+    if (stored) {
+      try {
+        const list = JSON.parse(stored);
+        const filtered = list.filter((item: any) => item.id !== id);
+        localStorage.setItem('dealsourcing_saved_outreach', JSON.stringify(filtered));
+        loadSavedOutreach();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }, [loadSavedOutreach]);
+
+  // Load saved outreach items on mount
+  useEffect(() => {
+    loadSavedOutreach();
+  }, [loadSavedOutreach]);
 
   const toggleSidebar = useCallback(() => {
     setSidebarCollapsed(prev => {
@@ -221,7 +366,11 @@ export const AppLayout: React.FC = () => {
         {/* Desktop & Tablet Sidebar — fixed, does not scroll with content */}
         {!sidebarCollapsed && (
           <aside className="hidden md:flex flex-col w-64 lg:w-72 shrink-0 border-r border-default bg-white dark:bg-slate-900 p-5 fixed top-[57px] left-0 bottom-0 z-30 overflow-y-auto transition-all duration-200">
-            <SidebarContent />
+            <SidebarContent
+              savedOutreachList={savedOutreachList}
+              onSelectSaved={setSelectedSavedItem}
+              onDeleteSaved={deleteSavedOutreach}
+            />
           </aside>
         )}
 
@@ -235,7 +384,10 @@ export const AppLayout: React.FC = () => {
 
           {/* Main Content Area */}
           <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-8 flex flex-col gap-6">
-            <Outlet context={{ refreshApprovals: checkApprovals }} />
+            <Outlet context={{
+              refreshApprovals: checkApprovals,
+              refreshSavedOutreach: loadSavedOutreach
+            }} />
           </main>
         </div>
       </div>
@@ -260,9 +412,73 @@ export const AppLayout: React.FC = () => {
                 ✕
               </button>
             </div>
-            <SidebarContent onClose={() => setMobileDrawerOpen(false)} />
+            <SidebarContent
+              onClose={() => setMobileDrawerOpen(false)}
+              savedOutreachList={savedOutreachList}
+              onSelectSaved={setSelectedSavedItem}
+              onDeleteSaved={deleteSavedOutreach}
+            />
           </div>
         </div>
+      )}
+
+      {/* Saved Outreach Details Modal */}
+      {selectedSavedItem && (
+        <Modal
+          isOpen={selectedSavedItem !== null}
+          onClose={() => setSelectedSavedItem(null)}
+          title={`Saved Outreach: ${selectedSavedItem.title}`}
+          size="lg"
+          footerActions={
+            <Button variant="outline" onClick={() => setSelectedSavedItem(null)}>Close</Button>
+          }
+        >
+          <div className="flex flex-col gap-6 text-left max-h-[70vh] overflow-y-auto pr-2">
+            {selectedSavedItem.prospects.map((p: any, idx: number) => (
+              <div key={p.companyId} className="border border-default rounded-xl p-5 bg-card flex flex-col gap-4">
+                <div className="flex items-center gap-2 border-b border-default pb-3">
+                  <span className="h-6 w-6 rounded-full bg-brand-primary-light text-brand-primary flex items-center justify-center font-bold text-xs">
+                    {idx + 1}
+                  </span>
+                  <div>
+                    <h4 className="text-sm font-extrabold text-primary">{p.contactName}</h4>
+                    <p className="text-xs text-secondary mt-0.5">{p.companyName}</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {p.scripts.map((script: any) => (
+                    <div key={script.type} className="border border-default rounded-lg p-3.5 bg-slate-50 dark:bg-slate-900/40">
+                      <div className="flex items-center justify-between gap-2 mb-2 border-b border-default pb-1.5">
+                        <span className="text-xs font-bold text-brand-primary uppercase tracking-wider">{script.label}</span>
+                        <button
+                          onClick={async () => {
+                            const text = script.subject ? `Subject: ${script.subject}\n\n${script.body}` : script.body;
+                            try {
+                              await navigator.clipboard.writeText(text);
+                              alert('Copied to clipboard!');
+                            } catch (e) {
+                              console.error(e);
+                            }
+                          }}
+                          className="text-[10px] font-bold text-secondary hover:text-primary border border-default rounded px-2 py-0.5 bg-card hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                        >
+                          Copy
+                        </button>
+                      </div>
+                      {script.subject && (
+                        <p className="text-xs text-primary mb-2">
+                          <span className="font-bold">Subject:</span> {script.subject}
+                        </p>
+                      )}
+                      <pre className="text-xs text-secondary leading-relaxed font-sans whitespace-pre-wrap">{script.body}</pre>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Modal>
       )}
       
       {/* Footer */}

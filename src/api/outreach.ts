@@ -108,6 +108,21 @@ export const generateOutreachScripts = async (
 };
 
 /**
+ * Synchronous generation of all three scripts (for instant loading).
+ */
+export const generateOutreachScriptsSync = (
+  company: Company,
+  mandate: Mandate,
+  channel: OutreachChannel = 'email'
+): OutreachScript[] => {
+  return [
+    generateProfessional(company, mandate, channel),
+    generateFounderFocused(company, mandate, channel),
+    generateDirect(company, mandate, channel),
+  ];
+};
+
+/**
  * Regenerate a single outreach script.
  * Replace with: POST /api/outreach/regenerate
  */
