@@ -13,14 +13,12 @@ import { useMandateHistory } from '../../context/MandateHistoryContext';
 interface SidebarContentProps {
   onClose?: () => void;
   savedOutreachList: any[];
-  onSelectSaved: (item: any) => void;
   onDeleteSaved: (id: string) => void;
 }
 
 const SidebarContent: React.FC<SidebarContentProps> = ({
   onClose,
   savedOutreachList,
-  onSelectSaved,
   onDeleteSaved
 }) => {
   const { mandates, activeId, selectMandate, createNewMandate, deleteMandate } = useMandateHistory();
@@ -368,7 +366,6 @@ export const AppLayout: React.FC = () => {
           <aside className="hidden md:flex flex-col w-64 lg:w-72 shrink-0 border-r border-default bg-white dark:bg-slate-900 p-5 fixed top-[57px] left-0 bottom-0 z-30 overflow-y-auto transition-all duration-200">
             <SidebarContent
               savedOutreachList={savedOutreachList}
-              onSelectSaved={setSelectedSavedItem}
               onDeleteSaved={deleteSavedOutreach}
             />
           </aside>
@@ -415,7 +412,6 @@ export const AppLayout: React.FC = () => {
             <SidebarContent
               onClose={() => setMobileDrawerOpen(false)}
               savedOutreachList={savedOutreachList}
-              onSelectSaved={setSelectedSavedItem}
               onDeleteSaved={deleteSavedOutreach}
             />
           </div>

@@ -3,12 +3,13 @@ import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
 import { useCompanies } from '../hooks/useCompanies';
 import { useMandate } from '../hooks/useMandate';
 import { useMandateHistory } from '../context/MandateHistoryContext';
-import { generateOutreachScripts, regenerateOutreachMessage, generateOutreachScriptsSync } from '../api/outreach';
+import { regenerateOutreachMessage, generateOutreachScriptsSync } from '../api/outreach';
 import type {
   OutreachChannel,
   OutreachScriptType,
   OutreachScript,
   OutreachSet,
+  Mandate,
 } from '../types';
 
 import LoadingState from '../components/ui/LoadingState';
@@ -19,11 +20,7 @@ import {
   RefreshCw, ChevronRight, ChevronDown, Pencil,
 } from 'lucide-react';
 
-const STEP_LABELS: Record<string, string> = {
-  researching: 'Researching company profile...',
-  reviewing:   'Reviewing acquisition mandate...',
-  drafting:    'Drafting personalized outreach...',
-};
+// STEP_LABELS removed because it is unused
 
 // ── Icon map for each script type (channel card) ─────────────────────────────
 const CHANNEL_ICONS: Record<string, React.ReactNode> = {
@@ -242,12 +239,10 @@ const Outreach: React.FC = () => {
       setActiveCompanyId(enrichedFirst?.id ?? selectedCompanies[0]?.id ?? null);
     }
   }, [urlCompanyId, selectedCompanies, enrichedIds, activeCompanyId]);
-  const [channel, setChannel] = useState<OutreachChannel>('email');
+  const channel: OutreachChannel = 'email';
   const [activeScriptType, setActiveScriptType] = useState<OutreachScriptType>('professional');
   const [outreachSets, setOutreachSets] = useState<Record<string, OutreachSet>>({});
   const [editedScripts, setEditedScripts] = useState<Record<string, Record<OutreachScriptType, { subject: string; body: string }>>>({});
-  const [generating, setGenerating] = useState(false);
-  const [generatingStep, setGeneratingStep] = useState('');
   const [regenerating, setRegenerating] = useState(false);
   const [researchOpen, setResearchOpen] = useState(false);
   const [saveDropdownOpen, setSaveDropdownOpen] = useState(false);
@@ -271,7 +266,7 @@ const Outreach: React.FC = () => {
   useEffect(() => {
     const allToProcess = companiesToProcess;
     if (allToProcess.length > 0) {
-      const finalMandate = mandate || {
+      const finalMandate = (mandate || {
         id: activeMandateId,
         title: 'Plastics Manufacturing Mandate',
         status: 'Approved',
@@ -279,7 +274,7 @@ const Outreach: React.FC = () => {
         objective: 'Search for plastics businesses',
         geography: 'Australia',
         targetIndustry: 'Plastics Manufacturing',
-      };
+      }) as Mandate;
       setOutreachSets(prev => {
         let changed = false;
         const next = { ...prev };
@@ -326,10 +321,10 @@ const Outreach: React.FC = () => {
       }
     }
 
-    const finalMandate = mandate || {
+    const finalMandate = (mandate || {
       id: activeMandateId,
       title: 'Plastics Manufacturing Mandate',
-    };
+    }) as Mandate;
 
     const buildProspectItem = (comp: any) => {
       const set = outreachSets[comp.id] || {
@@ -402,7 +397,7 @@ const Outreach: React.FC = () => {
 
   const handleRegenerate = useCallback(async (type: OutreachScriptType) => {
     if (!activeCompany) return;
-    const finalMandate = mandate || {
+    const finalMandate = (mandate || {
       id: activeMandateId,
       title: 'Plastics Manufacturing Mandate',
       status: 'Approved',
@@ -410,7 +405,7 @@ const Outreach: React.FC = () => {
       objective: 'Search for plastics businesses',
       geography: 'Australia',
       targetIndustry: 'Plastics Manufacturing',
-    };
+    }) as Mandate;
     setRegenerating(true);
     try {
       const refreshed = await regenerateOutreachMessage(activeCompany, finalMandate, type, channel);

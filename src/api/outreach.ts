@@ -17,11 +17,6 @@ const firstName = (fullName: string): string => {
 const cityFromLocation = (location: string): string =>
   location?.split(',')[0]?.trim() || location || '';
 
-const stateFromLocation = (location: string): string => {
-  const parts = location?.split(',');
-  return parts && parts.length > 1 ? parts[1].trim() : '';
-};
-
 const generateProfessional = (
   company: Company,
   mandate: Mandate,
@@ -44,7 +39,7 @@ const generateProfessional = (
 
 const generateFounderFocused = (
   company: Company,
-  mandate: Mandate,
+  _mandate: Mandate,
   _channel: OutreachChannel
 ): OutreachScript => {
   const ed = company.enrichmentData;
@@ -63,7 +58,7 @@ const generateFounderFocused = (
 
 const generateDirect = (
   company: Company,
-  mandate: Mandate,
+  _mandate: Mandate,
   _channel: OutreachChannel
 ): OutreachScript => {
   const ed = company.enrichmentData;

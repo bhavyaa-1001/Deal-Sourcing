@@ -4,7 +4,8 @@ import Modal from '../ui/Modal';
 import Badge from '../ui/Badge';
 import Button from '../ui/Button';
 import { Lock, CheckCircle, CreditCard, Sparkles, User, Mail, Phone, Users } from 'lucide-react';
-import { ENRICHMENT_PRICE_PER_COMPANY, calculateEnrichmentTotal } from '../../api/enrichment';
+const ENRICHMENT_PRICE_PER_COMPANY = 500;
+const calculateEnrichmentTotal = (count: number) => count * 500;
 
 type Step = 'confirm' | 'processing' | 'success';
 
