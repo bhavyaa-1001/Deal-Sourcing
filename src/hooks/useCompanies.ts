@@ -6,6 +6,7 @@ import {
   processEnrichmentPayment,
   getCompanyEnrichment,
 } from '../api/enrichment';
+import { useMandateHistory } from '../context/MandateHistoryContext';
 
 const initialFilters: CompanyFilter = {
   search: '',
@@ -19,7 +20,10 @@ const initialFilters: CompanyFilter = {
 };
 
 export const useCompanies = () => {
-  const activeMandateId = localStorage.getItem('dealsourcing_mandates_active_id') || 'mandate-101';
+  // Read activeId from React context (reactive) so any mandate switch immediately
+  // triggers a re-fetch — even if the consuming component doesn't remount.
+  const { activeId } = useMandateHistory();
+  const activeMandateId = activeId || localStorage.getItem('dealsourcing_mandates_active_id') || 'mandate-101';
   const SELECTED_KEY = `dealsourcing_selected_ids_${activeMandateId}`;
 
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -32,12 +36,13 @@ export const useCompanies = () => {
   const [filters, setFilters] = useState<CompanyFilter>(initialFilters);
   const [sortBy, setSortBy] = useState<string>('confidence-desc');
 
-  // Selection state (for Review Results enrichment)
+  // Selection state — initialized from the current mandate's storage key
   const [selectedIds, setSelectedIds] = useState<string[]>(() => {
     const stored = localStorage.getItem(`dealsourcing_selected_ids_${activeMandateId}`);
     return stored ? JSON.parse(stored) : [];
   });
 
+  // Re-fetch companies whenever the active mandate changes
   const fetchCompanies = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -50,7 +55,8 @@ export const useCompanies = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  // activeMandateId in deps ensures the callback is recreated (and re-run) on every mandate switch
+  }, [activeMandateId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     fetchCompanies();

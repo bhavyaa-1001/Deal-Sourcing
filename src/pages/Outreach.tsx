@@ -2,6 +2,7 @@ import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
 import { useCompanies } from '../hooks/useCompanies';
 import { useMandate } from '../hooks/useMandate';
+import { useMandateHistory } from '../context/MandateHistoryContext';
 import { generateOutreachScripts, regenerateOutreachMessage, generateOutreachScriptsSync } from '../api/outreach';
 import type {
   OutreachChannel,
@@ -212,8 +213,9 @@ const Outreach: React.FC = () => {
   const queryParams = useMemo(() => new URLSearchParams(search), [search]);
   const urlCompanyId = queryParams.get('companyId');
 
-  const { companies, allCompaniesRaw, enrichedIds, selectedIds, loading: companiesLoading, toggleSelection } = useCompanies();
-  const activeMandateId = localStorage.getItem('dealsourcing_mandates_active_id') || 'mandate-101';
+  const { companies, allCompaniesRaw, enrichedIds, selectedIds, loading: companiesLoading } = useCompanies();
+  const { activeId } = useMandateHistory();
+  const activeMandateId = activeId || localStorage.getItem('dealsourcing_mandates_active_id') || 'mandate-101';
   const { mandate, loading: mandateLoading } = useMandate(activeMandateId);
 
   const displayCompanies = allCompaniesRaw.length > 0 ? allCompaniesRaw : companies;
@@ -226,22 +228,20 @@ const Outreach: React.FC = () => {
 
   const [activeCompanyId, setActiveCompanyId] = useState<string | null>(null);
 
-  // Sync activeCompanyId from url parameter or select default
+  // Set activeCompanyId from URL param (when navigating from saved outreach)
+  // or default to first enriched/selected company
   useEffect(() => {
     if (urlCompanyId) {
       setActiveCompanyId(urlCompanyId);
-    } else if (!activeCompanyId && selectedCompanies.length > 0) {
+    }
+  }, [urlCompanyId]);
+
+  useEffect(() => {
+    if (!urlCompanyId && selectedCompanies.length > 0 && !activeCompanyId) {
       const enrichedFirst = selectedCompanies.find(c => enrichedIds.includes(c.id));
       setActiveCompanyId(enrichedFirst?.id ?? selectedCompanies[0]?.id ?? null);
     }
   }, [urlCompanyId, selectedCompanies, enrichedIds, activeCompanyId]);
-
-  // Ensure urlCompanyId is selected/checked in this mandate
-  useEffect(() => {
-    if (urlCompanyId && !selectedIds.includes(urlCompanyId)) {
-      toggleSelection(urlCompanyId);
-    }
-  }, [urlCompanyId, selectedIds, toggleSelection]);
   const [channel, setChannel] = useState<OutreachChannel>('email');
   const [activeScriptType, setActiveScriptType] = useState<OutreachScriptType>('professional');
   const [outreachSets, setOutreachSets] = useState<Record<string, OutreachSet>>({});
@@ -257,9 +257,20 @@ const Outreach: React.FC = () => {
   const activeOutreachSet = activeCompanyId ? outreachSets[activeCompanyId] : undefined;
   const hasScripts       = !!activeOutreachSet?.scripts?.length;
 
-  // Auto-generate scripts for all selected companies so they appear automatically (simulating backend generation)
+  // When coming from saved outreach (urlCompanyId present), include that company
+  // even if it's not in selectedCompanies for this mandate
+  const urlCompany = urlCompanyId ? displayCompanies.find(c => c.id === urlCompanyId) ?? null : null;
+  const companiesToProcess = useMemo(() => {
+    if (urlCompany && !selectedCompanies.some(c => c.id === urlCompany.id)) {
+      return [...selectedCompanies, urlCompany];
+    }
+    return selectedCompanies;
+  }, [selectedCompanies, urlCompany]);
+
+  // Auto-generate scripts for all companies to process (selected + url company)
   useEffect(() => {
-    if (selectedCompanies.length > 0) {
+    const allToProcess = companiesToProcess;
+    if (allToProcess.length > 0) {
       const finalMandate = mandate || {
         id: activeMandateId,
         title: 'Plastics Manufacturing Mandate',
@@ -272,7 +283,7 @@ const Outreach: React.FC = () => {
       setOutreachSets(prev => {
         let changed = false;
         const next = { ...prev };
-        selectedCompanies.forEach(c => {
+        allToProcess.forEach(c => {
           if (!next[c.id] && enrichedIds.includes(c.id)) {
             next[c.id] = {
               companyId: c.id,
@@ -286,7 +297,7 @@ const Outreach: React.FC = () => {
         return changed ? next : prev;
       });
     }
-  }, [selectedCompanies, mandate, enrichedIds, activeMandateId]);
+  }, [companiesToProcess, mandate, enrichedIds, activeMandateId]);
 
   const getScript = useCallback((type: OutreachScriptType): OutreachScript | null => {
     if (!hasScripts || !activeCompanyId) return null;
@@ -434,7 +445,7 @@ const Outreach: React.FC = () => {
 
   if (companiesLoading || mandateLoading) return <LoadingState message="Loading outreach workspace..." />;
 
-  if (selectedCompanies.length === 0) {
+  if (companiesToProcess.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-6 py-20 text-center">
         <div className="p-4 bg-amber-100 dark:bg-amber-950/30 rounded-full">
@@ -534,7 +545,7 @@ const Outreach: React.FC = () => {
 
       {/* ── Contact tabs ─────────────────────────────────────────────────── */}
       <div className="flex flex-wrap gap-2">
-        {selectedCompanies.map(company => {
+        {companiesToProcess.map(company => {
           const isActive   = company.id === activeCompanyId;
           const isEnriched = enrichedIds.includes(company.id);
           const contactName = company.enrichmentData?.contactPerson

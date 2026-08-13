@@ -10,22 +10,43 @@ const getEnrichedKey = (): string => `dealsourcing_enriched_ids_${getActiveManda
 
 const delay = (ms = 600) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Read persisted companies, falling back to mock data
+// Legacy global keys (pre-isolation) - used for migration fallback
+const LEGACY_COMPANIES_KEY = 'dealsourcing_companies';
+const LEGACY_ENRICHED_KEY = 'dealsourcing_enriched_ids';
+
+// Read persisted companies, falling back to legacy global key then mock data
 const initCompanies = (): Company[] => {
   const key = getStorageKey();
   const stored = localStorage.getItem(key);
   if (stored) {
     try {
       const parsed: Company[] = JSON.parse(stored);
-      // Ensure new fields exist for any stored data that predates this version
       return parsed.map(c => ({
         ...c,
         enrichmentStatus: c.enrichmentStatus ?? 'locked',
       }));
     } catch {
-      // Corrupt storage — reset
+      // Corrupt storage — fall through
     }
   }
+
+  // Migration: check old global key (data enriched before mandate isolation was added)
+  const legacy = localStorage.getItem(LEGACY_COMPANIES_KEY);
+  if (legacy) {
+    try {
+      const parsed: Company[] = JSON.parse(legacy);
+      const migrated = parsed.map(c => ({
+        ...c,
+        enrichmentStatus: c.enrichmentStatus ?? 'locked',
+      }));
+      // Write into mandate-specific key so future reads are fast
+      localStorage.setItem(key, JSON.stringify(migrated));
+      return migrated;
+    } catch {
+      // Corrupt legacy data — fall through
+    }
+  }
+
   localStorage.setItem(key, JSON.stringify(mockCompanies));
   return mockCompanies;
 };
@@ -35,8 +56,29 @@ const saveCompanies = (companies: Company[]) => {
 };
 
 export const getEnrichedIds = (): string[] => {
-  const stored = localStorage.getItem(getEnrichedKey());
-  return stored ? JSON.parse(stored) : [];
+  const mandateKey = getEnrichedKey();
+  const stored = localStorage.getItem(mandateKey);
+  if (stored) {
+    try {
+      const ids = JSON.parse(stored);
+      if (Array.isArray(ids) && ids.length > 0) return ids;
+    } catch {}
+  }
+
+  // Migration: check old global key (enrichment done before mandate isolation was added)
+  const legacy = localStorage.getItem(LEGACY_ENRICHED_KEY);
+  if (legacy) {
+    try {
+      const ids = JSON.parse(legacy);
+      if (Array.isArray(ids) && ids.length > 0) {
+        // Migrate into mandate-specific key so future reads are fast
+        localStorage.setItem(mandateKey, legacy);
+        return ids;
+      }
+    } catch {}
+  }
+
+  return [];
 };
 
 export const saveEnrichedIds = (ids: string[]) => {
