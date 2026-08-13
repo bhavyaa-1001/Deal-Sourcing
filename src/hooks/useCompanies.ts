@@ -1,11 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import type { Company, CompanyFilter, EnrichmentData } from '../types';
 import { companiesApi } from '../api/companies';
-import {
-  createEnrichmentOrder,
-  processEnrichmentPayment,
-  getCompanyEnrichment,
-} from '../api/enrichment';
+import { getCompanyEnrichment } from '../api/enrichment';
 import { useMandateHistory } from '../context/MandateHistoryContext';
 
 const initialFilters: CompanyFilter = {
@@ -92,21 +88,12 @@ export const useCompanies = () => {
   // ─── Enrichment flow ──────────────────────────────────────────────────────
 
   /**
-   * Runs the full enrichment flow for a set of company IDs:
-   * 1. Create order  2. Process payment  3. Fetch enrichment data per company
-   * 4. Mark as enriched in storage  5. Update local state
+   * Enriches a set of company IDs:
+   * 1. Fetch enrichment data per company  2. Mark as enriched in storage  3. Update local state
+   * (No payment step — enrichment is free/automatic)
    */
   const enrichCompanies = async (ids: string[]): Promise<void> => {
     if (ids.length === 0) return;
-
-    // Create order (no-op for demo, but backend-ready)
-    const order = await createEnrichmentOrder(ids);
-
-    // Process payment
-    const paymentResult = await processEnrichmentPayment(order.orderId);
-    if (!paymentResult.success) {
-      throw new Error('Payment failed. Please try again.');
-    }
 
     // Fetch enrichment data for each company in parallel
     const enrichmentMap: Record<string, EnrichmentData> = {};

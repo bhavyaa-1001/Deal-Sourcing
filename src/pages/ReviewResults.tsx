@@ -4,7 +4,7 @@ import { jsPDF } from 'jspdf';
 import { useCompanies } from '../hooks/useCompanies';
 import CompanyDetails from '../components/companies/CompanyDetails';
 import CompanyComparison from '../components/companies/CompanyComparison';
-import EnrichmentPaymentModal from '../components/companies/EnrichmentPaymentModal';
+import EnrichmentPreviewModal from '../components/companies/EnrichmentPreviewModal';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import LoadingState from '../components/ui/LoadingState';
@@ -39,8 +39,10 @@ export const ReviewResults: React.FC = () => {
   // Expanded inline detail sections state
   const [expandedCompanyIds, setExpandedCompanyIds] = useState<string[]>([]);
 
-  // Enrichment payment modal state
-  const [enrichModalOpen, setEnrichModalOpen] = useState(false);
+  // Enrichment preview modal + in-progress state
+  const [enrichPreviewOpen, setEnrichPreviewOpen] = useState(false);
+  const [enrichPreviewIds, setEnrichPreviewIds] = useState<string[]>([]);
+  const [isEnriching, setIsEnriching] = useState(false);
 
   // Export feedback
   const [exportMessage, setExportMessage] = useState<string | null>(null);
@@ -75,30 +77,34 @@ export const ReviewResults: React.FC = () => {
     return { total, highFit, enriched, selected };
   }, [displayCompanies, enrichedIds, selectedIds]);
 
-  const handleEnrichConfirm = async (ids: string[]) => {
-    await enrichCompanies(ids);
-    setEnrichModalOpen(false);
-    
-    // Automatically expand the newly enriched company sections
-    setExpandedCompanyIds(prev => {
-      const next = [...prev];
-      ids.forEach(id => {
-        if (!next.includes(id)) {
-          next.push(id);
-        }
-      });
-      return next;
-    });
+  // Open preview modal before enriching
+  const openEnrichPreview = (ids: string[]) => {
+    if (ids.length === 0) return;
+    setEnrichPreviewIds(ids);
+    setEnrichPreviewOpen(true);
+  };
 
-    // Smooth scroll to the first newly enriched company after rendering completes
-    setTimeout(() => {
-      if (ids.length > 0) {
-        const element = document.getElementById(`company-row-${ids[0]}`);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  const handleEnrichSelected = async (ids: string[]) => {
+    if (ids.length === 0 || isEnriching) return;
+    setIsEnriching(true);
+    try {
+      await enrichCompanies(ids);
+      // Automatically expand the newly enriched company sections
+      setExpandedCompanyIds(prev => {
+        const next = [...prev];
+        ids.forEach(id => { if (!next.includes(id)) next.push(id); });
+        return next;
+      });
+      // Smooth scroll to the first newly enriched company
+      setTimeout(() => {
+        if (ids.length > 0) {
+          const element = document.getElementById(`company-row-${ids[0]}`);
+          if (element) element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
-      }
-    }, 200);
+      }, 200);
+    } finally {
+      setIsEnriching(false);
+    }
   };
 
   const handleBack = () => navigate('/discover');
@@ -238,7 +244,6 @@ export const ReviewResults: React.FC = () => {
             </span>
           ))}
         </div>
-        <span className="text-xs text-amber-600 dark:text-amber-400 sm:ml-auto">₹500 per company</span>
       </div>
 
       {/* 3. Selection count */}
@@ -593,14 +598,14 @@ export const ReviewResults: React.FC = () => {
         <div
           className={`relative overflow-hidden rounded-xl border transition-all duration-300 ${
             unenrichedSelected.length > 0
-              ? 'border-blue-300 dark:border-blue-700 shadow-lg shadow-blue-100 dark:shadow-blue-900/20'
+              ? 'border-brand-primary-light dark:border-brand-primary-dark/80 shadow-premium-lg'
               : 'border-default'
           }`}
         >
           <div
             className={`absolute inset-0 ${
               unenrichedSelected.length > 0
-                ? 'bg-gradient-to-r from-blue-600/10 via-indigo-600/8 to-purple-600/10 dark:from-blue-900/30 dark:via-indigo-900/20 dark:to-purple-900/30'
+                ? 'bg-brand-primary-light/40 dark:bg-brand-primary-dark/20'
                 : 'bg-slate-50 dark:bg-slate-900/30'
             }`}
           />
@@ -609,49 +614,54 @@ export const ReviewResults: React.FC = () => {
               <div
                 className={`relative p-3 rounded-xl shrink-0 ${
                   unenrichedSelected.length > 0
-                    ? 'bg-gradient-to-br from-blue-500 to-indigo-600 shadow-md shadow-blue-200 dark:shadow-blue-900/40'
+                    ? 'bg-brand-primary shadow-premium'
                     : 'bg-slate-200 dark:bg-slate-700'
                 }`}
               >
-                <Users className={`h-5 w-5 ${unenrichedSelected.length > 0 ? 'text-white' : 'text-slate-500'}`} />
+                <Users className={`h-5 w-5 ${unenrichedSelected.length > 0 ? 'text-white font-bold' : 'text-slate-500'}`} />
                 {unenrichedSelected.length > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 h-4 w-4 rounded-full bg-amber-400 text-[9px] font-black text-slate-900 flex items-center justify-center shadow">
+                  <span className="absolute -top-1.5 -right-1.5 h-4 w-4 rounded-full bg-brand-warning text-[9px] font-black text-white flex items-center justify-center shadow">
                     {unenrichedSelected.length}
                   </span>
                 )}
               </div>
               <div className="text-left">
-                <p className={`text-base font-bold ${unenrichedSelected.length > 0 ? 'text-blue-800 dark:text-blue-200' : 'text-secondary'}`}>
+                <p className={`text-base font-bold ${unenrichedSelected.length > 0 ? 'text-brand-primary dark:text-brand-primary-light' : 'text-secondary'}`}>
                   {unenrichedSelected.length > 0
                     ? `${unenrichedSelected.length} ${unenrichedSelected.length === 1 ? 'company' : 'companies'} ready for enrichment`
                     : 'Select companies above to enrich them'}
                 </p>
                 <p className="text-xs text-secondary mt-0.5">
                   {unenrichedSelected.length > 0
-                    ? `Total cost: ₹${(unenrichedSelected.length * 500).toLocaleString('en-IN')} — unlocks founder info, emails & LinkedIn`
+                    ? 'Enrichment unlocks founder info, emails & LinkedIn for outreach'
                     : 'Tick the top checkbox in each row to add companies to the enrichment queue'}
                 </p>
               </div>
             </div>
 
             <button
-              disabled={unenrichedSelected.length === 0}
-              onClick={() => setEnrichModalOpen(true)}
+              disabled={unenrichedSelected.length === 0 || isEnriching}
+              onClick={() => openEnrichPreview(unenrichedSelected.map(c => c.id))}
               id="enrich-selected-btn"
               className={`
                 relative shrink-0 min-w-[220px] flex items-center justify-center gap-2.5
                 px-6 py-3 rounded-xl font-bold text-sm transition-all duration-200
                 focus:outline-none focus:ring-2 focus:ring-offset-2
-                ${unenrichedSelected.length > 0
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-200 dark:shadow-blue-900/40 focus:ring-blue-500 cursor-pointer active:scale-95'
+                ${unenrichedSelected.length > 0 && !isEnriching
+                  ? 'bg-brand-primary hover:bg-brand-primary-hover text-white shadow-premium cursor-pointer active:scale-95 focus:ring-brand-primary'
                   : 'bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed'
                 }
               `}
             >
-              <Lock className="h-4 w-4 shrink-0" />
-              {unenrichedSelected.length > 0
-                ? `Enrich ${unenrichedSelected.length} Selected ${unenrichedSelected.length === 1 ? 'Company' : 'Companies'}`
-                : 'Enrich Selected Companies'}
+              {isEnriching ? (
+                <><RefreshCw className="h-4 w-4 shrink-0 animate-spin" /> Enriching...</>
+              ) : (
+                <><Unlock className="h-4 w-4 shrink-0" />
+                {unenrichedSelected.length > 0
+                  ? `Enrich ${unenrichedSelected.length} Selected ${unenrichedSelected.length === 1 ? 'Company' : 'Companies'}`
+                  : 'Enrich Selected Companies'}
+                </>
+              )}
             </button>
           </div>
         </div>
@@ -663,9 +673,8 @@ export const ReviewResults: React.FC = () => {
         onClose={() => setSelectedCompanyId(null)}
         onEnrich={(id) => {
           if (!enrichedIds.includes(id)) {
-            toggleSelection(id);
+            openEnrichPreview([id]);
             setSelectedCompanyId(null);
-            setEnrichModalOpen(true);
           }
         }}
       />
@@ -683,13 +692,17 @@ export const ReviewResults: React.FC = () => {
         <CompanyComparison companies={comparisonTargets} />
       </Modal>
 
-      <EnrichmentPaymentModal
-        isOpen={enrichModalOpen}
-        companies={unenrichedSelected}
-        onClose={() => setEnrichModalOpen(false)}
-        onConfirm={handleEnrichConfirm}
+      {/* Enrichment Preview Modal */}
+      <EnrichmentPreviewModal
+        isOpen={enrichPreviewOpen}
+        companies={displayCompanies.filter(c => enrichPreviewIds.includes(c.id))}
+        isEnriching={isEnriching}
+        onClose={() => { if (!isEnriching) setEnrichPreviewOpen(false); }}
+        onConfirm={async (ids) => {
+          await handleEnrichSelected(ids);
+          setEnrichPreviewOpen(false);
+        }}
       />
-
       {/* ── Page Footer Navigation — Export PDF + Continue to Outreach live here ── */}
       <div className="border-t border-default pt-6 flex items-center justify-between mt-4 flex-wrap gap-3">
         <Button

@@ -1,17 +1,25 @@
 /**
  * src/api/enrichment.ts
  *
- * Enrichment & Payment Service — currently frontend-only mock simulation.
- * Replace the function bodies with real API calls when the Python backend is ready.
- * All pricing is configured in ONE place: ENRICHMENT_PRICE_PER_COMPANY.
+ * Enrichment Service — currently uses mock data.
+ *
+ * ┌─────────────────────────────────────────────────────────────────┐
+ * │  BACKEND INTEGRATION POINT                                      │
+ * │  When the backend AI model is ready, replace the body of        │
+ * │  `getCompanyEnrichment()` with a real API call:                 │
+ * │                                                                 │
+ * │    POST /api/enrichment/generate                                │
+ * │    Body: { companyId: string }                                  │
+ * │    Returns: EnrichmentData                                      │
+ * │                                                                 │
+ * │  The rest of the frontend (useCompanies → companiesApi) will    │
+ * │  work automatically — no other changes needed.                  │
+ * └─────────────────────────────────────────────────────────────────┘
  */
 
 import type { EnrichmentData } from '../types';
 
-// ─── Pricing Configuration (single source of truth) ─────────────────────────
-export const ENRICHMENT_PRICE_PER_COMPANY = 500; // ₹ INR per company
-
-// ─── Mock enrichment data ────────────────────────────────────────────────────
+// ─── Mock enrichment data (used until backend model is ready) ─────────────────
 const MOCK_ENRICHMENT_DATA: Record<string, EnrichmentData> = {
   'comp-101': {
     founderName: 'Robert "Bob" Miller',
@@ -87,55 +95,35 @@ const MOCK_ENRICHMENT_DATA: Record<string, EnrichmentData> = {
   },
 };
 
-// ─── Service Functions ───────────────────────────────────────────────────────
-
-/** Returns the per-company enrichment price in INR */
-export const getEnrichmentPrice = (): number => ENRICHMENT_PRICE_PER_COMPANY;
-
-/** Calculates the total enrichment cost for N companies */
-export const calculateEnrichmentTotal = (count: number): number =>
-  count * ENRICHMENT_PRICE_PER_COMPANY;
+// ─── Enrichment API ───────────────────────────────────────────────────────────
 
 /**
- * Simulates creating an enrichment order.
- * Replace with: POST /api/enrichment/orders
- */
-export const createEnrichmentOrder = async (
-  companyIds: string[]
-): Promise<{ orderId: string; total: number; companyIds: string[] }> => {
-  await new Promise(r => setTimeout(r, 300));
-  return {
-    orderId: `order-${Date.now()}`,
-    total: calculateEnrichmentTotal(companyIds.length),
-    companyIds,
-  };
-};
-
-/**
- * Simulates processing a payment and returning success.
- * Replace with: POST /api/enrichment/payments/:orderId
- */
-export const processEnrichmentPayment = async (
-  _orderId: string
-): Promise<{ success: boolean; transactionId: string }> => {
-  await new Promise(r => setTimeout(r, 1200)); // simulate payment gateway delay
-  return {
-    success: true,
-    transactionId: `txn-${Date.now()}`,
-  };
-};
-
-/**
- * Returns enrichment data for a company after successful payment.
- * Replace with: GET /api/enrichment/companies/:companyId
+ * Fetches enrichment data for a single company.
+ *
+ * ⚡ BACKEND SWAP POINT:
+ * Replace the mock lookup below with your actual API call, e.g.:
+ *
+ *   const response = await fetch(`/api/enrichment/generate`, {
+ *     method: 'POST',
+ *     headers: { 'Content-Type': 'application/json' },
+ *     body: JSON.stringify({ companyId }),
+ *   });
+ *   if (!response.ok) throw new Error('Enrichment generation failed');
+ *   return response.json() as Promise<EnrichmentData>;
+ *
+ * The calling code in useCompanies.ts runs this for each selected company
+ * in parallel (Promise.all), then persists results to localStorage and
+ * updates the React state — all automatically.
  */
 export const getCompanyEnrichment = async (
   companyId: string
 ): Promise<EnrichmentData> => {
-  await new Promise(r => setTimeout(r, 400));
+  // TODO: Replace with real backend call → POST /api/enrichment/generate
+  await new Promise(r => setTimeout(r, 800)); // simulate model inference time
+
   const data = MOCK_ENRICHMENT_DATA[companyId];
   if (!data) {
-    // Return a generic placeholder for companies without specific mock data
+    // Fallback for companies not in mock data — backend will always return real data
     return {
       founderName: 'Contact information unavailable',
       founderRole: 'Details not available in enrichment sources',
