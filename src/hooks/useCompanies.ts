@@ -1,6 +1,13 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import type { Company, CompanyFilter } from '../types';
+import type { Company, CompanyFilter, EnrichmentData } from '../types';
 import { companiesApi } from '../api/companies';
+import {
+  createEnrichmentOrder,
+  processEnrichmentPayment,
+  getCompanyEnrichment,
+} from '../api/enrichment';
+
+const SELECTED_KEY = 'dealsourcing_selected_ids';
 
 const initialFilters: CompanyFilter = {
   search: '',
@@ -15,17 +22,20 @@ const initialFilters: CompanyFilter = {
 
 export const useCompanies = () => {
   const [companies, setCompanies] = useState<Company[]>([]);
-  const [shortlistIds, setShortlistIds] = useState<string[]>([]);
+  const [enrichedIds, setEnrichedIds] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Filter and Sorting State
   const [filters, setFilters] = useState<CompanyFilter>(initialFilters);
-  const [sortBy, setSortBy] = useState<string>('confidence-desc'); // name-asc, confidence-desc, revenue-desc
-  
-  // Selection for comparison (max 4)
-  const [selectedForComparison, setSelectedForComparison] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState<string>('confidence-desc');
+
+  // Selection state (for Review Results enrichment)
+  const [selectedIds, setSelectedIds] = useState<string[]>(() => {
+    const stored = localStorage.getItem(SELECTED_KEY);
+    return stored ? JSON.parse(stored) : [];
+  });
 
   const fetchCompanies = useCallback(async () => {
     setLoading(true);
@@ -33,7 +43,7 @@ export const useCompanies = () => {
     try {
       const data = await companiesApi.getCompanies();
       setCompanies(data.companies);
-      setShortlistIds(data.shortlistIds);
+      setEnrichedIds(data.enrichedIds);
     } catch (err: any) {
       setError(err?.message || 'Failed to load discovered companies.');
     } finally {
@@ -45,25 +55,79 @@ export const useCompanies = () => {
     fetchCompanies();
   }, [fetchCompanies]);
 
-  const toggleShortlist = async (id: string) => {
-    setError(null);
-    try {
-      const company = companies.find(c => c.id === id);
-      const isCurrentlyShortlisted = shortlistIds.includes(id);
-      
-      const updatedIds = await companiesApi.toggleShortlist(id);
-      setShortlistIds(updatedIds);
-      
-      if (!isCurrentlyShortlisted && company) {
-        setSuccessMessage(`"${company.name}" added to shortlist.`);
-      } else if (company) {
-        setSuccessMessage(`"${company.name}" removed from shortlist.`);
-      }
-      setTimeout(() => setSuccessMessage(null), 3000);
-    } catch (err: any) {
-      setError(err?.message || 'Failed to update shortlist.');
-    }
+  // Persist selected IDs
+  useEffect(() => {
+    localStorage.setItem(SELECTED_KEY, JSON.stringify(selectedIds));
+  }, [selectedIds]);
+
+  // ─── Selection controls ───────────────────────────────────────────────────
+
+  const toggleSelection = (id: string) => {
+    setSelectedIds(prev =>
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+    );
   };
+
+  const selectAll = () => {
+    setSelectedIds(companies.map(c => c.id));
+  };
+
+  const clearSelection = () => {
+    setSelectedIds([]);
+  };
+
+  // ─── Enrichment flow ──────────────────────────────────────────────────────
+
+  /**
+   * Runs the full enrichment flow for a set of company IDs:
+   * 1. Create order  2. Process payment  3. Fetch enrichment data per company
+   * 4. Mark as enriched in storage  5. Update local state
+   */
+  const enrichCompanies = async (ids: string[]): Promise<void> => {
+    if (ids.length === 0) return;
+
+    // Create order (no-op for demo, but backend-ready)
+    const order = await createEnrichmentOrder(ids);
+
+    // Process payment
+    const paymentResult = await processEnrichmentPayment(order.orderId);
+    if (!paymentResult.success) {
+      throw new Error('Payment failed. Please try again.');
+    }
+
+    // Fetch enrichment data for each company in parallel
+    const enrichmentMap: Record<string, EnrichmentData> = {};
+    await Promise.all(
+      ids.map(async id => {
+        enrichmentMap[id] = await getCompanyEnrichment(id);
+      })
+    );
+
+    // Persist to localStorage
+    await companiesApi.markAsEnriched(ids, enrichmentMap);
+
+    // Update React state
+    setEnrichedIds(prev => Array.from(new Set([...prev, ...ids])));
+    setCompanies(prev =>
+      prev.map(c => {
+        if (ids.includes(c.id)) {
+          return {
+            ...c,
+            enrichmentStatus: 'enriched' as const,
+            enrichmentData: enrichmentMap[c.id],
+          };
+        }
+        return c;
+      })
+    );
+
+    setSuccessMessage(
+      `${ids.length} ${ids.length === 1 ? 'company' : 'companies'} successfully enriched.`
+    );
+    setTimeout(() => setSuccessMessage(null), 4000);
+  };
+
+  // ─── Filter helpers ───────────────────────────────────────────────────────
 
   const updateFilters = (newFilters: Partial<CompanyFilter>) => {
     setFilters(prev => ({ ...prev, ...newFilters }));
@@ -73,24 +137,8 @@ export const useCompanies = () => {
     setFilters(initialFilters);
   };
 
-  const toggleComparisonSelection = (id: string) => {
-    setSelectedForComparison(prev => {
-      if (prev.includes(id)) {
-        return prev.filter(item => item !== id);
-      }
-      if (prev.length >= 4) {
-        // Limit to 4 companies
-        return prev;
-      }
-      return [...prev, id];
-    });
-  };
+  // ─── Unique dropdown options ──────────────────────────────────────────────
 
-  const clearComparison = () => {
-    setSelectedForComparison([]);
-  };
-
-  // Helper to extract dropdown options from raw data
   const uniqueOptions = useMemo(() => {
     const industries = new Set<string>();
     const locations = new Set<string>();
@@ -98,15 +146,11 @@ export const useCompanies = () => {
 
     companies.forEach(c => {
       if (c.industry) industries.add(c.industry);
-      // Simplify location to state or main city for dropdown filters
       if (c.location) {
         const state = c.location.split(',')[1]?.trim() || c.location;
         locations.add(state);
       }
-      if (c.ownership) {
-        // e.g. "Private (Founder Owned)" -> simplify or keep exact
-        ownerships.add(c.ownership);
-      }
+      if (c.ownership) ownerships.add(c.ownership);
     });
 
     return {
@@ -116,11 +160,11 @@ export const useCompanies = () => {
     };
   }, [companies]);
 
-  // Apply filters and sorting
+  // ─── Filtered + sorted companies ─────────────────────────────────────────
+
   const filteredCompanies = useMemo(() => {
     let result = [...companies];
 
-    // Search query
     if (filters.search.trim()) {
       const query = filters.search.toLowerCase();
       result = result.filter(
@@ -132,37 +176,13 @@ export const useCompanies = () => {
       );
     }
 
-    // Industry Filter
-    if (filters.industry) {
-      result = result.filter(c => c.industry === filters.industry);
-    }
+    if (filters.industry) result = result.filter(c => c.industry === filters.industry);
+    if (filters.location) result = result.filter(c => c.location.includes(filters.location));
+    if (filters.revenue) result = result.filter(c => c.revenueRange === filters.revenue);
+    if (filters.employees) result = result.filter(c => c.employeeRange === filters.employees);
+    if (filters.ownership) result = result.filter(c => c.ownership === filters.ownership);
+    if (filters.fitLevel) result = result.filter(c => c.fitLevel === filters.fitLevel);
 
-    // Location Filter (State match)
-    if (filters.location) {
-      result = result.filter(c => c.location.includes(filters.location));
-    }
-
-    // Revenue Filter (rough matching or exact range)
-    if (filters.revenue) {
-      result = result.filter(c => c.revenueRange === filters.revenue);
-    }
-
-    // Employees Filter
-    if (filters.employees) {
-      result = result.filter(c => c.employeeRange === filters.employees);
-    }
-
-    // Ownership Filter
-    if (filters.ownership) {
-      result = result.filter(c => c.ownership === filters.ownership);
-    }
-
-    // Fit Level Filter
-    if (filters.fitLevel) {
-      result = result.filter(c => c.fitLevel === filters.fitLevel);
-    }
-
-    // Confidence Filter
     if (filters.confidence) {
       const minConfidence = parseInt(filters.confidence, 10);
       if (!isNaN(minConfidence)) {
@@ -170,14 +190,10 @@ export const useCompanies = () => {
       }
     }
 
-    // Sorting
     result.sort((a, b) => {
-      if (sortBy === 'name-asc') {
-        return a.name.localeCompare(b.name);
-      } else if (sortBy === 'confidence-desc') {
-        return b.confidenceScore - a.confidenceScore;
-      } else if (sortBy === 'revenue-desc') {
-        // simple heuristic: extract first digits
+      if (sortBy === 'name-asc') return a.name.localeCompare(b.name);
+      if (sortBy === 'confidence-desc') return b.confidenceScore - a.confidenceScore;
+      if (sortBy === 'revenue-desc') {
         const getVal = (range: string) => {
           const matched = range.match(/\d+/);
           return matched ? parseInt(matched[0], 10) : 0;
@@ -190,22 +206,11 @@ export const useCompanies = () => {
     return result;
   }, [companies, filters, sortBy]);
 
-  // Derived arrays
-  const shortlistedCompanies = useMemo(() => {
-    return companies.filter(c => shortlistIds.includes(c.id));
-  }, [companies, shortlistIds]);
-
-  const comparisonCompanies = useMemo(() => {
-    return companies.filter(c => selectedForComparison.includes(c.id));
-  }, [companies, selectedForComparison]);
-
   return {
     companies: filteredCompanies,
     allCompaniesRaw: companies,
-    shortlistedCompanies,
-    shortlistIds,
-    comparisonCompanies,
-    selectedForComparison,
+    enrichedIds,
+    selectedIds,
     loading,
     error,
     successMessage,
@@ -215,9 +220,11 @@ export const useCompanies = () => {
     updateFilters,
     clearFilters,
     setSortBy,
-    toggleShortlist,
-    toggleComparisonSelection,
-    clearComparison,
+    toggleSelection,
+    selectAll,
+    clearSelection,
+    enrichCompanies,
     refetch: fetchCompanies,
   };
 };
+

@@ -1,35 +1,54 @@
-import type { Company } from '../types';
+import type { Company, EnrichmentData } from '../types';
 import { mockCompanies } from '../data/mockCompanies';
 
 const STORAGE_KEY = 'dealsourcing_companies';
-const SHORTLIST_KEY = 'dealsourcing_shortlist_ids';
+const ENRICHED_KEY = 'dealsourcing_enriched_ids';
 
+const delay = (ms = 600) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Read persisted companies, falling back to mock data
 const initCompanies = (): Company[] => {
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored) {
-    return JSON.parse(stored);
+    try {
+      const parsed: Company[] = JSON.parse(stored);
+      // Ensure new fields exist for any stored data that predates this version
+      return parsed.map(c => ({
+        ...c,
+        enrichmentStatus: c.enrichmentStatus ?? 'locked',
+      }));
+    } catch {
+      // Corrupt storage — reset
+    }
   }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(mockCompanies));
   return mockCompanies;
 };
 
-const getShortlistIds = (): string[] => {
-  const stored = localStorage.getItem(SHORTLIST_KEY);
+const saveCompanies = (companies: Company[]) => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(companies));
+};
+
+export const getEnrichedIds = (): string[] => {
+  const stored = localStorage.getItem(ENRICHED_KEY);
   return stored ? JSON.parse(stored) : [];
 };
 
-const saveShortlistIds = (ids: string[]) => {
-  localStorage.setItem(SHORTLIST_KEY, JSON.stringify(ids));
+export const saveEnrichedIds = (ids: string[]) => {
+  localStorage.setItem(ENRICHED_KEY, JSON.stringify(ids));
 };
 
-const delay = (ms = 600) => new Promise(resolve => setTimeout(resolve, ms));
-
 export const companiesApi = {
-  getCompanies: async (): Promise<{ companies: Company[]; shortlistIds: string[] }> => {
+  getCompanies: async (): Promise<{ companies: Company[]; enrichedIds: string[] }> => {
     await delay(600);
     const companies = initCompanies();
-    const shortlistIds = getShortlistIds();
-    return { companies, shortlistIds };
+    const enrichedIds = getEnrichedIds();
+    // Sync enrichmentStatus from enrichedIds
+    const synced = companies.map(c => ({
+      ...c,
+      enrichmentStatus: (enrichedIds.includes(c.id) ? 'enriched' : c.enrichmentStatus) as Company['enrichmentStatus'],
+    }));
+    return { companies: synced, enrichedIds };
   },
 
   getCompanyById: async (id: string): Promise<Company> => {
@@ -42,17 +61,28 @@ export const companiesApi = {
     return company;
   },
 
-  toggleShortlist: async (id: string): Promise<string[]> => {
-    await delay(300);
-    const ids = getShortlistIds();
-    const index = ids.indexOf(id);
-    let newIds: string[];
-    if (index > -1) {
-      newIds = ids.filter(item => item !== id);
-    } else {
-      newIds = [...ids, id];
-    }
-    saveShortlistIds(newIds);
-    return newIds;
-  }
+  /** Marks a set of companies as enriched and persists their enrichment data */
+  markAsEnriched: async (
+    ids: string[],
+    enrichmentMap: Record<string, EnrichmentData>
+  ): Promise<void> => {
+    await delay(200);
+    const companies = initCompanies();
+    const existing = getEnrichedIds();
+    const allEnriched = Array.from(new Set([...existing, ...ids]));
+    saveEnrichedIds(allEnriched);
+
+    const updated = companies.map(c => {
+      if (ids.includes(c.id)) {
+        return {
+          ...c,
+          enrichmentStatus: 'enriched' as const,
+          enrichmentData: enrichmentMap[c.id] ?? c.enrichmentData,
+        };
+      }
+      return c;
+    });
+    saveCompanies(updated);
+  },
 };
+

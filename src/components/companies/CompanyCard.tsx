@@ -2,22 +2,15 @@ import React from 'react';
 import type { Company } from '../../types';
 import Card from '../ui/Card';
 import Badge from '../ui/Badge';
-import { Database, Plus, Check } from 'lucide-react';
+import { Database } from 'lucide-react';
 import Button from '../ui/Button';
 
 interface CompanyCardProps {
   company: Company;
-  isShortlisted: boolean;
   onView: () => void;
-  onToggleShortlist: () => void;
 }
 
-export const CompanyCard: React.FC<CompanyCardProps> = ({
-  company,
-  isShortlisted,
-  onView,
-  onToggleShortlist
-}) => {
+export const CompanyCard: React.FC<CompanyCardProps> = ({ company, onView }) => {
   const getFitBadge = (fit: Company['fitLevel']) => {
     switch (fit) {
       case 'HIGH FIT':
@@ -95,25 +88,19 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({
         <span className="truncate">Source: {company.sourceName}</span>
       </div>
 
-      {/* 5. CTA Action Buttons */}
-      <div className="grid grid-cols-2 gap-3 mt-1">
+      {/* 5. CTA Action Button */}
+      <div className="mt-1">
         <Button
           variant="outline"
           size="sm"
           onClick={onView}
+          className="w-full"
         >
           View Company
-        </Button>
-        <Button
-          variant={isShortlisted ? 'success' : 'secondary'}
-          size="sm"
-          onClick={onToggleShortlist}
-          leftIcon={isShortlisted ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-        >
-          {isShortlisted ? 'Shortlisted' : 'Add Shortlist'}
         </Button>
       </div>
     </Card>
   );
 };
 export default CompanyCard;
+

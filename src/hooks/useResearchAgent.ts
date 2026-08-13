@@ -1,99 +1,49 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { researchAgentApi } from '../api/researchAgent';
 import type { ChatMessage, MandateCriteria } from '../api/researchAgent';
-
-const mapStorageToCriteria = (storedMandate: any): MandateCriteria => {
-  return {
-    targetIndustry: storedMandate.targetIndustry || 'Not specified',
-    primaryActivities: storedMandate.targetActivity || 'Not specified',
-    geography: storedMandate.geography || 'Not specified',
-    revenueRange: typeof storedMandate.revenueRange === 'object' 
-      ? storedMandate.revenueRange.label 
-      : storedMandate.revenueRange || 'Not specified',
-    companySize: typeof storedMandate.employeeRange === 'object'
-      ? storedMandate.employeeRange.label
-      : storedMandate.employeeRange || 'Not specified',
-    ownershipProfile: storedMandate.ownershipPreference || 'Not specified',
-    successionPreference: storedMandate.successionPreference || 'Not specified',
-    exclusions: Array.isArray(storedMandate.industryExclusions)
-      ? storedMandate.industryExclusions.join(', ') || 'Not specified'
-      : storedMandate.industryExclusions || 'Not specified'
-  };
-};
+import { useMandateHistory } from '../context/MandateHistoryContext';
 
 export const useResearchAgent = () => {
-  const [messages, setMessages] = useState<ChatMessage[]>(() => {
-    const stored = localStorage.getItem('dealsourcing_mandate');
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        if (parsed.status === 'Approved') {
-          return [
-            {
-              id: 'msg-init-loaded',
-              sender: 'agent',
-              text: "Hello. I've loaded your defined acquisition mandate. You can review the criteria on the right, edit them directly using the edit icons, or continue to the next stage.",
-              timestamp: '10:30 AM'
-            }
-          ];
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    return researchAgentApi.getInitialState().messages;
-  });
-  
-  const [mandate, setMandate] = useState<MandateCriteria>(() => {
-    const stored = localStorage.getItem('dealsourcing_mandate');
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        if (parsed.status === 'Approved') {
-          return mapStorageToCriteria(parsed);
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    return researchAgentApi.getInitialState().mandate;
-  });
-
-  const [quickPrompts, setQuickPrompts] = useState<string[]>(() => {
-    const stored = localStorage.getItem('dealsourcing_mandate');
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        if (parsed.status === 'Approved') {
-          return [];
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    return researchAgentApi.getInitialState().quickPrompts;
-  });
-
-  const [activeField, setActiveField] = useState<keyof MandateCriteria | null>(null);
+  const { activeMandate, updateActiveMandate } = useMandateHistory();
   const [isLoading, setIsLoading] = useState(false);
+  const [quickPrompts, setQuickPrompts] = useState<string[]>([]);
+  const [activeField, setActiveField] = useState<keyof MandateCriteria | null>(null);
 
-  const [isComplete, setIsComplete] = useState<boolean>(() => {
-    const stored = localStorage.getItem('dealsourcing_mandate');
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        if (parsed.status === 'Approved') {
-          return true;
-        }
-      } catch (e) {
-        console.error(e);
-      }
+  // Extract from active mandate or fall back
+  const messages = activeMandate?.conversation || [];
+  const mandate: MandateCriteria = activeMandate?.criteria || {
+    targetIndustry: 'Not specified',
+    primaryActivities: 'Not specified',
+    geography: 'Not specified',
+    revenueRange: 'Not specified',
+    companySize: 'Not specified',
+    ownershipProfile: 'Not specified',
+    successionPreference: 'Not specified',
+    exclusions: 'Not specified',
+    additionalDetails: 'Not specified'
+  };
+  const confirmedCriteria: Record<keyof MandateCriteria, boolean> = activeMandate?.confirmedCriteria || {
+    targetIndustry: false,
+    primaryActivities: false,
+    geography: false,
+    revenueRange: false,
+    companySize: false,
+    ownershipProfile: false,
+    successionPreference: false,
+    exclusions: false,
+    additionalDetails: false
+  };
+
+  // Sync initial welcome quick prompts when starting a new mandate
+  useEffect(() => {
+    if (messages.length === 1 && messages[0].id.includes('welcome')) {
+      setQuickPrompts(researchAgentApi.getInitialState().quickPrompts);
+      setActiveField(null);
     }
-    return false;
-  });
+  }, [messages]);
 
   const sendMessage = useCallback(async (text: string) => {
-    if (!text.trim() || isLoading) return;
+    if (!text.trim() || isLoading || !activeMandate) return;
 
     // 1. Add user message
     const userMsg: ChatMessage = {
@@ -103,7 +53,10 @@ export const useResearchAgent = () => {
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
     
-    setMessages(prev => [...prev, userMsg]);
+    const updatedConversation = [...messages, userMsg];
+    updateActiveMandate({
+      conversation: updatedConversation
+    });
     setIsLoading(true);
 
     try {
@@ -118,66 +71,105 @@ export const useResearchAgent = () => {
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
 
-      setMessages(prev => [...prev, agentMsg]);
-      setMandate(result.updatedMandate);
+      // Determine new confirmed states: if a value was suggested/updated, ensure it remains unconfirmed
+      const newConfirmed = { ...confirmedCriteria };
+      (Object.keys(result.updatedMandate) as (keyof MandateCriteria)[]).forEach(k => {
+        // If value changed from previous, or became filled, mark as unconfirmed (SUGGESTED)
+        if (result.updatedMandate[k] !== mandate[k]) {
+          newConfirmed[k] = false; 
+        }
+      });
+
+      updateActiveMandate({
+        conversation: [...updatedConversation, agentMsg],
+        criteria: result.updatedMandate,
+        confirmedCriteria: newConfirmed
+      });
+
       setQuickPrompts(result.quickPrompts);
       setActiveField(result.activeField);
-      setIsComplete(result.isComplete);
     } catch (error) {
       console.error("Failed to send message to Research Agent:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [mandate, activeField, isLoading]);
+  }, [messages, mandate, activeField, confirmedCriteria, activeMandate, isLoading, updateActiveMandate]);
+
+  const confirmField = useCallback((field: keyof MandateCriteria) => {
+    if (!activeMandate) return;
+    const updatedConfirmed = {
+      ...confirmedCriteria,
+      [field]: true
+    };
+    updateActiveMandate({
+      confirmedCriteria: updatedConfirmed
+    });
+  }, [confirmedCriteria, activeMandate, updateActiveMandate]);
+
+  const unconfirmField = useCallback((field: keyof MandateCriteria) => {
+    if (!activeMandate) return;
+    const updatedConfirmed = {
+      ...confirmedCriteria,
+      [field]: false
+    };
+    updateActiveMandate({
+      confirmedCriteria: updatedConfirmed
+    });
+  }, [confirmedCriteria, activeMandate, updateActiveMandate]);
 
   const resetConversation = useCallback(() => {
+    if (!activeMandate) return;
     const initialState = researchAgentApi.getInitialState();
-    setMessages(initialState.messages);
-    setMandate(initialState.mandate);
+    
+    updateActiveMandate({
+      conversation: initialState.messages,
+      criteria: initialState.mandate,
+      confirmedCriteria: {
+        targetIndustry: false,
+        primaryActivities: false,
+        geography: false,
+        revenueRange: false,
+        companySize: false,
+        ownershipProfile: false,
+        successionPreference: false,
+        exclusions: false,
+        additionalDetails: false
+      },
+      status: 'Draft',
+      currentWorkflowStep: 1
+    });
+
     setQuickPrompts(initialState.quickPrompts);
     setActiveField(null);
-    setIsComplete(false);
     setIsLoading(false);
-  }, []);
+  }, [activeMandate, updateActiveMandate]);
 
   const updateSummaryFieldDirectly = useCallback((field: keyof MandateCriteria, value: string) => {
-    setMandate(prev => {
-      const next = { ...prev, [field]: value };
-      
-      // Auto-save changes back to localStorage if mandate is already loaded
-      const stored = localStorage.getItem('dealsourcing_mandate');
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
-          const mandateObj = {
-            ...parsed,
-            geography: next.geography,
-            targetIndustry: next.targetIndustry,
-            targetActivity: next.primaryActivities,
-            revenueRange: { ...parsed.revenueRange, label: next.revenueRange },
-            employeeRange: { ...parsed.employeeRange, label: next.companySize },
-            ownershipPreference: next.ownershipProfile,
-            successionPreference: next.successionPreference,
-            industryExclusions: next.exclusions !== 'Not specified' ? [next.exclusions] : [],
-            lastUpdated: new Date().toISOString()
-          };
-          localStorage.setItem('dealsourcing_mandate', JSON.stringify(mandateObj));
-        } catch (e) {
-          console.error("Failed to save edited mandate field to storage:", e);
-        }
-      }
-      return next;
+    if (!activeMandate) return;
+    const nextCriteria = {
+      ...mandate,
+      [field]: value
+    };
+    const nextConfirmed = {
+      ...confirmedCriteria,
+      [field]: true // Manually edited/saved fields default to Confirmed
+    };
+    updateActiveMandate({
+      criteria: nextCriteria,
+      confirmedCriteria: nextConfirmed
     });
-  }, []);
+  }, [mandate, confirmedCriteria, activeMandate, updateActiveMandate]);
 
   return {
     messages,
-    mandate,
+    mandate: mandate as MandateCriteria,
+    confirmedCriteria: confirmedCriteria as Record<keyof MandateCriteria, boolean>,
     quickPrompts,
     activeField,
     isLoading,
-    isComplete,
     sendMessage,
+    confirmField,
+    unconfirmField,
     resetConversation,
     updateSummaryFieldDirectly
   };

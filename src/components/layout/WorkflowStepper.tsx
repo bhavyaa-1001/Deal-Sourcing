@@ -61,14 +61,14 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
               return (
                 <li
                   key={step.number}
-                  className="flex-1 flex items-center"
+                  className={`flex items-center ${idx === STEPS.length - 1 ? 'flex-initial shrink-0' : 'flex-1'}`}
                 >
                   <button
                     onClick={() => handleStepClick(step)}
                     disabled={!isUnlocked}
                     className={`
                       flex items-center gap-3 text-left focus-ring rounded p-2 transition-colors cursor-pointer
-                      disabled:cursor-not-allowed disabled:opacity-50 hover:bg-slate-100/50 dark:hover:bg-slate-800/30
+                      disabled:cursor-not-allowed disabled:opacity-50 hover:bg-slate-100/50 dark:hover:bg-slate-800/30 shrink-0
                     `}
                   >
                     {/* Circle Indicator */}

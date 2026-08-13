@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCompanies } from '../hooks/useCompanies';
 import CompanyFilters from '../components/companies/CompanyFilters';
@@ -9,38 +9,26 @@ import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import EmptyState from '../components/ui/EmptyState';
 import LoadingState from '../components/ui/LoadingState';
-import { LayoutGrid, Table, ArrowLeft, ArrowRight, CheckCircle2, Database, Target, Award } from 'lucide-react';
+import { LayoutGrid, Table, ArrowLeft, ArrowRight, Database, Target, Award } from 'lucide-react';
 
 export const CompanyDiscovery: React.FC = () => {
   const navigate = useNavigate();
   const {
     companies,
-    shortlistIds,
     loading,
     error,
-    successMessage,
     filters,
     uniqueOptions,
     updateFilters,
     clearFilters,
-    toggleShortlist
   } = useCompanies();
 
-  // View state: 'cards' | 'table'
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
-  
-  // Selected company for modal
   const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
 
-  const handleBack = () => {
-    navigate('/research');
-  };
+  const handleBack = () => navigate('/research');
+  const handleContinue = () => navigate('/review');
 
-  const handleContinue = () => {
-    navigate('/review');
-  };
-
-  // Find currently opened company details
   const activeCompany = companies.find(c => c.id === selectedCompanyId) || null;
 
   if (loading && companies.length === 0) {
@@ -65,10 +53,10 @@ export const CompanyDiscovery: React.FC = () => {
             Discover Companies
           </h2>
           <p className="text-lg text-secondary mt-2">
-            Find target businesses in Australia that match your acquisition mandate.
+            Explore companies matching your acquisition mandate. Select companies for deeper evaluation in Review Results.
           </p>
         </div>
-        
+
         {/* Toggle Grid/Table view */}
         <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-md border border-default self-start md:self-auto">
           <button
@@ -90,44 +78,24 @@ export const CompanyDiscovery: React.FC = () => {
         </div>
       </div>
 
-      {/* Success Notification Alert */}
-      {successMessage && (
-        <div className="bg-brand-success-light text-brand-success border border-brand-success rounded-md p-4 flex items-center gap-2.5 text-left animate-fadeIn">
-          <CheckCircle2 className="h-5 w-5" />
-          <span className="font-semibold text-base">{successMessage}</span>
-        </div>
-      )}
-
-      {/* 1. Metrics Cards (High level telemetry matching requirements) */}
+      {/* 1. Metrics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-left">
         <Card className="flex justify-between items-start p-5 border border-default bg-card rounded shadow-none">
           <div className="flex flex-col gap-1.5 min-w-0 flex-1 pr-2">
-            <span className="text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider block">
-              Discovered Targets
-            </span>
-            <span className="text-3xl font-bold text-primary block my-0.5">
-              148
-            </span>
-            <span className="text-xs text-secondary block leading-normal">
-              Companies identified through research sources
-            </span>
+            <span className="text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider block">Discovered Targets</span>
+            <span className="text-3xl font-bold text-primary block my-0.5">148</span>
+            <span className="text-xs text-secondary block leading-normal">Companies identified through research sources</span>
           </div>
           <div className="p-2 bg-slate-50 dark:bg-slate-900 border border-default rounded text-slate-450 shrink-0">
             <Database className="h-4.5 w-4.5" />
           </div>
         </Card>
-        
+
         <Card className="flex justify-between items-start p-5 border border-default bg-card rounded shadow-none">
           <div className="flex flex-col gap-1.5 min-w-0 flex-1 pr-2">
-            <span className="text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider block">
-              Potential Fits
-            </span>
-            <span className="text-3xl font-bold text-primary block my-0.5">
-              42
-            </span>
-            <span className="text-xs text-secondary block leading-normal">
-              Candidates matching initial criteria
-            </span>
+            <span className="text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider block">Potential Fits</span>
+            <span className="text-3xl font-bold text-primary block my-0.5">42</span>
+            <span className="text-xs text-secondary block leading-normal">Candidates matching initial criteria</span>
           </div>
           <div className="p-2 bg-slate-50 dark:bg-slate-900 border border-default rounded text-slate-450 shrink-0">
             <Target className="h-4.5 w-4.5" />
@@ -136,15 +104,9 @@ export const CompanyDiscovery: React.FC = () => {
 
         <Card className="flex justify-between items-start p-5 border border-default bg-card rounded shadow-none">
           <div className="flex flex-col gap-1.5 min-w-0 flex-1 pr-2">
-            <span className="text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider block">
-              High Alignment
-            </span>
-            <span className="text-3xl font-bold text-primary block my-0.5">
-              18
-            </span>
-            <span className="text-xs text-secondary block leading-normal">
-              Strong acquisition alignment targets
-            </span>
+            <span className="text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider block">High Alignment</span>
+            <span className="text-3xl font-bold text-primary block my-0.5">{companies.filter(c => c.fitLevel === 'HIGH FIT').length}</span>
+            <span className="text-xs text-secondary block leading-normal">Strong acquisition alignment targets</span>
           </div>
           <div className="p-2 bg-slate-50 dark:bg-slate-900 border border-default rounded text-slate-450 shrink-0">
             <Award className="h-4.5 w-4.5" />
@@ -169,38 +131,30 @@ export const CompanyDiscovery: React.FC = () => {
           onAction={clearFilters}
         />
       ) : viewMode === 'cards' ? (
-        /* Cards Layout Grid */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {companies.map(company => (
             <CompanyCard
               key={company.id}
               company={company}
-              isShortlisted={shortlistIds.includes(company.id)}
               onView={() => setSelectedCompanyId(company.id)}
-              onToggleShortlist={() => toggleShortlist(company.id)}
             />
           ))}
         </div>
       ) : (
-        /* Table Layout View */
         <CompanyTable
           companies={companies}
-          shortlistIds={shortlistIds}
           onView={(id) => setSelectedCompanyId(id)}
-          onToggleShortlist={(id) => toggleShortlist(id)}
         />
       )}
 
-      {/* 4. Company Detail Modal / Side Drawer Drawer */}
+      {/* 4. Company Detail Modal */}
       <CompanyDetails
         company={activeCompany}
         isOpen={selectedCompanyId !== null}
         onClose={() => setSelectedCompanyId(null)}
-        isShortlisted={selectedCompanyId ? shortlistIds.includes(selectedCompanyId) : false}
-        onToggleShortlist={() => selectedCompanyId && toggleShortlist(selectedCompanyId)}
       />
 
-      {/* Page Actions Footer Navigation */}
+      {/* Page Actions Footer */}
       <div className="border-t border-default pt-6 flex items-center justify-between mt-4">
         <Button
           variant="outline"
@@ -210,20 +164,16 @@ export const CompanyDiscovery: React.FC = () => {
         >
           Back
         </Button>
-        
-        <div className="flex items-center gap-4">
-          <span className="hidden md:inline text-base font-semibold text-secondary">
-            {shortlistIds.length} companies selected for review
-          </span>
-          <Button
-            variant="primary"
-            onClick={handleContinue}
-            rightIcon={<ArrowRight className="h-5 w-5" />}
-            className="min-w-[200px]"
-          >
-            Continue to Review Shortlist
-          </Button>
-        </div>
+
+        <Button
+          variant="primary"
+          onClick={handleContinue}
+          rightIcon={<ArrowRight className="h-5 w-5" />}
+          className="min-w-[200px]"
+          id="continue-to-review-btn"
+        >
+          Continue to Review Results
+        </Button>
       </div>
     </div>
   );

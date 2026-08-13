@@ -7,34 +7,192 @@ import { mandatesApi } from '../../api/mandates';
 import { researchApi } from '../../api/research';
 import Modal from '../ui/Modal';
 import Button from '../ui/Button';
-import { FileText, Settings, Search, CheckSquare } from 'lucide-react';
+import { FileText, Settings, Search, CheckSquare, Trash2 } from 'lucide-react';
+import { useMandateHistory } from '../../context/MandateHistoryContext';
+
+const SidebarContent: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
+  const { mandates, activeId, selectMandate, createNewMandate, deleteMandate } = useMandateHistory();
+  const navigate = useNavigate();
+
+  const handleSelect = (id: string) => {
+    selectMandate(id);
+    navigate('/mandate');
+    if (onClose) onClose();
+  };
+
+  const handleNew = () => {
+    createNewMandate();
+    navigate('/mandate');
+    if (onClose) onClose();
+  };
+
+  return (
+    <div className="flex flex-col h-full text-left">
+      <div className="mb-4">
+        <span className="text-[13px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
+          MANDATES
+        </span>
+      </div>
+
+      <button
+        onClick={handleNew}
+        className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-[#D9DDE1] hover:border-slate-400 dark:border-slate-700 dark:hover:border-slate-500 text-[#172A3A] dark:text-slate-200 bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800 rounded-md font-bold text-[14px] cursor-pointer transition-all mb-5 min-h-[38px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-primary"
+      >
+        <span>+ New Mandate</span>
+      </button>
+
+      <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-2.5">
+        RECENT MANDATES
+      </span>
+
+      <div className="flex-1 overflow-y-auto flex flex-col gap-3 pr-1">
+        {mandates.map((m) => {
+          const isActive = m.id === activeId;
+          const dateStr = new Date(m.createdAt).toLocaleDateString([], {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+          });
+          
+          const confirmedCount = Object.values(m.confirmedCriteria).filter(Boolean).length;
+          
+          return (
+            <div
+              key={m.id}
+              className={`group relative w-full p-4 rounded-md border text-left transition-all flex flex-col gap-1.5
+                ${isActive
+                  ? 'border-brand-primary bg-slate-50 dark:bg-slate-800 text-primary shadow-sm'
+                  : 'border-default bg-card text-secondary hover:bg-slate-50/50 dark:hover:bg-slate-800/40'
+                }
+              `}
+            >
+              {/* Clickable Card Body Area */}
+              <div 
+                onClick={() => handleSelect(m.id)}
+                className="flex-1 cursor-pointer"
+              >
+                <div className="flex justify-between items-start gap-2 pr-6">
+                  <span className={`font-bold text-[15px] leading-tight block truncate text-primary ${isActive ? 'font-extrabold' : ''}`}>
+                    {m.title}
+                  </span>
+                </div>
+
+                <div className="text-xs text-secondary mt-0.5 leading-snug pr-6">
+                  <span>{m.criteria.targetIndustry || 'Unspecified Industry'}</span>
+                  {m.criteria.geography && m.criteria.geography !== 'Not specified' && (
+                    <span> · {m.criteria.geography}</span>
+                  )}
+                </div>
+
+                <div className="flex justify-between items-center text-[10px] text-slate-400 dark:text-slate-500 mt-2 font-medium">
+                  <span>{dateStr}</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className={`text-[10px] px-1.5 py-0.2 rounded font-bold uppercase tracking-wider border shrink-0
+                      ${m.status === 'Approved' || m.status === 'Confirmed'
+                        ? 'border-brand-success/30 bg-brand-success-light text-brand-success'
+                        : 'border-slate-300 bg-slate-100 text-slate-600 dark:bg-slate-850 dark:text-slate-400 dark:border-slate-700'
+                      }
+                    `}>
+                      {m.status === 'Approved' || m.status === 'Confirmed' ? 'Confirmed' : 'Draft'}
+                    </span>
+                    <span>•</span>
+                    <span>{confirmedCount}/9 Confirmed</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Absolute Delete Button */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (window.confirm(`Are you sure you want to delete this mandate: "${m.title}"?`)) {
+                    deleteMandate(m.id);
+                  }
+                }}
+                className="absolute right-3 top-3.5 p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-455 hover:text-red-655 dark:hover:text-red-400 cursor-pointer md:opacity-0 group-hover:opacity-100 transition-all focus:opacity-100"
+                title="Delete mandate"
+                aria-label="Delete mandate"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 export const AppLayout: React.FC = () => {
   const themeState = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
+  const { refreshTrigger } = useMandateHistory();
   
   const [mandateApproved, setMandateApproved] = useState(false);
   const [researchApproved, setResearchApproved] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    return localStorage.getItem('dealsourcing_sidebar_collapsed') === 'true';
+  });
 
+  const toggleSidebar = useCallback(() => {
+    setSidebarCollapsed(prev => {
+      const next = !prev;
+      localStorage.setItem('dealsourcing_sidebar_collapsed', String(next));
+      return next;
+    });
+  }, []);
+
+  const handleHeaderToggle = useCallback(() => {
+    if (window.innerWidth < 768) {
+      setMobileDrawerOpen(prev => !prev);
+    } else {
+      toggleSidebar();
+    }
+  }, [toggleSidebar]);
+ 
   // Function to query the mock API and update stepper navigation locks
   const checkApprovals = useCallback(async () => {
     try {
-      const mandate = await mandatesApi.getMandate('mandate-101');
+      const activeId = localStorage.getItem('dealsourcing_mandates_active_id') || 'mandate-101';
+      
+      const storedHistory = localStorage.getItem('dealsourcing_mandates_history');
+      if (storedHistory) {
+        const historyList = JSON.parse(storedHistory);
+        const activeMandate = historyList.find((m: any) => m.id === activeId);
+        if (activeMandate) {
+          setMandateApproved(activeMandate.status === 'Approved' || activeMandate.status === 'Confirmed');
+          
+          const strategyKey = `dealsourcing_strategy_${activeId}`;
+          const storedStrategy = localStorage.getItem(strategyKey);
+          if (storedStrategy) {
+            const parsedStrategy = JSON.parse(storedStrategy);
+            setResearchApproved(parsedStrategy.status === 'Approved');
+          } else {
+            // Seed a default strategy for mandate-101, draft for others
+            setResearchApproved(activeId === 'mandate-101');
+          }
+          return;
+        }
+      }
+      
+      // Fallback
+      const mandate = await mandatesApi.getMandate(activeId);
       setMandateApproved(mandate.status === 'Approved');
       
-      const research = await researchApi.getResearchStrategy('mandate-101');
+      const research = await researchApi.getResearchStrategy(activeId);
       setResearchApproved(research.status === 'Approved');
     } catch (err) {
       console.error('Error fetching stepper approvals status:', err);
     }
   }, []);
 
-  // Check state on mount and when location changes
+  // Check state on mount and when location or active mandate changes
   useEffect(() => {
     checkApprovals();
-  }, [location.pathname, checkApprovals]);
+  }, [location.pathname, refreshTrigger, checkApprovals]);
 
   // Monitor URL hash changes to trigger help modal
   useEffect(() => {
@@ -45,25 +203,67 @@ export const AppLayout: React.FC = () => {
 
   const handleCloseHelp = () => {
     setHelpOpen(false);
-    // Remove the #help hash from URL path without reloading page
     navigate(location.pathname, { replace: true });
   };
 
   return (
     <div className="min-h-screen bg-app flex flex-col text-primary">
-      {/* Top Header */}
-      <Header themeState={themeState} />
-
-      {/* Horizontal Workflow Stepper */}
-      <WorkflowStepper
-        mandateApproved={mandateApproved}
-        researchApproved={researchApproved}
+      {/* Top Header with Integrated Hamburger Sidebar Toggle */}
+      <Header
+        themeState={themeState}
+        sidebarCollapsed={sidebarCollapsed}
+        onToggleSidebar={handleHeaderToggle}
       />
 
-      {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-8 flex flex-col gap-6">
-        <Outlet context={{ refreshApprovals: checkApprovals }} />
-      </main>
+      {/* Main layout splitting sidebar and content */}
+      <div className="flex-1 flex flex-row items-stretch relative">
+        
+        {/* Desktop & Tablet Sidebar — fixed, does not scroll with content */}
+        {!sidebarCollapsed && (
+          <aside className="hidden md:flex flex-col w-64 lg:w-72 shrink-0 border-r border-default bg-white dark:bg-slate-900 p-5 fixed top-[57px] left-0 bottom-0 z-30 overflow-y-auto transition-all duration-200">
+            <SidebarContent />
+          </aside>
+        )}
+
+        {/* Workspace content block — shifts right when sidebar is open */}
+        <div className={`flex-1 flex flex-col min-w-0 transition-all duration-200 ${!sidebarCollapsed ? 'md:ml-64 lg:ml-72' : ''}`}>
+          {/* Horizontal Workflow Stepper */}
+          <WorkflowStepper
+            mandateApproved={mandateApproved}
+            researchApproved={researchApproved}
+          />
+
+          {/* Main Content Area */}
+          <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-8 flex flex-col gap-6">
+            <Outlet context={{ refreshApprovals: checkApprovals }} />
+          </main>
+        </div>
+      </div>
+      
+      {/* Mobile Drawer Overlay */}
+      {mobileDrawerOpen && (
+        <div className="fixed inset-0 z-50 flex md:hidden">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={() => setMobileDrawerOpen(false)}
+          />
+          {/* Drawer content panel */}
+          <div className="relative w-80 max-w-[85vw] h-full bg-white dark:bg-slate-900 border-r border-default flex flex-col p-6 animate-slideIn text-left">
+            <div className="flex justify-between items-center mb-6">
+              <span className="text-base font-bold text-primary">DEAL SOURCING</span>
+              <button
+                onClick={() => setMobileDrawerOpen(false)}
+                className="text-secondary hover:text-primary font-bold text-xl cursor-pointer p-1"
+                aria-label="Close mandates drawer"
+              >
+                ✕
+              </button>
+            </div>
+            <SidebarContent onClose={() => setMobileDrawerOpen(false)} />
+          </div>
+        </div>
+      )}
       
       {/* Footer */}
       <footer className="w-full py-6 border-t border-default bg-card text-center text-secondary text-sm">

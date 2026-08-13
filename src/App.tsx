@@ -4,26 +4,29 @@ import DefineMandate from './pages/DefineMandate';
 import ResearchStrategy from './pages/ResearchStrategy';
 import CompanyDiscovery from './pages/CompanyDiscovery';
 import ReviewResults from './pages/ReviewResults';
+import { MandateHistoryProvider } from './context/MandateHistoryContext';
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route element={<AppLayout />}>
-          {/* Default path redirect to step 1 */}
-          <Route path="/" element={<Navigate to="/mandate" replace />} />
-          
-          {/* Main steps routes */}
-          <Route path="/mandate" element={<DefineMandate />} />
-          <Route path="/research" element={<ResearchStrategy />} />
-          <Route path="/discover" element={<CompanyDiscovery />} />
-          <Route path="/review" element={<ReviewResults />} />
-          
-          {/* Fallback 404 Route */}
-          <Route path="*" element={<Navigate to="/mandate" replace />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <MandateHistoryProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route element={<AppLayout />}>
+            {/* Default path redirect to step 1 */}
+            <Route path="/" element={<Navigate to="/mandate" replace />} />
+            
+            {/* Main steps routes */}
+            <Route path="/mandate" element={<DefineMandate />} />
+            <Route path="/research" element={<ResearchStrategy />} />
+            <Route path="/discover" element={<CompanyDiscovery />} />
+            <Route path="/review" element={<ReviewResults />} />
+            
+            {/* Fallback 404 Route */}
+            <Route path="*" element={<Navigate to="/mandate" replace />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </MandateHistoryProvider>
   );
 }
 

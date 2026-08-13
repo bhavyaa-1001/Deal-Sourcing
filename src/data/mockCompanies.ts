@@ -31,7 +31,8 @@ export const mockCompanies: Company[] = [
       sourcesUsed: ['Plastics Industry Association Directory', 'ASIC Company Extract', 'LinkedIn Employee Analysis'],
       verificationStatus: 'VERIFIED',
       lastVerifiedDate: '2026-08-01'
-    }
+    },
+    enrichmentStatus: 'locked'
   },
   {
     id: 'comp-102',
@@ -63,7 +64,8 @@ export const mockCompanies: Company[] = [
       sourcesUsed: ['Rotational Moulders Association', 'Google Places Reviews', 'Land Title Registry'],
       verificationStatus: 'VERIFIED',
       lastVerifiedDate: '2026-07-28'
-    }
+    },
+    enrichmentStatus: 'locked'
   },
   {
     id: 'comp-103',
@@ -95,7 +97,8 @@ export const mockCompanies: Company[] = [
       sourcesUsed: ['PIPA Directory', 'ABN Lookup', 'Company Financial Summary'],
       verificationStatus: 'VERIFIED',
       lastVerifiedDate: '2026-08-05'
-    }
+    },
+    enrichmentStatus: 'locked'
   },
   {
     id: 'comp-104',
@@ -127,7 +130,8 @@ export const mockCompanies: Company[] = [
       sourcesUsed: ['Plastics Industry Association Directory', 'ASIC search'],
       verificationStatus: 'VERIFIED',
       lastVerifiedDate: '2026-08-02'
-    }
+    },
+    enrichmentStatus: 'locked'
   },
   {
     id: 'comp-105',
@@ -159,7 +163,8 @@ export const mockCompanies: Company[] = [
       sourcesUsed: ['Rotational Moulders Association'],
       verificationStatus: 'UNVERIFIED',
       lastVerifiedDate: '2026-06-15'
-    }
+    },
+    enrichmentStatus: 'locked'
   },
   {
     id: 'comp-106',
@@ -191,6 +196,7 @@ export const mockCompanies: Company[] = [
       sourcesUsed: ['Plastics Association', 'PE Hub Australia', 'ASIC database'],
       verificationStatus: 'VERIFIED',
       lastVerifiedDate: '2026-08-08'
-    }
+    },
+    enrichmentStatus: 'locked'
   }
 ];

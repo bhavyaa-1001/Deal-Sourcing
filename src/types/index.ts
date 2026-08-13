@@ -37,8 +37,8 @@ export interface ResearchSource {
   companiesFound: number;
   status: SourceStatus;
   url?: string;
-  qualityScore: number; // 0.0 - 1.0
-  duplicatePercentage: number; // 0 - 100
+  qualityScore: number;
+  duplicatePercentage: number;
   notes?: string;
   sampleCompanies?: string[];
   rejectedReason?: string;
@@ -77,6 +77,25 @@ export interface ResearchStrategy {
 
 export type FitLevel = 'HIGH FIT' | 'MEDIUM FIT' | 'LOW FIT';
 
+// ─── Enrichment ───────────────────────────────────────────────────────────────
+
+export type EnrichmentStatus = 'locked' | 'processing' | 'enriched';
+
+export interface EnrichmentData {
+  founderName: string;
+  founderRole: string;
+  managementTeam: string;
+  contactPerson: string;
+  email: string;
+  phone: string;
+  linkedin: string;
+  website: string;
+  bio: string;
+  successionNote: string;
+}
+
+// ─── Company ──────────────────────────────────────────────────────────────────
+
 export interface Company {
   id: string;
   name: string;
@@ -88,7 +107,7 @@ export interface Company {
   ownership: string;
   founded: number;
   fitLevel: FitLevel;
-  confidenceScore: number; // e.g. 94 for 94%
+  confidenceScore: number;
   whyItMatches: string;
   website: string;
   sourceName: string;
@@ -108,6 +127,9 @@ export interface Company {
     verificationStatus: 'VERIFIED' | 'UNVERIFIED';
     lastVerifiedDate: string;
   };
+  /** Enrichment status — gated contact data only visible after payment */
+  enrichmentStatus: EnrichmentStatus;
+  enrichmentData?: EnrichmentData;
 }
 
 export interface CompanyFilter {
@@ -120,3 +142,4 @@ export interface CompanyFilter {
   fitLevel: string;
   confidence: string;
 }
+

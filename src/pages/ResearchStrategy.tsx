@@ -12,6 +12,7 @@ export const ResearchStrategy: React.FC = () => {
   const navigate = useNavigate();
   const { refreshApprovals } = useOutletContext<LayoutContextType>();
   
+  const activeId = localStorage.getItem('dealsourcing_mandates_active_id') || 'mandate-101';
   const {
     strategy,
     loading,
@@ -19,7 +20,7 @@ export const ResearchStrategy: React.FC = () => {
     successMessage,
     toggleGap,
     approveStrategy
-  } = useResearch();
+  } = useResearch(activeId);
 
   const [savedMandate, setSavedMandate] = useState<any>(null);
 
@@ -215,7 +216,7 @@ export const ResearchStrategy: React.FC = () => {
                   className={`w-full flex items-start gap-3 p-3.5 border rounded text-left transition-all cursor-pointer select-none
                     ${gap.acknowledged 
                       ? 'border-brand-success/40 bg-brand-success-light dark:bg-brand-success-light/10 text-slate-800 dark:text-slate-200' 
-                      : 'border-default hover:border-slate-450 dark:hover:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50/50 dark:hover:bg-slate-850/50 text-slate-700 dark:text-slate-300'
+                      : 'border-default hover:border-slate-400 dark:hover:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 text-slate-700 dark:text-slate-300'
                     }
                   `}
                 >
