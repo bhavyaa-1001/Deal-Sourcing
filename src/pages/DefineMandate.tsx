@@ -377,21 +377,29 @@ export const DefineMandate: React.FC = () => {
                   All criteria confirmed. Ready to approve.
                 </span>
               )}
-              <Button
-                variant="primary"
-                onClick={handleContinue}
-                disabled={confirmedCount < 9}
-                rightIcon={<ArrowRight className="h-5 w-5" />}
-                className="w-full"
-              >
-                Approve Mandate & Continue
-              </Button>
             </div>
 
           </div>
 
         </div>
 
+      </div>
+
+      {/* Sticky Bottom Action Bar */}
+      <div className="sticky bottom-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-default py-4.5 px-6 -mx-6 -mb-6 flex items-center justify-between z-25 shadow-[0_-8px_30px_rgba(0,0,0,0.04)] mt-6 rounded-b">
+        <div className="flex items-center gap-2 select-none">
+          <span className="text-xs md:text-sm font-bold text-slate-450 uppercase tracking-wider block">Acquisition Mandate Progress:</span>
+          <span className="text-sm font-extrabold text-primary">{confirmedCount} / 9 Criteria Confirmed</span>
+        </div>
+        <Button
+          variant="primary"
+          onClick={handleContinue}
+          disabled={confirmedCount < 9}
+          rightIcon={<ArrowRight className="h-5 w-5" />}
+          className="min-w-[220px]"
+        >
+          Approve Mandate & Continue
+        </Button>
       </div>
 
     </div>

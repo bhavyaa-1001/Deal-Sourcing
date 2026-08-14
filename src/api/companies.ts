@@ -1,5 +1,6 @@
 import type { Company, EnrichmentData } from '../types';
 import { mockCompanies } from '../data/mockCompanies';
+import { getCompanyEnrichment } from './enrichment';
 
 const getActiveMandateId = (): string => {
   return localStorage.getItem('dealsourcing_mandates_active_id') || 'mandate-101';
@@ -90,11 +91,26 @@ export const companiesApi = {
     await delay(600);
     const companies = initCompanies();
     const enrichedIds = getEnrichedIds();
-    // Sync enrichmentStatus from enrichedIds
-    const synced = companies.map(c => ({
-      ...c,
-      enrichmentStatus: (enrichedIds.includes(c.id) ? 'enriched' : c.enrichmentStatus) as Company['enrichmentStatus'],
-    }));
+    
+    // Sync enrichmentStatus and populate enrichmentData if enriched
+    const synced = await Promise.all(
+      companies.map(async c => {
+        const isEnriched = enrichedIds.includes(c.id) || c.enrichmentStatus === 'enriched';
+        if (isEnriched) {
+          const enrichmentData = c.enrichmentData || await getCompanyEnrichment(c.id);
+          return {
+            ...c,
+            enrichmentStatus: 'enriched' as const,
+            enrichmentData,
+          };
+        }
+        return {
+          ...c,
+          enrichmentStatus: 'locked' as const,
+        };
+      })
+    );
+
     return { companies: synced, enrichedIds };
   },
 
@@ -105,7 +121,20 @@ export const companiesApi = {
     if (!company) {
       throw new Error(`Company with ID ${id} not found.`);
     }
-    return company;
+    const enrichedIds = getEnrichedIds();
+    const isEnriched = enrichedIds.includes(company.id) || company.enrichmentStatus === 'enriched';
+    if (isEnriched) {
+      const enrichmentData = company.enrichmentData || await getCompanyEnrichment(company.id);
+      return {
+        ...company,
+        enrichmentStatus: 'enriched' as const,
+        enrichmentData,
+      };
+    }
+    return {
+      ...company,
+      enrichmentStatus: 'locked' as const,
+    };
   },
 
   /** Marks a set of companies as enriched and persists their enrichment data */

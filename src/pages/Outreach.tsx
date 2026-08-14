@@ -716,8 +716,8 @@ const Outreach: React.FC = () => {
         </div>
       )}
 
-      {/* Footer nav */}
-      <div className="border-t border-default pt-6 flex items-center justify-between mt-4">
+      {/* Sticky Footer nav */}
+      <div className="sticky bottom-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-default py-4.5 px-6 -mx-6 -mb-6 flex items-center justify-between z-25 shadow-[0_-8px_30px_rgba(0,0,0,0.04)] mt-6 rounded-b">
         <Button
           variant="outline"
           onClick={() => navigate('/review')}

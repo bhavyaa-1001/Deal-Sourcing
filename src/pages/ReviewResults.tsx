@@ -306,7 +306,12 @@ export const ReviewResults: React.FC = () => {
                       </td>
 
                       <td className="px-3 py-3.5 font-bold">
-                        <span className="text-primary text-sm md:text-base">{company.name}</span>
+                        <span
+                          onClick={() => setSelectedCompanyId(company.id)}
+                          className="text-primary text-sm md:text-base hover:text-brand-primary hover:underline cursor-pointer"
+                        >
+                          {company.name}
+                        </span>
                         <span className="text-xs text-secondary block mt-0.5 font-semibold">{company.industry}</span>
                       </td>
 
@@ -717,8 +722,8 @@ export const ReviewResults: React.FC = () => {
           setEnrichPreviewOpen(false);
         }}
       />
-      {/* ── Page Footer Navigation — Export PDF + Continue to Outreach live here ── */}
-      <div className="border-t border-default pt-6 flex items-center justify-between mt-4 flex-wrap gap-3">
+      {/* ── Sticky Page Footer Navigation — Export PDF + Continue to Outreach ── */}
+      <div className="sticky bottom-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-default py-4.5 px-6 -mx-6 -mb-6 flex items-center justify-between z-25 shadow-[0_-8px_30px_rgba(0,0,0,0.04)] mt-6 rounded-b flex-wrap gap-3">
         <Button
           variant="outline"
           onClick={handleBack}
