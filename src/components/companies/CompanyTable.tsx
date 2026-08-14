@@ -31,7 +31,9 @@ export const CompanyTable: React.FC<CompanyTableProps> = ({ companies, onView })
             <th className="px-6 py-4.5">Company Name</th>
             <th className="px-6 py-4.5">Location</th>
             <th className="px-6 py-4.5">Industry</th>
-            <th className="px-6 py-4.5">Fit Score</th>
+            <th className="px-6 py-4.5">Fit</th>
+            <th className="px-6 py-4.5">Fit Level</th>
+            <th className="px-6 py-4.5">Confidence</th>
             <th className="px-6 py-4.5">Revenue</th>
             <th className="px-6 py-4.5">Employees</th>
             <th className="px-6 py-4.5 text-right">Actions</th>
@@ -46,7 +48,12 @@ export const CompanyTable: React.FC<CompanyTableProps> = ({ companies, onView })
               {/* Name & Website */}
               <td className="px-6 py-5 font-bold">
                 <div className="flex flex-col">
-                  <span className="text-primary text-base">{company.name}</span>
+                  <span
+                    onClick={() => onView(company.id)}
+                    className="text-primary text-base hover:text-brand-primary hover:underline cursor-pointer"
+                  >
+                    {company.name}
+                  </span>
                   <a
                     href={company.website}
                     target="_blank"
@@ -72,14 +79,21 @@ export const CompanyTable: React.FC<CompanyTableProps> = ({ companies, onView })
                 {company.industry}
               </td>
 
-              {/* Fit */}
+              {/* Fit (float) */}
+              <td className="px-6 py-5 font-bold text-slate-700 dark:text-slate-350">
+                {company.fitScore !== undefined ? company.fitScore.toFixed(1) : '0.0'}
+              </td>
+
+              {/* Fit Level */}
               <td className="px-6 py-5">
-                <div className="flex items-center gap-2">
-                  {getFitBadge(company.fitLevel)}
-                  <span className="text-sm font-bold text-slate-700 dark:text-slate-350">
-                    {company.confidenceScore}%
-                  </span>
-                </div>
+                {getFitBadge(company.fitLevel)}
+              </td>
+
+              {/* Confidence */}
+              <td className="px-6 py-5">
+                <span className="text-sm font-bold text-slate-700 dark:text-slate-350">
+                  {(company.confidenceScore ?? 0).toFixed(1)}%
+                </span>
               </td>
 
               {/* Revenue */}

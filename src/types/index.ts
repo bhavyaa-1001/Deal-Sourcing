@@ -107,6 +107,7 @@ export interface Company {
   ownership: string;
   founded: number;
   fitLevel: FitLevel;
+  fitScore: number;
   confidenceScore: number;
   whyItMatches: string;
   website: string;

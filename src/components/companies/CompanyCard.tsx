@@ -29,7 +29,10 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, onView }) => 
       {/* 1. Header: Name & Fit */}
       <div className="flex justify-between items-start gap-4">
         <div className="min-w-0">
-          <h3 className="text-xl font-bold text-primary tracking-tight leading-tight block truncate">
+          <h3
+            onClick={onView}
+            className="text-xl font-bold text-primary hover:text-brand-primary hover:underline cursor-pointer tracking-tight leading-tight block truncate"
+          >
             {company.name}
           </h3>
           <div className="text-sm text-secondary mt-1.5 font-semibold flex items-center gap-1.5">
@@ -40,8 +43,11 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, onView }) => 
         </div>
         <div className="shrink-0 flex flex-col items-end gap-1.5">
           {getFitBadge(company.fitLevel)}
-          <span className="text-sm font-bold text-[#9A8056] mt-0.5">
-            {company.confidenceScore}% Match
+          <span className="text-sm font-bold text-[#9A8056] mt-0.5 block text-right">
+            {(company.confidenceScore ?? 0).toFixed(1)}% Match
+          </span>
+          <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 block text-right">
+            Fit: {(company.fitScore ?? 0).toFixed(1)}
           </span>
         </div>
       </div>

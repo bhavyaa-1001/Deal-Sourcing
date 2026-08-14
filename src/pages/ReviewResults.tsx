@@ -50,6 +50,11 @@ export const ReviewResults: React.FC = () => {
   const displayCompanies = allCompaniesRaw.length > 0 ? allCompaniesRaw : companies;
   const activeCompany = displayCompanies.find(c => c.id === selectedCompanyId) || null;
 
+  // Lead Modal navigation callbacks
+  const activeIndex = selectedCompanyId ? displayCompanies.findIndex(c => c.id === selectedCompanyId) : -1;
+  const onPrevious = activeIndex > 0 ? () => setSelectedCompanyId(displayCompanies[activeIndex - 1].id) : undefined;
+  const onNext = activeIndex >= 0 && activeIndex < displayCompanies.length - 1 ? () => setSelectedCompanyId(displayCompanies[activeIndex + 1].id) : undefined;
+
   // Auto-select when companies first load
   useEffect(() => {
     if (displayCompanies.length > 0 && selectedIds.length === 0) {
@@ -262,7 +267,9 @@ export const ReviewResults: React.FC = () => {
                 <th className="px-3 py-3 w-14 text-center text-[10px] font-bold text-secondary uppercase tracking-wide">Select</th>
                 <th className="px-3 py-3">Company</th>
                 <th className="px-3 py-3">Location</th>
-                <th className="px-3 py-3">Fit Score</th>
+                <th className="px-3 py-3">Fit</th>
+                <th className="px-3 py-3">Fit Level</th>
+                <th className="px-3 py-3">Confidence</th>
                 <th className="px-3 py-3">Revenue</th>
                 <th className="px-3 py-3">Employees</th>
                 <th className="px-3 py-3 text-right pr-5">Actions</th>
@@ -305,13 +312,18 @@ export const ReviewResults: React.FC = () => {
 
                       <td className="px-3 py-3.5 text-secondary font-semibold text-xs md:text-sm">{company.location}</td>
 
+                      <td className="px-3 py-3.5 font-bold text-slate-700 dark:text-slate-350">
+                        {company.fitScore !== undefined ? company.fitScore.toFixed(1) : '0.0'}
+                      </td>
+
                       <td className="px-3 py-3.5">
-                        <div className="flex items-center gap-1">
-                          {company.fitLevel === 'HIGH FIT' && <Badge variant="success" className="text-[10px] px-1 py-0.5">HIGH</Badge>}
-                          {company.fitLevel === 'MEDIUM FIT' && <Badge variant="warning" className="text-[10px] px-1 py-0.5">MEDIUM</Badge>}
-                          {company.fitLevel === 'LOW FIT' && <Badge variant="danger" className="text-[10px] px-1 py-0.5">LOW</Badge>}
-                          <span className="text-xs md:text-sm font-bold text-brand-primary">{company.confidenceScore}%</span>
-                        </div>
+                        {company.fitLevel === 'HIGH FIT' && <Badge variant="success" className="text-[10px] px-1 py-0.5">HIGH</Badge>}
+                        {company.fitLevel === 'MEDIUM FIT' && <Badge variant="warning" className="text-[10px] px-1 py-0.5">MEDIUM</Badge>}
+                        {company.fitLevel === 'LOW FIT' && <Badge variant="danger" className="text-[10px] px-1 py-0.5">LOW</Badge>}
+                      </td>
+
+                      <td className="px-3 py-3.5">
+                        <span className="text-xs md:text-sm font-bold text-brand-primary">{(company.confidenceScore ?? 0).toFixed(1)}%</span>
                       </td>
 
                       <td className="px-3 py-3.5 font-bold text-slate-800 dark:text-slate-200 text-xs md:text-sm whitespace-nowrap">{company.revenueRange}</td>
@@ -347,7 +359,7 @@ export const ReviewResults: React.FC = () => {
 
                     {isExpanded && (
                       <tr id={`enrich-details-${company.id}`} className="bg-slate-50/45 dark:bg-slate-900/10">
-                        <td colSpan={7} className="px-6 py-6 border-b border-default">
+                        <td colSpan={9} className="px-6 py-6 border-b border-default">
                           <div className="flex flex-col gap-6 text-left animate-fadeIn">
                             
                             <div className="flex items-center justify-between border-b border-default pb-3">
@@ -671,6 +683,8 @@ export const ReviewResults: React.FC = () => {
         company={activeCompany}
         isOpen={selectedCompanyId !== null}
         onClose={() => setSelectedCompanyId(null)}
+        onPrevious={onPrevious}
+        onNext={onNext}
         onEnrich={(id) => {
           if (!enrichedIds.includes(id)) {
             openEnrichPreview([id]);

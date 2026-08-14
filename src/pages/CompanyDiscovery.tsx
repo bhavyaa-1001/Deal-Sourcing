@@ -1,15 +1,18 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCompanies } from '../hooks/useCompanies';
 import CompanyFilters from '../components/companies/CompanyFilters';
 import CompanyCard from '../components/companies/CompanyCard';
 import CompanyTable from '../components/companies/CompanyTable';
 import CompanyDetails from '../components/companies/CompanyDetails';
+import CompanyKanban from '../components/companies/CompanyKanban';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import EmptyState from '../components/ui/EmptyState';
 import LoadingState from '../components/ui/LoadingState';
-import { LayoutGrid, Table, ArrowLeft, ArrowRight, Database, Target, Award } from 'lucide-react';
+import { LayoutGrid, Table, Kanban, ArrowLeft, ArrowRight, Database, Target, Award } from 'lucide-react';
+import type { FitLevel } from '../types';
+import { useMemo } from 'react';
 
 export const CompanyDiscovery: React.FC = () => {
   const navigate = useNavigate();
@@ -23,13 +26,33 @@ export const CompanyDiscovery: React.FC = () => {
     clearFilters,
   } = useCompanies();
 
-  const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
+  const [viewMode, setViewMode] = useState<'cards' | 'table' | 'kanban'>('kanban');
   const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
+  const [fitLevelOverrides, setFitLevelOverrides] = useState<Record<string, FitLevel>>({});
 
   const handleBack = () => navigate('/research');
   const handleContinue = () => navigate('/review');
 
-  const activeCompany = companies.find(c => c.id === selectedCompanyId) || null;
+  const displayCompanies = useMemo(() => {
+    return companies.map(c => ({
+      ...c,
+      fitLevel: fitLevelOverrides[c.id] || c.fitLevel
+    }));
+  }, [companies, fitLevelOverrides]);
+
+  const activeCompany = displayCompanies.find(c => c.id === selectedCompanyId) || null;
+
+  // Lead Modal navigation callbacks
+  const activeIndex = selectedCompanyId ? displayCompanies.findIndex(c => c.id === selectedCompanyId) : -1;
+  const onPrevious = activeIndex > 0 ? () => setSelectedCompanyId(displayCompanies[activeIndex - 1].id) : undefined;
+  const onNext = activeIndex >= 0 && activeIndex < displayCompanies.length - 1 ? () => setSelectedCompanyId(displayCompanies[activeIndex + 1].id) : undefined;
+
+  const handleMoveCompany = (id: string, newFit: FitLevel) => {
+    setFitLevelOverrides(prev => ({
+      ...prev,
+      [id]: newFit
+    }));
+  };
 
   if (loading && companies.length === 0) {
     return <LoadingState message="Discovering candidate companies matching mandate..." />;
@@ -57,22 +80,30 @@ export const CompanyDiscovery: React.FC = () => {
           </p>
         </div>
 
-        {/* Toggle Grid/Table view */}
-        <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-md border border-default self-start md:self-auto">
+        {/* Toggle Grid/Table/Kanban view */}
+        <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-md border border-default self-start md:self-auto select-none">
+          <button
+            onClick={() => setViewMode('kanban')}
+            className={`flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded cursor-pointer transition-colors ${viewMode === 'kanban' ? 'bg-card text-brand-primary shadow-sm' : 'text-secondary hover:text-primary'}`}
+            aria-label="Kanban view mode"
+          >
+            <Kanban className="h-4 w-4" />
+            <span>Kanban</span>
+          </button>
           <button
             onClick={() => setViewMode('cards')}
-            className={`flex items-center gap-1.5 px-4.5 py-2.5 text-base font-semibold rounded cursor-pointer transition-colors ${viewMode === 'cards' ? 'bg-card text-brand-primary shadow-sm' : 'text-secondary hover:text-primary'}`}
+            className={`flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded cursor-pointer transition-colors ${viewMode === 'cards' ? 'bg-card text-brand-primary shadow-sm' : 'text-secondary hover:text-primary'}`}
             aria-label="Cards view mode"
           >
-            <LayoutGrid className="h-5 w-5" />
+            <LayoutGrid className="h-4 w-4" />
             <span>Cards</span>
           </button>
           <button
             onClick={() => setViewMode('table')}
-            className={`flex items-center gap-1.5 px-4.5 py-2.5 text-base font-semibold rounded cursor-pointer transition-colors ${viewMode === 'table' ? 'bg-card text-brand-primary shadow-sm' : 'text-secondary hover:text-primary'}`}
+            className={`flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded cursor-pointer transition-colors ${viewMode === 'table' ? 'bg-card text-brand-primary shadow-sm' : 'text-secondary hover:text-primary'}`}
             aria-label="Table view mode"
           >
-            <Table className="h-5 w-5" />
+            <Table className="h-4 w-4" />
             <span>Table</span>
           </button>
         </div>
@@ -123,16 +154,22 @@ export const CompanyDiscovery: React.FC = () => {
       />
 
       {/* 3. Company Listing Section */}
-      {companies.length === 0 ? (
+      {displayCompanies.length === 0 ? (
         <EmptyState
           title="No companies found"
           description="We couldn't find any target companies matching your current filters. Try relaxing your constraints, clearing filters, or widening the revenue ranges."
           actionText="Clear Filters"
           onAction={clearFilters}
         />
+      ) : viewMode === 'kanban' ? (
+        <CompanyKanban
+          companies={displayCompanies}
+          onView={(id) => setSelectedCompanyId(id)}
+          onMoveCompany={handleMoveCompany}
+        />
       ) : viewMode === 'cards' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {companies.map(company => (
+          {displayCompanies.map(company => (
             <CompanyCard
               key={company.id}
               company={company}
@@ -142,7 +179,7 @@ export const CompanyDiscovery: React.FC = () => {
         </div>
       ) : (
         <CompanyTable
-          companies={companies}
+          companies={displayCompanies}
           onView={(id) => setSelectedCompanyId(id)}
         />
       )}
@@ -152,6 +189,8 @@ export const CompanyDiscovery: React.FC = () => {
         company={activeCompany}
         isOpen={selectedCompanyId !== null}
         onClose={() => setSelectedCompanyId(null)}
+        onPrevious={onPrevious}
+        onNext={onNext}
       />
 
       {/* Page Actions Footer */}
