@@ -362,6 +362,22 @@ export const MandateHistoryProvider: React.FC<{ children: React.ReactNode }> = (
       }
       return updatedList;
     });
+
+    // Also clean up any saved outreach connected to this deleted mandate
+    const savedKey = 'dealsourcing_saved_outreach';
+    const stored = localStorage.getItem(savedKey);
+    if (stored) {
+      try {
+        const list = JSON.parse(stored);
+        if (Array.isArray(list)) {
+          const filteredList = list.filter((item: any) => item.mandateId !== id);
+          localStorage.setItem(savedKey, JSON.stringify(filteredList));
+        }
+      } catch (e) {
+        console.error('Failed to clean saved outreach on mandate delete:', e);
+      }
+    }
+
     triggerRefresh();
   }, [activeId, syncToActiveMandate, triggerRefresh]);
 
