@@ -66,6 +66,20 @@ export const CompanyKanban: React.FC<CompanyKanbanProps> = ({
   };
 
 
+  const getConfidenceBadge = (score: number) => {
+    let color = 'bg-brand-success-light text-brand-success border-brand-success/20 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-800/30';
+    if (score < 70) {
+      color = 'bg-brand-danger-light text-brand-danger border-brand-danger/20 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-800/30';
+    } else if (score < 85) {
+      color = 'bg-brand-warning-light text-brand-warning border-brand-warning/20 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-800/30';
+    }
+    return (
+      <span className={`text-[11px] font-extrabold px-2 py-0.5 rounded border ${color} select-none whitespace-nowrap`}>
+        {score.toFixed(0)}% AI Fit
+      </span>
+    );
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch min-h-[600px] text-left">
       {columns.map(col => {
@@ -78,10 +92,10 @@ export const CompanyKanban: React.FC<CompanyKanbanProps> = ({
             onDragOver={(e) => handleDragOver(e, col.fit)}
             onDragLeave={handleDragLeave}
             onDrop={(e) => handleDrop(e, col.fit)}
-            className={`flex flex-col rounded-2xl border p-4.5 transition-all duration-200 select-none bg-app/20 dark:bg-slate-900/40
+            className={`flex flex-col rounded-2xl border p-4.5 transition-all duration-200 select-none min-h-[500px]
               ${isOver 
-                ? 'border-brand-primary ring-2 ring-brand-primary/10 shadow-lg scale-[1.01]' 
-                : 'border-default'
+                ? 'border-brand-primary border-dashed border-2 bg-brand-primary-light/10 dark:bg-slate-800/60 shadow-lg scale-[1.005]' 
+                : 'border-default bg-slate-50/30 dark:bg-slate-900/25'
               }
             `}
           >
@@ -93,7 +107,7 @@ export const CompanyKanban: React.FC<CompanyKanbanProps> = ({
                   {col.label}
                 </h3>
               </div>
-              <span className={`text-xs font-black px-2.5 py-1 rounded-full ${col.bg} ${col.text} border ${col.border}`}>
+              <span className={`text-[11px] font-extrabold px-2.5 py-0.5 rounded-full ${col.bg} ${col.text} border ${col.border} shadow-sm`}>
                 {columnCompanies.length}
               </span>
             </div>
@@ -101,7 +115,7 @@ export const CompanyKanban: React.FC<CompanyKanbanProps> = ({
             {/* Droppable Area Container */}
             <div className="flex-1 flex flex-col gap-3.5 overflow-y-auto max-h-[75vh] pr-1.5 scrollbar-thin">
               {columnCompanies.length === 0 ? (
-                <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-default/70 rounded-xl py-12 px-4 text-center select-none">
+                <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-default/70 rounded-xl py-12 px-4 text-center select-none bg-white/40 dark:bg-slate-900/10">
                   <ShieldAlert className="h-7 w-7 text-slate-350 dark:text-slate-600 mb-2" />
                   <p className="text-xs text-secondary font-semibold">Drop candidates here</p>
                   <p className="text-[10px] text-slate-400 mt-1 font-medium">Drag a company to change fit level</p>
@@ -112,27 +126,22 @@ export const CompanyKanban: React.FC<CompanyKanbanProps> = ({
                     key={c.id}
                     draggable
                     onDragStart={(e) => handleDragStart(e, c.id)}
-                    className="group bg-white dark:bg-slate-800 border border-default hover:border-brand-primary/45 rounded-xl p-4 shadow-sm hover:shadow transition-all duration-200 cursor-grab active:cursor-grabbing relative flex flex-col gap-3.5"
+                    className="group bg-white dark:bg-slate-800 border border-default hover:border-brand-primary/45 rounded-xl p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-grab active:cursor-grabbing relative flex flex-col gap-3.5"
                   >
                     {/* Header */}
                     <div>
                       <div className="flex justify-between items-start gap-3">
                         <h4
                           onClick={() => onView(c.id)}
-                          className="font-extrabold text-[17px] text-primary leading-snug group-hover:text-brand-primary hover:underline cursor-pointer transition-colors pr-4 truncate"
+                          className="font-extrabold text-[17px] text-primary leading-snug group-hover:text-brand-primary hover:underline cursor-pointer transition-colors pr-2 truncate"
                         >
                           {c.name}
                         </h4>
-                        <div className="flex flex-col items-end shrink-0">
-                          <span className="text-[13px] font-black text-brand-warning leading-none">
-                            {(c.confidenceScore ?? 0).toFixed(1)}%
-                          </span>
-                          <span className="text-[10px] font-semibold text-slate-450 dark:text-slate-500 mt-1 leading-none">
-                            Fit: {(c.fitScore ?? 0).toFixed(1)}
-                          </span>
+                        <div className="shrink-0 pt-0.5">
+                          {getConfidenceBadge(c.confidenceScore ?? 0)}
                         </div>
                       </div>
-                      <div className="text-[13px] text-secondary mt-1 font-semibold flex items-center gap-1.5 truncate">
+                      <div className="text-[13px] text-secondary mt-1.5 font-semibold flex items-center gap-1.5 truncate">
                         <span>{c.location.split(',')[0]}</span>
                         <span>•</span>
                         <span>{c.industry}</span>

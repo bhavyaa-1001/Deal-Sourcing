@@ -49,6 +49,13 @@ const RELATED_LIST = [
   { label: 'Emails', icon: <Mail className="h-4 w-4" /> }
 ];
 
+const TEAM_MEMBERS = [
+  { name: 'Bhavya Bansal', role: 'Lead Partner', initials: 'BB', color: 'bg-blue-600' },
+  { name: 'Sarah Jenkins', role: 'M&A Associate', initials: 'SJ', color: 'bg-purple-600' },
+  { name: 'David Vance', role: 'Investment Analyst', initials: 'DV', color: 'bg-emerald-600' },
+  { name: 'Unassigned', role: 'Team Pool', initials: '??', color: 'bg-slate-400' }
+];
+
 export const CompanyDetails: React.FC<CompanyDetailsProps> = ({
   company,
   isOpen,
@@ -59,17 +66,67 @@ export const CompanyDetails: React.FC<CompanyDetailsProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState('Overview');
   const [leadStatus, setLeadStatus] = useState<LeadStatus>('Not Contacted');
+  const [leadOwner, setLeadOwner] = useState('Bhavya Bansal');
   const [showNotesText, setShowNotesText] = useState('');
-  const [notesList, setNotesList] = useState<string[]>([]);
+  const [notesList, setNotesList] = useState<any[]>([]);
+  const [selectedNoteAuthor, setSelectedNoteAuthor] = useState('Bhavya Bansal');
+  const [timelineEvents, setTimelineEvents] = useState<any[]>([]);
 
-  // Load persistent lead status and notes for this company
+  // Load persistent lead status, owner, notes, and timeline logs for this company
   useEffect(() => {
     if (company) {
+      // 1. Lead Status
       const storedStatus = localStorage.getItem(`dealsourcing_lead_status_${company.id}`);
       setLeadStatus((storedStatus as LeadStatus) || 'Not Contacted');
 
+      // 2. Lead Owner
+      const storedOwner = localStorage.getItem(`dealsourcing_lead_owner_${company.id}`);
+      setLeadOwner(storedOwner || 'Bhavya Bansal');
+
+      // 3. Notes List
       const storedNotes = localStorage.getItem(`dealsourcing_lead_notes_${company.id}`);
-      setNotesList(storedNotes ? JSON.parse(storedNotes) : []);
+      if (storedNotes) {
+        setNotesList(JSON.parse(storedNotes));
+      } else {
+        const defaultNotes = [
+          {
+            id: 'note-seed-1',
+            text: 'Initial profile verified against mandate criteria. Fit looks high based on primary industry classifications.',
+            author: 'Sarah Jenkins',
+            timestamp: 'Yesterday at 4:32 PM'
+          }
+        ];
+        setNotesList(defaultNotes);
+        localStorage.setItem(`dealsourcing_lead_notes_${company.id}`, JSON.stringify(defaultNotes));
+      }
+
+      // 4. Timeline Events
+      const storedTimeline = localStorage.getItem(`dealsourcing_lead_timeline_${company.id}`);
+      if (storedTimeline) {
+        setTimelineEvents(JSON.parse(storedTimeline));
+      } else {
+        const isEnriched = company.enrichmentStatus === 'enriched';
+        const defaultEvents = [
+          {
+            id: 'evt-discover',
+            title: 'Lead Discovered',
+            description: `Identified via research source: ${company.sourceName || 'Registry Database'}.`,
+            time: '1 day ago',
+            user: 'System'
+          }
+        ];
+        if (isEnriched) {
+          defaultEvents.unshift({
+            id: 'evt-enrich',
+            title: 'Data Enrichment',
+            description: 'AI model generated company founder profiling and succession notes successfully.',
+            time: 'Processed recently',
+            user: 'System'
+          });
+        }
+        setTimelineEvents(defaultEvents);
+        localStorage.setItem(`dealsourcing_lead_timeline_${company.id}`, JSON.stringify(defaultEvents));
+      }
     }
   }, [company]);
 
@@ -78,17 +135,47 @@ export const CompanyDetails: React.FC<CompanyDetailsProps> = ({
   const isEnriched = company.enrichmentStatus === 'enriched';
   const isProcessing = company.enrichmentStatus === 'processing';
 
+  const logTimelineEvent = (title: string, description: string) => {
+    const newEvent = {
+      id: `evt-${Date.now()}`,
+      title,
+      description,
+      time: 'Just now',
+      user: 'Bhavya Bansal' // Active user session
+    };
+    setTimelineEvents(prev => {
+      const updated = [newEvent, ...prev];
+      localStorage.setItem(`dealsourcing_lead_timeline_${company.id}`, JSON.stringify(updated));
+      return updated;
+    });
+  };
+
   const handleStatusChange = (status: LeadStatus) => {
     setLeadStatus(status);
     localStorage.setItem(`dealsourcing_lead_status_${company.id}`, status);
+    logTimelineEvent('Lead Status Updated', `Status changed to '${status}'.`);
+  };
+
+  const handleOwnerChange = (newOwner: string) => {
+    setLeadOwner(newOwner);
+    localStorage.setItem(`dealsourcing_lead_owner_${company.id}`, newOwner);
+    logTimelineEvent('Lead Owner Assigned', `Lead assigned to ${newOwner}.`);
   };
 
   const handleAddNote = (e: React.FormEvent) => {
     e.preventDefault();
     if (!showNotesText.trim()) return;
-    const newNotes = [showNotesText.trim(), ...notesList];
-    setNotesList(newNotes);
-    localStorage.setItem(`dealsourcing_lead_notes_${company.id}`, JSON.stringify(newNotes));
+
+    const newNote = {
+      id: `note-${Date.now()}`,
+      text: showNotesText.trim(),
+      author: selectedNoteAuthor,
+      timestamp: 'Just now'
+    };
+    const updated = [newNote, ...notesList];
+    setNotesList(updated);
+    localStorage.setItem(`dealsourcing_lead_notes_${company.id}`, JSON.stringify(updated));
+    logTimelineEvent('Note Added', `Added a new note regarding prospect details.`);
     setShowNotesText('');
   };
 
@@ -248,7 +335,17 @@ export const CompanyDetails: React.FC<CompanyDetailsProps> = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 border-b border-default pb-5 bg-slate-50/50 dark:bg-slate-900/10 p-4.5 rounded-xl">
                   <div>
                     <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Lead Owner</span>
-                    <span className="text-[13px] font-extrabold text-primary block mt-1">Bhavya Bansal</span>
+                    <select
+                      value={leadOwner}
+                      onChange={(e) => handleOwnerChange(e.target.value)}
+                      className="text-[13px] font-extrabold text-primary bg-transparent border border-default rounded px-2.5 py-1.5 mt-1.5 focus:outline-none focus:ring-1 focus:ring-brand-primary cursor-pointer w-full max-w-[200px]"
+                    >
+                      {TEAM_MEMBERS.map(member => (
+                        <option key={member.name} value={member.name}>
+                          {member.name} ({member.role || 'Unassigned'})
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Lead Status</span>
@@ -376,41 +473,37 @@ export const CompanyDetails: React.FC<CompanyDetailsProps> = ({
                   
                   {/* Timeline track list */}
                   <div className="relative border-l border-default pl-6 ml-3 flex flex-col gap-6.5">
-                    
-                    {/* Item 1 */}
-                    <div className="relative">
-                      <span className="absolute -left-[31px] top-0 w-4.5 h-4.5 rounded-full bg-brand-primary border-4 border-white dark:border-slate-800 shadow-sm" />
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-extrabold text-primary">Lead Discovered</span>
-                          <span className="text-[10px] text-slate-400">1 day ago</span>
-                        </div>
-                        <p className="text-xs text-secondary mt-1 font-medium">
-                          Identified via research source: <span className="font-semibold">{company.sourceName}</span>.
-                        </p>
-                      </div>
-                    </div>
+                    {timelineEvents.map((evt) => {
+                      const isStatus = evt.title.includes('Status');
+                      const isOwner = evt.title.includes('Owner');
+                      const dotColor = isStatus 
+                        ? 'bg-brand-primary' 
+                        : isOwner 
+                          ? 'bg-purple-600' 
+                          : evt.title.includes('Enrichment')
+                            ? 'bg-brand-success'
+                            : 'bg-slate-400';
 
-                    {/* Item 2 (Condition enrichment status) */}
-                    <div className="relative">
-                      <span className={`absolute -left-[31px] top-0 w-4.5 h-4.5 rounded-full border-4 border-white dark:border-slate-800 shadow-sm
-                        ${isEnriched ? 'bg-brand-success' : 'bg-slate-350 dark:bg-slate-700'}
-                      `} />
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-extrabold text-primary">Data Enrichment</span>
-                          <span className="text-[10px] text-slate-400">
-                            {isEnriched ? 'Processed recently' : 'Pending'}
-                          </span>
+                      return (
+                        <div key={evt.id} className="relative">
+                          <span className={`absolute -left-[31px] top-0.5 w-4.5 h-4.5 rounded-full ${dotColor} border-4 border-white dark:border-slate-800 shadow-sm`} />
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-extrabold text-primary">{evt.title}</span>
+                              <span className="text-[10px] text-slate-400 font-medium">{evt.time}</span>
+                            </div>
+                            <p className="text-xs text-secondary mt-1 font-semibold leading-relaxed">
+                              {evt.description}
+                            </p>
+                            {evt.user && evt.user !== 'System' && (
+                              <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mt-1 block">
+                                Action by: {evt.user}
+                              </span>
+                            )}
+                          </div>
                         </div>
-                        <p className="text-xs text-secondary mt-1 font-medium">
-                          {isEnriched 
-                            ? 'AI model generated company founder profiling and succession notes successfully.' 
-                            : 'Enrichment required to fetch verified contact details.'
-                          }
-                        </p>
-                      </div>
-                    </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -420,32 +513,61 @@ export const CompanyDetails: React.FC<CompanyDetailsProps> = ({
             {activeTab === 'Notes' && (
               <div className="flex flex-col gap-5 text-left">
                 <h3 className="text-xs font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                  Lead Notes
+                  Team Discussion & Notes
                 </h3>
                 
-                {/* Form */}
-                <form onSubmit={handleAddNote} className="flex gap-2">
-                  <input
-                    type="text"
-                    value={showNotesText}
-                    onChange={(e) => setShowNotesText(e.target.value)}
-                    placeholder="Type a new note here..."
-                    className="flex-1 px-3 py-2 text-sm border border-default rounded-lg bg-card text-primary focus:border-brand-primary"
-                  />
-                  <Button type="submit" variant="primary" size="sm">Add Note</Button>
+                {/* Form with Author Selector */}
+                <form onSubmit={handleAddNote} className="flex flex-col sm:flex-row gap-3 bg-slate-50/50 dark:bg-slate-900/10 p-3 rounded-lg border border-default">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider whitespace-nowrap">Post as:</span>
+                    <select
+                      value={selectedNoteAuthor}
+                      onChange={(e) => setSelectedNoteAuthor(e.target.value)}
+                      className="text-xs font-bold text-primary bg-white dark:bg-slate-800 border border-default rounded px-2 py-1 focus:outline-none cursor-pointer"
+                    >
+                      {TEAM_MEMBERS.map(m => (
+                        <option key={m.name} value={m.name}>{m.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex flex-1 gap-2">
+                    <input
+                      type="text"
+                      value={showNotesText}
+                      onChange={(e) => setShowNotesText(e.target.value)}
+                      placeholder="Type a team note or update here..."
+                      className="flex-1 px-3 py-1.5 text-sm border border-default rounded bg-card text-primary focus:outline-none focus:border-brand-primary"
+                    />
+                    <Button type="submit" variant="primary" size="sm">Post</Button>
+                  </div>
                 </form>
 
                 {/* List */}
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-4">
                   {notesList.length === 0 ? (
-                    <span className="text-xs text-slate-400 italic block py-4 text-center">No notes added yet.</span>
+                    <span className="text-xs text-slate-400 italic block py-4 text-center">No team notes added yet.</span>
                   ) : (
-                    notesList.map((note, index) => (
-                      <div key={index} className="p-3 bg-slate-50 dark:bg-slate-900/30 rounded-lg border border-default">
-                        <p className="text-xs text-primary font-semibold">{note}</p>
-                        <span className="text-[9px] text-slate-400 mt-1 block">Added just now</span>
-                      </div>
-                    ))
+                    notesList.map((note: any) => {
+                      const member = TEAM_MEMBERS.find(m => m.name === note.author) || TEAM_MEMBERS[3];
+                      return (
+                        <div key={note.id} className="flex items-start gap-3 p-3.5 bg-slate-50/50 dark:bg-slate-900/10 rounded-xl border border-default">
+                          <div className={`w-8 h-8 rounded-full ${member.color} flex items-center justify-center text-white text-[11px] font-extrabold shrink-0 shadow-sm select-none`}>
+                            {member.initials}
+                          </div>
+                          <div className="flex-1 text-left min-w-0">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-xs font-extrabold text-primary truncate">
+                                {note.author} <span className="text-[10px] text-slate-400 font-medium">({member.role})</span>
+                              </span>
+                              <span className="text-[9px] text-slate-400 shrink-0 font-medium">{note.timestamp}</span>
+                            </div>
+                            <p className="text-xs text-secondary mt-1.5 leading-relaxed font-semibold break-words">
+                              {note.text}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })
                   )}
                 </div>
               </div>

@@ -28,7 +28,7 @@ export const useTheme = () => {
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return;
     
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
     const handleChange = (e: MediaQueryListEvent) => {
       const userSaved = localStorage.getItem('dealsourcing_theme');
       // If the user has not explicitly set a manual preference, follow system change
