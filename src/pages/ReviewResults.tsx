@@ -180,71 +180,71 @@ export const ReviewResults: React.FC = () => {
 
       {/* Toasts */}
       {successMessage && (
-        <div className="bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800 rounded-md p-4 flex items-center gap-2.5 text-left animate-fadeIn">
+        <div className="bg-[#E3ECE6] dark:bg-emerald-950/20 text-[#35624A] dark:text-emerald-300 border border-[#B7CCBC] dark:border-emerald-800 rounded-lg p-4 flex items-center gap-2.5 text-left animate-fadeIn">
           <CheckCircle2 className="h-5 w-5" />
-          <span className="font-semibold text-base">{successMessage}</span>
+          <span className="font-bold text-sm md:text-base">{successMessage}</span>
         </div>
       )}
       {exportMessage && (
-        <div className="bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 rounded-md p-4 flex items-center gap-2.5 text-left animate-fadeIn">
+        <div className="bg-[#E5EBE3] dark:bg-slate-800 text-[#5F735F] dark:text-slate-200 border border-[#B7CCBC] dark:border-slate-700 rounded-lg p-4 flex items-center gap-2.5 text-left animate-fadeIn">
           <FileDown className="h-5 w-5" />
-          <span className="font-semibold text-base">{exportMessage}</span>
+          <span className="font-bold text-sm md:text-base">{exportMessage}</span>
         </div>
       )}
 
       {/* 1. Metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-left">
-        <Card className="flex items-center gap-4 p-5">
-          <div className="p-3 bg-brand-primary-light rounded-full text-brand-primary-dark shrink-0">
+        <Card className="flex items-center gap-4 p-5 bg-white border border-[#D8D5CE] shadow-[0_1px_3px_rgba(32,42,46,0.04)]">
+          <div className="p-3 bg-[#F1EFEA] rounded-full text-[#202A2E] shrink-0">
             <FolderCheck className="h-6 w-6" />
           </div>
           <div>
-            <span className="text-xs font-bold text-secondary uppercase tracking-wider block">Total Companies</span>
-            <span className="text-2xl font-black text-primary block mt-0.5">{metrics.total}</span>
+            <span className="text-xs font-bold text-[#626A6D] uppercase tracking-wider block">Total Companies</span>
+            <span className="text-2xl font-black text-[#202A2E] dark:text-white block mt-0.5">{metrics.total}</span>
           </div>
         </Card>
 
-        <Card className="flex items-center gap-4 p-5">
-          <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-full text-green-700 dark:text-green-400 shrink-0">
+        <Card className="flex items-center gap-4 p-5 bg-white border border-[#D8D5CE] shadow-[0_1px_3px_rgba(32,42,46,0.04)]">
+          <div className="p-3 bg-[#E3ECE6] rounded-full text-[#35624A] shrink-0">
             <CheckCircle2 className="h-6 w-6" />
           </div>
           <div>
-            <span className="text-xs font-bold text-secondary uppercase tracking-wider block">High Fit</span>
-            <span className="text-2xl font-black text-primary block mt-0.5">{metrics.highFit}</span>
+            <span className="text-xs font-bold text-[#626A6D] uppercase tracking-wider block">High Fit</span>
+            <span className="text-2xl font-black text-[#202A2E] dark:text-white block mt-0.5">{metrics.highFit}</span>
           </div>
         </Card>
 
-        <Card className="flex items-center gap-4 p-5">
-          <div className="p-3 bg-amber-100 dark:bg-amber-900/30 rounded-full text-amber-700 dark:amber-400 shrink-0">
+        <Card className="flex items-center gap-4 p-5 bg-white border border-[#D8D5CE] shadow-[0_1px_3px_rgba(32,42,46,0.04)]">
+          <div className="p-3 bg-[#F5EDDA] rounded-full text-[#9A7535] shrink-0">
             <AlertCircle className="h-6 w-6" />
           </div>
           <div>
-            <span className="text-xs font-bold text-secondary uppercase tracking-wider block">Selected</span>
-            <span className="text-2xl font-black text-primary block mt-0.5">{metrics.selected}</span>
+            <span className="text-xs font-bold text-[#626A6D] uppercase tracking-wider block">Selected</span>
+            <span className="text-2xl font-black text-[#202A2E] dark:text-white block mt-0.5">{metrics.selected}</span>
           </div>
         </Card>
 
-        <Card className="flex items-center gap-4 p-5">
-          <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-full text-purple-700 dark:text-purple-400 shrink-0">
+        <Card className="flex items-center gap-4 p-5 bg-white border border-[#D8D5CE] shadow-[0_1px_3px_rgba(32,42,46,0.04)]">
+          <div className="p-3 bg-[#E5EBE3] rounded-full text-[#5F735F] shrink-0">
             <Sparkles className="h-6 w-6" />
           </div>
           <div>
-            <span className="text-xs font-bold text-secondary uppercase tracking-wider block">Enriched</span>
-            <span className="text-2xl font-black text-primary block mt-0.5">{metrics.enriched}</span>
+            <span className="text-xs font-bold text-[#626A6D] uppercase tracking-wider block">Enriched</span>
+            <span className="text-2xl font-black text-[#202A2E] dark:text-white block mt-0.5">{metrics.enriched}</span>
           </div>
         </Card>
       </div>
 
       {/* 2. Enrichment benefits info bar */}
-      <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center gap-3">
-        <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300 shrink-0">
+      <div className="bg-[#F5EDDA] dark:bg-amber-950/20 border border-[#E3D4B3] dark:border-amber-800 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+        <div className="flex items-center gap-2 text-[#9A7535] dark:text-amber-300 shrink-0">
           <Lock className="h-5 w-5" />
           <span className="font-bold text-sm">Enrich to unlock:</span>
         </div>
-        <div className="flex flex-wrap gap-3 text-sm text-amber-700 dark:text-amber-300 font-semibold">
+        <div className="flex flex-wrap gap-3 text-sm text-[#9A7535] dark:text-amber-300 font-semibold">
           {['Founder Name & Role', 'Management Team', 'Direct Email', 'Phone Number', 'LinkedIn Profile'].map(b => (
             <span key={b} className="flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-400 shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#9A7535] shrink-0" />
               {b}
             </span>
           ))}
@@ -253,18 +253,18 @@ export const ReviewResults: React.FC = () => {
 
       {/* 3. Selection count */}
       <div className="flex items-center">
-        <span className="text-sm text-secondary font-semibold ml-auto">
+        <span className="text-sm text-[#626A6D] dark:text-slate-400 font-bold ml-auto">
           {selectedIds.length} selected &bull; {enrichedIds.length} enriched
         </span>
       </div>
 
       {/* 4. Main table */}
       <div className="w-full flex flex-col gap-4 text-left">
-        <div className="w-full overflow-x-auto rounded-lg border border-default shadow-sm bg-card">
+        <div className="w-full overflow-x-auto rounded-lg border border-[#D8D5CE] dark:border-slate-800 shadow-[0_1px_3px_rgba(32,42,46,0.04)] bg-white dark:bg-card">
           <table className="w-full border-collapse text-left text-sm md:text-base">
             <thead>
-              <tr className="bg-slate-50 dark:bg-slate-900 border-b border-default text-primary font-bold text-xs md:text-sm uppercase tracking-wider">
-                <th className="px-3 py-3 w-14 text-center text-[10px] font-bold text-secondary uppercase tracking-wide">Select</th>
+              <tr className="bg-[#F1EFEA] dark:bg-slate-900 border-b border-[#D8D5CE] dark:border-slate-800 text-[#202A2E] dark:text-white font-bold text-xs md:text-sm uppercase tracking-wider">
+                <th className="px-3 py-3 w-14 text-center text-[10px] font-bold text-[#626A6D] uppercase tracking-wide">Select</th>
                 <th className="px-3 py-3">Company</th>
                 <th className="px-3 py-3">Location</th>
                 <th className="px-3 py-3">Fit</th>
@@ -275,7 +275,7 @@ export const ReviewResults: React.FC = () => {
                 <th className="px-3 py-3 text-right pr-5">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-default text-primary">
+            <tbody className="divide-y divide-[#D8D5CE] dark:divide-slate-800 text-primary">
               {displayCompanies.map(company => {
                 const isSelected = selectedIds.includes(company.id);
                 const isEnriched = company.enrichmentStatus === 'enriched' || enrichedIds.includes(company.id);
@@ -286,7 +286,7 @@ export const ReviewResults: React.FC = () => {
                   <React.Fragment key={company.id}>
                     <tr
                       id={`company-row-${company.id}`}
-                      className={`hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors duration-150 ${isSelected ? 'bg-blue-50/30 dark:bg-blue-950/10' : ''}`}
+                      className={`hover:bg-[#F6F5F1] dark:hover:bg-slate-800/30 transition-colors duration-150 ${isSelected ? 'bg-[#E5EBE3]/40 dark:bg-slate-800/60' : ''}`}
                     >
                       <td className="px-3 py-3.5 text-center">
                         {/* Single checkbox: selects + adds to compare in one click */}
@@ -300,7 +300,7 @@ export const ReviewResults: React.FC = () => {
                             type="checkbox"
                             checked={isSelected}
                             onChange={() => {}}
-                            className="h-4 w-4 accent-blue-600 rounded border-default cursor-pointer"
+                            className="h-4 w-4 accent-[#202A2E] rounded border-[#D8D5CE] cursor-pointer"
                           />
                         </button>
                       </td>
@@ -387,7 +387,7 @@ export const ReviewResults: React.FC = () => {
                               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 <div className="flex flex-col gap-5">
                                   <div className="bg-card border border-default p-4 rounded-lg">
-                                    <h5 className="text-xs font-bold text-slate-450 uppercase tracking-wider mb-2 border-b border-default pb-1">
+                                    <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 border-b border-default pb-1">
                                       Founder
                                     </h5>
                                     <div className="space-y-1 text-sm">
@@ -399,7 +399,7 @@ export const ReviewResults: React.FC = () => {
                                     </div>
                                   </div>
                                   <div className="bg-card border border-default p-4 rounded-lg">
-                                    <h5 className="text-xs font-bold text-slate-450 uppercase tracking-wider mb-2 border-b border-default pb-1">
+                                    <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 border-b border-default pb-1">
                                       Primary Contact
                                     </h5>
                                     <div className="space-y-1 text-sm">
@@ -411,7 +411,7 @@ export const ReviewResults: React.FC = () => {
 
                                 <div className="flex flex-col gap-5">
                                   <div className="bg-card border border-default p-4 rounded-lg">
-                                    <h5 className="text-xs font-bold text-slate-450 uppercase tracking-wider mb-2 border-b border-default pb-1">
+                                    <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 border-b border-default pb-1">
                                       Management Team
                                     </h5>
                                     <ul className="space-y-1.5 text-sm text-secondary list-disc pl-4 font-semibold">
@@ -421,7 +421,7 @@ export const ReviewResults: React.FC = () => {
                                     </ul>
                                   </div>
                                   <div className="bg-card border border-default p-4 rounded-lg">
-                                    <h5 className="text-xs font-bold text-slate-450 uppercase tracking-wider mb-2 border-b border-default pb-1">
+                                    <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 border-b border-default pb-1">
                                       Contact Information
                                     </h5>
                                     <div className="space-y-2 text-sm">
@@ -449,7 +449,7 @@ export const ReviewResults: React.FC = () => {
 
                                 <div className="flex flex-col gap-5">
                                   <div className="bg-card border border-default p-4 rounded-lg">
-                                    <h5 className="text-xs font-bold text-slate-450 uppercase tracking-wider mb-2 border-b border-default pb-1">
+                                    <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 border-b border-default pb-1">
                                       Company Information
                                     </h5>
                                     <div className="space-y-2 text-sm">
@@ -468,7 +468,7 @@ export const ReviewResults: React.FC = () => {
                                     </div>
                                   </div>
                                   <div className="bg-card border border-default p-4 rounded-lg">
-                                    <h5 className="text-xs font-bold text-slate-450 uppercase tracking-wider mb-2 border-b border-default pb-1">
+                                    <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 border-b border-default pb-1">
                                       Succession / Acquisition Notes
                                     </h5>
                                     <div className="space-y-2 text-sm">
@@ -498,7 +498,7 @@ export const ReviewResults: React.FC = () => {
                               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 <div className="flex flex-col gap-5">
                                   <div className="bg-card border border-default p-4 rounded-lg opacity-70">
-                                    <h5 className="text-xs font-bold text-slate-455 uppercase tracking-wider mb-2 border-b border-default pb-1">
+                                    <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 border-b border-default pb-1">
                                       Founder
                                     </h5>
                                     <div className="space-y-1 text-sm text-slate-400">
@@ -508,7 +508,7 @@ export const ReviewResults: React.FC = () => {
                                     </div>
                                   </div>
                                   <div className="bg-card border border-default p-4 rounded-lg opacity-70">
-                                    <h5 className="text-xs font-bold text-slate-455 uppercase tracking-wider mb-2 border-b border-default pb-1">
+                                    <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 border-b border-default pb-1">
                                       Primary Contact
                                     </h5>
                                     <div className="space-y-1 text-sm text-slate-400">
@@ -520,7 +520,7 @@ export const ReviewResults: React.FC = () => {
 
                                 <div className="flex flex-col gap-5">
                                   <div className="bg-card border border-default p-4 rounded-lg opacity-70">
-                                    <h5 className="text-xs font-bold text-slate-455 uppercase tracking-wider mb-2 border-b border-default pb-1">
+                                    <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 border-b border-default pb-1">
                                       Management Team
                                     </h5>
                                     <div className="space-y-1 text-sm text-slate-400">
@@ -529,7 +529,7 @@ export const ReviewResults: React.FC = () => {
                                     </div>
                                   </div>
                                   <div className="bg-card border border-default p-4 rounded-lg opacity-70">
-                                    <h5 className="text-xs font-bold text-slate-455 uppercase tracking-wider mb-2 border-b border-default pb-1">
+                                    <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 border-b border-default pb-1">
                                       Contact Information
                                     </h5>
                                     <div className="space-y-2 text-sm text-slate-400">
@@ -543,7 +543,7 @@ export const ReviewResults: React.FC = () => {
 
                                 <div className="flex flex-col gap-5">
                                   <div className="bg-card border border-default p-4 rounded-lg">
-                                    <h5 className="text-xs font-bold text-slate-455 uppercase tracking-wider mb-2 border-b border-default pb-1">
+                                    <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 border-b border-default pb-1">
                                       Company Information
                                     </h5>
                                     <div className="space-y-2 text-sm">
@@ -562,7 +562,7 @@ export const ReviewResults: React.FC = () => {
                                     </div>
                                   </div>
                                   <div className="bg-card border border-default p-4 rounded-lg">
-                                    <h5 className="text-xs font-bold text-slate-455 uppercase tracking-wider mb-2 border-b border-default pb-1">
+                                    <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 border-b border-default pb-1">
                                       Succession / Acquisition Notes
                                     </h5>
                                     <div className="space-y-2 text-sm">

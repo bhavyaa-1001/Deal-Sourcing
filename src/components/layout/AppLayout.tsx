@@ -4,22 +4,24 @@ import Header from './Header';
 import WorkflowStepper from './WorkflowStepper';
 import { useTheme } from '../../hooks/useTheme';
 import { mandatesApi } from '../../api/mandates';
-import { researchApi } from '../../api/research';
 import Modal from '../ui/Modal';
 import Button from '../ui/Button';
-import { FileText, Settings, Search, CheckSquare, Trash2 } from 'lucide-react';
+import ResearchStrategyModal from '../research/ResearchStrategyModal';
+import { FileText, Settings, Search, CheckSquare, Trash2, Compass } from 'lucide-react';
 import { useMandateHistory } from '../../context/MandateHistoryContext';
 
 interface SidebarContentProps {
   onClose?: () => void;
   savedOutreachList: any[];
   onDeleteSaved: (id: string) => void;
+  onOpenStrategy: (id: string, title: string) => void;
 }
 
 const SidebarContent: React.FC<SidebarContentProps> = ({
   onClose,
   savedOutreachList,
-  onDeleteSaved
+  onDeleteSaved,
+  onOpenStrategy
 }) => {
   const { mandates, activeId, selectMandate, createNewMandate, deleteMandate } = useMandateHistory();
   const navigate = useNavigate();
@@ -75,25 +77,26 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-full text-left select-none">
-      <div className="mb-4">
-        <span className="text-[13px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
+    <div className="flex flex-col h-full text-left select-none text-primary">
+      <div className="mb-3">
+        <span className="text-[11px] font-black text-[#626A6D] dark:text-[#9AA9B8] uppercase tracking-widest block">
           MANDATES
         </span>
       </div>
 
       <button
         onClick={handleNew}
-        className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-[#D9DDE1] hover:border-slate-400 dark:border-slate-700 dark:hover:border-slate-500 text-[#172A3A] dark:text-slate-200 bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800 rounded-md font-bold text-[14px] cursor-pointer transition-all mb-5 min-h-[38px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-primary"
+        className="w-full flex items-center justify-center gap-2 px-3.5 py-2 border border-[#D8D5CE] hover:border-[#BDB9B0] dark:border-[#38516A] dark:hover:border-[#4E6E8E] text-[#202A2E] dark:text-[#F1F5F9] bg-white hover:bg-[#F1EFEA] dark:bg-[#1D3044] dark:hover:bg-[#253D54] rounded-lg font-bold text-[13px] cursor-pointer transition-all mb-4 min-h-[36px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-primary shadow-[0_1px_3px_rgba(32,42,46,0.04)]"
       >
-        <span>+ New Mandate</span>
+        <span className="text-[#5F735F] dark:text-[#C5B76A] font-black text-sm">+</span>
+        <span>New Mandate</span>
       </button>
 
-      <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-2.5">
+      <span className="text-[10px] font-black text-[#626A6D] dark:text-[#9AA9B8] uppercase tracking-widest block mb-2">
         RECENT MANDATES
       </span>
 
-      <div className="flex flex-col gap-3 pr-1">
+      <div className="flex flex-col gap-2.5 pr-0.5">
         {mandates.map((m) => {
           const isActive = m.id === activeId;
           const dateStr = new Date(m.createdAt).toLocaleDateString([], {
@@ -107,10 +110,10 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
           return (
             <div
               key={m.id}
-              className={`group relative w-full p-4 rounded-md border text-left transition-all flex flex-col gap-1.5
+              className={`group relative w-full p-3.5 rounded-xl border text-left transition-all flex flex-col gap-1.5
                 ${isActive
-                  ? 'border-brand-primary bg-purple-50/50 dark:bg-purple-950/20 text-primary shadow-md'
-                  : 'border-default bg-card text-secondary hover:bg-slate-50/50 dark:hover:bg-slate-800/40'
+                  ? 'border-[#202A2E] dark:border-[#7E8350] dark:border-l-[3px] dark:border-l-[#C5B76A] bg-white dark:bg-[#1D2B3A] text-primary shadow-[0_2px_8px_rgba(32,42,46,0.08)]'
+                  : 'border-[#D8D5CE] dark:border-[#2D4053] bg-white dark:bg-[#182536] text-secondary hover:border-[#BDB9B0] dark:hover:bg-[#1D2B3A] dark:hover:border-[#40566A] shadow-[0_1px_3px_rgba(32,42,46,0.04)]'
                 }
               `}
             >
@@ -119,104 +122,124 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
                 onClick={() => handleSelect(m.id)}
                 className="flex-1 cursor-pointer"
               >
-                <div className="flex justify-between items-center gap-2 pr-6">
-                  <span className={`font-bold text-[15px] leading-tight block truncate text-primary ${isActive ? 'font-extrabold text-brand-primary' : ''}`}>
+                <div className="flex justify-between items-center gap-2 pr-2">
+                  <span className={`font-bold text-[14px] leading-tight block truncate text-[#202A2E] dark:text-[#F1F5F9] ${isActive ? 'font-black' : ''}`}>
                     {m.title}
                   </span>
                   {isActive && (
-                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-brand-primary-light text-brand-primary border border-brand-primary/20 font-extrabold uppercase shrink-0">
-                      Selected
+                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#F4E8E2] dark:bg-[#3A3520] text-[#A65F3F] dark:text-[#D5C76E] border border-[#A65F3F]/20 dark:border-[#625A2F] font-black uppercase tracking-wider shrink-0">
+                      Active
                     </span>
                   )}
                 </div>
 
-                <div className="text-xs text-secondary mt-0.5 leading-snug pr-6">
+                <div className="text-[11px] text-[#626A6D] dark:text-[#9AA9B8] mt-1 leading-snug pr-2 font-medium">
                   <span>{m.criteria.targetIndustry || 'Unspecified Industry'}</span>
                   {m.criteria.geography && m.criteria.geography !== 'Not specified' && (
                     <span> · {m.criteria.geography}</span>
                   )}
                 </div>
 
-                <div className="flex justify-between items-center text-[10px] text-slate-400 dark:text-slate-500 mt-2 font-medium">
+                <div className="flex justify-between items-center text-[10px] text-[#899093] dark:text-[#9AA9B8] mt-2 font-semibold">
                   <span>{dateStr}</span>
                   <div className="flex items-center gap-1.5">
-                    <span className={`text-[10px] px-1.5 py-0.2 rounded font-bold uppercase tracking-wider border shrink-0
+                    <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider border shrink-0
                       ${m.status === 'Approved' || m.status === 'Confirmed'
-                        ? 'border-brand-success/30 bg-brand-success-light text-brand-success'
-                        : 'border-slate-300 bg-slate-100 text-slate-600 dark:bg-slate-850 dark:text-slate-400 dark:border-slate-700'
+                        ? 'border-[#B7CCBC] bg-[#E3ECE6] text-[#35624A] dark:bg-[#173529] dark:text-[#8FBEA1] dark:border-[#39634D]'
+                        : 'border-[#D8D5CE] bg-[#F1EFEA] text-[#626A6D] dark:bg-[#141F2C] dark:text-[#9AA9B8] dark:border-[#2D4053]'
                       }
                     `}>
                       {m.status === 'Approved' || m.status === 'Confirmed' ? 'Confirmed' : 'Draft'}
                     </span>
                     <span>•</span>
-                    <span>{confirmedCount}/9 Confirmed</span>
+                    <span>{confirmedCount}/9</span>
                   </div>
                 </div>
               </div>
 
-              {/* Absolute Delete Button */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (window.confirm(`Are you sure you want to delete this mandate: "${m.title}"?`)) {
-                    deleteMandate(m.id);
-                  }
-                }}
-                className="absolute right-3 top-3.5 p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-455 hover:text-red-655 dark:hover:text-red-400 cursor-pointer md:opacity-0 group-hover:opacity-100 transition-all focus:opacity-100"
-                title="Delete mandate"
-                aria-label="Delete mandate"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
+              {/* Hover Action Cluster: Strategy button + Delete button */}
+              <div className="absolute top-2.5 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 dark:bg-[#182536]/90 p-0.5 rounded-md backdrop-blur-xs border border-[#D8D5CE]/60 dark:border-[#344658]/60 shadow-sm">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onOpenStrategy(m.id, m.title);
+                  }}
+                  className="px-1.5 py-0.5 rounded text-[10px] font-bold text-[#A65F3F] dark:text-[#C5B76A] hover:bg-[#F4E8E2] dark:hover:bg-[#3A3520] cursor-pointer transition-colors flex items-center gap-1"
+                  title="View Research Strategy for this mandate"
+                  aria-label={`View research strategy for ${m.title}`}
+                >
+                  <Compass className="h-3 w-3" />
+                  <span>Strategy</span>
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (mandates.length <= 1) {
+                      alert("You cannot delete the only remaining mandate.");
+                      return;
+                    }
+                    if (window.confirm(`Delete mandate "${m.title}"?`)) {
+                      deleteMandate(m.id);
+                    }
+                  }}
+                  className="p-1 rounded text-[#899093] hover:text-[#A44A42] dark:hover:text-red-400 cursor-pointer transition-colors"
+                  title="Delete mandate"
+                  aria-label={`Delete mandate ${m.title}`}
+                >
+                  <Trash2 className="h-3 w-3" />
+                </button>
+              </div>
             </div>
           );
         })}
       </div>
 
-      {/* SAVED OUTREACH section */}
-      <div className="mt-6 mb-2 border-t border-default pt-5">
-        <span className="text-[13px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-3">
-          SAVED OUTREACH
-        </span>
-        <div className="flex flex-col gap-2.5 pr-1">
+      {/* Saved Outreach Section in Sidebar */}
+      <div className="mt-6 pt-4 border-t border-[#D8D5CE] dark:border-[#263544]">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-[10px] font-black text-[#626A6D] dark:text-[#9AA9B8] uppercase tracking-widest block">
+            SAVED OUTREACH
+          </span>
+          <span className="text-[10px] font-bold text-[#899093] dark:text-[#7F8D9B]">
+            {savedOutreachList.length}
+          </span>
+        </div>
+
+        <div className="flex flex-col gap-2">
           {savedOutreachList.length === 0 ? (
-            <span className="text-xs text-slate-455 italic block py-1.5">No saved outreach yet.</span>
+            <p className="text-[11px] text-[#899093] dark:text-[#7F8D9B] italic">No saved outreach yet.</p>
           ) : (
             savedOutreachList.map((item) => (
               <div
                 key={item.id}
-                className="w-full flex flex-col gap-1.5 p-3 rounded border border-default bg-card hover:bg-slate-50/50 dark:hover:bg-slate-800/40 text-xs font-semibold transition-all"
+                className="group relative p-2.5 rounded-lg border border-[#D8D5CE] dark:border-[#2D4053] bg-white dark:bg-[#182536] hover:border-[#BDB9B0] dark:hover:border-[#40566A] text-left transition-all shadow-[0_1px_2px_rgba(32,42,46,0.02)]"
               >
-                <div className="flex items-center justify-between gap-2 border-b border-default pb-1.5 select-none">
-                  <div
-                    className="flex-1 text-left truncate text-primary font-bold text-[13px]"
-                    title={item.title}
-                  >
+                <div className="flex items-center justify-between pr-5 mb-1">
+                  <span className="font-bold text-[12px] text-[#202A2E] dark:text-[#F1F5F9] truncate block">
                     {item.title}
-                  </div>
-                  
+                  </span>
                   <button
                     onClick={() => {
                       if (window.confirm(`Are you sure you want to delete this saved outreach: "${item.title}"?`)) {
                         onDeleteSaved(item.id);
                       }
                     }}
-                    className="p-1 rounded text-slate-400 hover:text-red-500 dark:hover:text-red-400 cursor-pointer transition-opacity"
+                    className="absolute right-2 top-2 p-1 rounded text-[#899093] hover:text-[#A44A42] dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                     title="Delete saved outreach"
                   >
-                    <Trash2 className="h-3.5 w-3.5" />
+                    <Trash2 className="h-3 w-3" />
                   </button>
                 </div>
 
                 {/* Nested clickable prospects list */}
-                <div className="flex flex-col gap-1 pl-1">
+                <div className="flex flex-col gap-1 pl-0.5">
                   {item.prospects && item.prospects.map((p: any) => (
                     <button
                       key={p.companyId}
                       onClick={() => handleSavedProspectClick(item.mandateId || 'mandate-101', p.companyId)}
-                      className="w-full text-left py-1 text-[11px] font-semibold text-secondary hover:text-brand-primary focus:outline-none cursor-pointer truncate flex items-center gap-1.5"
+                      className="w-full text-left py-0.5 text-[11px] font-semibold text-[#626A6D] hover:text-[#202A2E] dark:text-[#9AA9B8] dark:hover:text-[#F1F5F9] focus:outline-none cursor-pointer truncate flex items-center gap-1.5"
                     >
-                      <span className="w-1 h-1 rounded-full bg-[#A855F7] shrink-0" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#5F735F] dark:bg-[#C5B76A] shrink-0" />
                       <span className="truncate">{p.contactName} ({p.companyName})</span>
                     </button>
                   ))}
@@ -237,7 +260,6 @@ export const AppLayout: React.FC = () => {
   const { refreshTrigger } = useMandateHistory();
   
   const [mandateApproved, setMandateApproved] = useState(false);
-  const [researchApproved, setResearchApproved] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
@@ -247,6 +269,15 @@ export const AppLayout: React.FC = () => {
   // Saved outreach list state
   const [savedOutreachList, setSavedOutreachList] = useState<any[]>([]);
   const [selectedSavedItem, setSelectedSavedItem] = useState<any | null>(null);
+
+  // Research strategy modal state (opened from mandate card in sidebar)
+  const [strategyModalOpen, setStrategyModalOpen] = useState(false);
+  const [selectedStrategyMandate, setSelectedStrategyMandate] = useState<{ id: string; title: string } | null>(null);
+
+  const handleOpenStrategy = useCallback((id: string, title: string) => {
+    setSelectedStrategyMandate({ id, title });
+    setStrategyModalOpen(true);
+  }, []);
 
   const loadSavedOutreach = useCallback(() => {
     const stored = localStorage.getItem('dealsourcing_saved_outreach');
@@ -307,16 +338,6 @@ export const AppLayout: React.FC = () => {
         const activeMandate = historyList.find((m: any) => m.id === activeId);
         if (activeMandate) {
           setMandateApproved(activeMandate.status === 'Approved' || activeMandate.status === 'Confirmed');
-          
-          const strategyKey = `dealsourcing_strategy_${activeId}`;
-          const storedStrategy = localStorage.getItem(strategyKey);
-          if (storedStrategy) {
-            const parsedStrategy = JSON.parse(storedStrategy);
-            setResearchApproved(parsedStrategy.status === 'Approved');
-          } else {
-            // Seed a default strategy for mandate-101, draft for others
-            setResearchApproved(activeId === 'mandate-101');
-          }
           return;
         }
       }
@@ -324,9 +345,6 @@ export const AppLayout: React.FC = () => {
       // Fallback
       const mandate = await mandatesApi.getMandate(activeId);
       setMandateApproved(mandate.status === 'Approved');
-      
-      const research = await researchApi.getResearchStrategy(activeId);
-      setResearchApproved(research.status === 'Approved');
     } catch (err) {
       console.error('Error fetching stepper approvals status:', err);
     }
@@ -349,8 +367,10 @@ export const AppLayout: React.FC = () => {
     navigate(location.pathname, { replace: true });
   };
 
+  const isMandatePage = location.pathname === '/mandate' || location.pathname === '/';
+
   return (
-    <div className="min-h-screen bg-app flex flex-col text-primary">
+    <div className={`${isMandatePage ? 'h-screen max-h-screen overflow-hidden' : 'min-h-screen'} bg-app flex flex-col text-primary`}>
       {/* Top Header with Integrated Hamburger Sidebar Toggle */}
       <Header
         themeState={themeState}
@@ -359,28 +379,34 @@ export const AppLayout: React.FC = () => {
       />
 
       {/* Main layout splitting sidebar and content */}
-      <div className="flex-1 flex flex-row items-stretch relative">
+      <div className={`flex-1 ${isMandatePage ? 'min-h-0 overflow-hidden' : ''} flex flex-row items-stretch relative`}>
         
         {/* Desktop & Tablet Sidebar — fixed, does not scroll with content */}
         {!sidebarCollapsed && (
-          <aside className="hidden md:flex flex-col w-64 lg:w-72 shrink-0 border-r border-default bg-white dark:bg-slate-900 p-5 fixed top-[57px] left-0 bottom-0 z-30 overflow-y-auto transition-all duration-200">
+          <aside className="hidden md:flex flex-col w-64 lg:w-72 shrink-0 border-r border-[#D8D5CE] dark:border-[#263544] bg-[#EDEBE5] dark:bg-[#141F2C] p-4.5 fixed top-[60px] md:top-[64px] left-0 bottom-0 z-30 overflow-y-auto transition-all duration-200">
             <SidebarContent
               savedOutreachList={savedOutreachList}
               onDeleteSaved={deleteSavedOutreach}
+              onOpenStrategy={handleOpenStrategy}
             />
           </aside>
         )}
 
         {/* Workspace content block — shifts right when sidebar is open */}
-        <div className={`flex-1 flex flex-col min-w-0 transition-all duration-200 ${!sidebarCollapsed ? 'md:ml-64 lg:ml-72' : ''}`}>
+        <div className={`flex-1 ${isMandatePage ? 'min-h-0 overflow-hidden' : ''} flex flex-col min-w-0 transition-all duration-200 ${!sidebarCollapsed ? 'md:ml-64 lg:ml-72' : ''}`}>
           {/* Horizontal Workflow Stepper */}
-          <WorkflowStepper
-            mandateApproved={mandateApproved}
-            researchApproved={researchApproved}
-          />
+          <div className="shrink-0">
+            <WorkflowStepper
+              mandateApproved={mandateApproved}
+            />
+          </div>
 
-          {/* Main Content Area */}
-          <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-8 flex flex-col gap-6">
+          {/* Main Content Area — strict fit on Mandate, normal scrollable on all other pages */}
+          <main className={
+            isMandatePage
+              ? "flex-1 min-h-0 max-w-7xl w-full mx-auto px-3.5 md:px-5 py-2 flex flex-col overflow-hidden"
+              : "flex-1 max-w-7xl w-full mx-auto px-4 md:px-6 py-5 md:py-6 flex flex-col gap-5"
+          }>
             <Outlet context={{
               refreshApprovals: checkApprovals,
               refreshSavedOutreach: loadSavedOutreach
@@ -398,9 +424,9 @@ export const AppLayout: React.FC = () => {
             onClick={() => setMobileDrawerOpen(false)}
           />
           {/* Drawer content panel */}
-          <div className="relative w-80 max-w-[85vw] h-full bg-white dark:bg-slate-900 border-r border-default flex flex-col p-6 animate-slideIn text-left">
+          <div className="relative w-80 max-w-[85vw] h-full bg-[#EDEBE5] dark:bg-[#141F2C] border-r border-[#D8D5CE] dark:border-[#263544] flex flex-col p-6 animate-slideIn text-left shadow-2xl">
             <div className="flex justify-between items-center mb-6">
-              <span className="text-base font-bold text-primary">DEAL SOURCING</span>
+              <span className="text-base font-black text-primary">DEAL SOURCING</span>
               <button
                 onClick={() => setMobileDrawerOpen(false)}
                 className="text-secondary hover:text-primary font-bold text-xl cursor-pointer p-1"
@@ -413,10 +439,19 @@ export const AppLayout: React.FC = () => {
               onClose={() => setMobileDrawerOpen(false)}
               savedOutreachList={savedOutreachList}
               onDeleteSaved={deleteSavedOutreach}
+              onOpenStrategy={handleOpenStrategy}
             />
           </div>
         </div>
       )}
+
+      {/* Research Strategy Modal accessible from any mandate card */}
+      <ResearchStrategyModal
+        isOpen={strategyModalOpen}
+        mandateId={selectedStrategyMandate?.id || null}
+        mandateTitle={selectedStrategyMandate?.title}
+        onClose={() => setStrategyModalOpen(false)}
+      />
 
       {/* Saved Outreach Details Modal */}
       {selectedSavedItem && (

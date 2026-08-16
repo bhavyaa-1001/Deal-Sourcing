@@ -33,12 +33,12 @@ const CHANNEL_ICONS: Record<string, React.ReactNode> = {
 };
 
 const CHANNEL_COLORS: Record<string, string> = {
-  email:    'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
-  linkedin: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
-  direct:   'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
-  followup: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
-  professional: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
-  founder: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
+  email:    'bg-[#E3ECE6] text-[#35624A] dark:bg-emerald-900/30 dark:text-emerald-400',
+  linkedin: 'bg-[#E5EBE3] text-[#5F735F] dark:bg-slate-800 dark:text-slate-300',
+  direct:   'bg-[#E5EBE3] text-[#5F735F] dark:bg-slate-800 dark:text-slate-300',
+  followup: 'bg-[#F5EDDA] text-[#9A7535] dark:bg-amber-900/30 dark:text-amber-400',
+  professional: 'bg-[#E3ECE6] text-[#35624A] dark:bg-emerald-900/30 dark:text-emerald-400',
+  founder: 'bg-[#E3ECE6] text-[#35624A] dark:bg-emerald-900/30 dark:text-emerald-400',
 };
 
 // ── Inline editable message card ─────────────────────────────────────────────
@@ -552,11 +552,11 @@ const Outreach: React.FC = () => {
               onClick={() => handleCompanySelect(company.id)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-semibold transition-all duration-150 cursor-pointer ${
                 isActive
-                  ? 'border-brand-primary bg-brand-primary-light dark:bg-blue-950/30 text-brand-primary shadow-sm'
-                  : 'border-default bg-card text-primary hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                  ? 'border-[#202A2E] bg-[#EDEBE5] dark:bg-slate-800 text-[#202A2E] dark:text-white shadow-sm'
+                  : 'border-[#D8D5CE] bg-white dark:bg-card text-[#202A2E] dark:text-slate-200 hover:bg-[#F1EFEA] dark:hover:bg-slate-800/50'
               }`}
             >
-              <Users className={`h-3.5 w-3.5 shrink-0 ${isActive ? 'text-brand-primary' : isEnriched ? 'text-green-500' : 'text-amber-500'}`} />
+              <Users className={`h-3.5 w-3.5 shrink-0 ${isActive ? 'text-[#202A2E] dark:text-white' : isEnriched ? 'text-[#35624A]' : 'text-[#9A7535]'}`} />
               {contactName}
             </button>
           );
@@ -565,17 +565,17 @@ const Outreach: React.FC = () => {
 
       {/* ── Main content ─────────────────────────────────────────────────── */}
       {!activeCompany ? (
-        <div className="border border-default rounded-xl p-10 text-center text-secondary bg-card">
+        <div className="border border-[#D8D5CE] dark:border-slate-800 rounded-xl p-10 text-center text-[#626A6D] bg-white dark:bg-card">
           Select a company above to begin.
         </div>
       ) : !isActiveEnriched ? (
-        <div className="border border-default rounded-xl p-10 flex flex-col items-center gap-5 text-center bg-card">
-          <div className="p-4 bg-amber-100 dark:bg-amber-950/30 rounded-full">
-            <AlertTriangle className="h-8 w-8 text-amber-600 dark:text-amber-400" />
+        <div className="border border-[#D8D5CE] dark:border-slate-800 rounded-xl p-10 flex flex-col items-center gap-5 text-center bg-white dark:bg-card">
+          <div className="p-4 bg-[#F5EDDA] dark:bg-amber-950/30 rounded-full">
+            <AlertTriangle className="h-8 w-8 text-[#9A7535] dark:text-amber-400" />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-primary mb-2">Enrichment Required</h3>
-            <p className="text-secondary text-base max-w-md">
+            <h3 className="text-xl font-bold text-[#202A2E] dark:text-white mb-2">Enrichment Required</h3>
+            <p className="text-[#626A6D] text-base max-w-md">
               <strong>{activeCompany.name}</strong> needs to be enriched before outreach can be generated.
             </p>
           </div>
@@ -587,9 +587,9 @@ const Outreach: React.FC = () => {
         <div className="flex flex-col gap-4 animate-fadeIn">
 
           {/* Contact card */}
-          <div className="border border-default rounded-xl px-5 py-4 bg-card flex items-center gap-4">
-            <div className="p-2.5 rounded-lg bg-brand-primary-light dark:bg-blue-950/30 shrink-0">
-              <Users className="h-5 w-5 text-brand-primary" />
+          <div className="border border-[#D8D5CE] dark:border-slate-800 rounded-xl px-5 py-4 bg-white dark:bg-card flex items-center gap-4 shadow-[0_1px_3px_rgba(32,42,46,0.04)]">
+            <div className="p-2.5 rounded-lg bg-[#EDEBE5] dark:bg-slate-800 shrink-0">
+              <Users className="h-5 w-5 text-[#202A2E] dark:text-white" />
             </div>
             <div>
               <p className="text-sm font-bold text-primary">

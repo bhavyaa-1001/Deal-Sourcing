@@ -360,7 +360,7 @@ export const CompanyDetails: React.FC<CompanyDetailsProps> = ({
                         {company.enrichmentData.email}
                       </a>
                     ) : (
-                      <span className="text-xs text-slate-450 italic flex items-center gap-1 mt-1 font-medium select-none">
+                      <span className="text-xs text-slate-500 dark:text-slate-400 italic flex items-center gap-1 mt-1 font-medium select-none">
                         <Lock className="h-3 w-3 text-[#9A8056]" />
                         Unlock with enrichment
                       </span>
@@ -373,7 +373,7 @@ export const CompanyDetails: React.FC<CompanyDetailsProps> = ({
                         {company.enrichmentData.phone}
                       </span>
                     ) : (
-                      <span className="text-xs text-slate-450 italic flex items-center gap-1 mt-1 font-medium select-none">
+                      <span className="text-xs text-slate-500 dark:text-slate-400 italic flex items-center gap-1 mt-1 font-medium select-none">
                         <Lock className="h-3 w-3 text-[#9A8056]" />
                         Unlock with enrichment
                       </span>

@@ -13,17 +13,17 @@ export const Badge: React.FC<BadgeProps> = ({
   ...props
 }) => {
   const styles = {
-    primary: 'bg-white text-brand-primary border-brand-primary dark:bg-slate-900 dark:border-brand-primary-light/30',
-    success: 'bg-white text-brand-success border-brand-success dark:bg-slate-900 dark:border-brand-success/30',
-    warning: 'bg-white text-brand-warning border-brand-warning dark:bg-slate-900 dark:border-brand-warning/30',
-    danger: 'bg-white text-brand-danger border-brand-danger dark:bg-slate-900 dark:border-brand-danger/30',
-    neutral: 'bg-white text-slate-500 border-slate-300 dark:bg-slate-900 dark:text-slate-400 dark:border-slate-800'
+    primary: 'bg-[#EDEBE5] text-[#202A2E] border-[#D8D5CE] dark:bg-[#182536] dark:text-[#F1F5F9] dark:border-[#344658]',
+    success: 'bg-[#E3ECE6] text-[#35624A] border-[#B7CCBC] dark:bg-[#173529] dark:text-[#8FBEA1] dark:border-[#39634D]',
+    warning: 'bg-[#F5EDDA] text-[#9A7535] border-[#E3D4B3] dark:bg-[#3A3520] dark:text-[#D5C76E] dark:border-[#625A2F]',
+    danger: 'bg-[#F4E4E1] text-[#A44A42] border-[#E3C4C0] dark:bg-[#381E21] dark:text-[#E89E9A] dark:border-[#54282B]',
+    neutral: 'bg-[#F1EFEA] text-[#626A6D] border-[#D8D5CE] dark:bg-[#141F2C] dark:text-[#9AA9B8] dark:border-[#2D4053]'
   };
 
   return (
     <span
       className={`
-        inline-flex items-center px-3 py-1 rounded text-sm font-bold border min-h-[32px]
+        inline-flex items-center px-2.5 py-0.5 rounded text-xs font-bold border
         ${styles[variant]}
         ${className}
       `}
@@ -34,3 +34,4 @@ export const Badge: React.FC<BadgeProps> = ({
   );
 };
 export default Badge;
+

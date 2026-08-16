@@ -30,7 +30,7 @@ export const CompanyDiscovery: React.FC = () => {
   const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
   const [fitLevelOverrides, setFitLevelOverrides] = useState<Record<string, FitLevel>>({});
 
-  const handleBack = () => navigate('/research');
+  const handleBack = () => navigate('/mandate');
   const handleContinue = () => navigate('/review');
 
   const displayCompanies = useMemo(() => {
@@ -113,33 +113,33 @@ export const CompanyDiscovery: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-left">
         <Card className="flex justify-between items-start p-5 border border-default bg-card rounded shadow-none">
           <div className="flex flex-col gap-1.5 min-w-0 flex-1 pr-2">
-            <span className="text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider block">Discovered Targets</span>
+            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Discovered Targets</span>
             <span className="text-3xl font-bold text-primary block my-0.5">148</span>
             <span className="text-xs text-secondary block leading-normal">Companies identified through research sources</span>
           </div>
-          <div className="p-2 bg-slate-50 dark:bg-slate-900 border border-default rounded text-slate-450 shrink-0">
+          <div className="p-2 bg-slate-50 dark:bg-slate-900 border border-default rounded text-slate-500 dark:text-slate-400 shrink-0">
             <Database className="h-4.5 w-4.5" />
           </div>
         </Card>
 
         <Card className="flex justify-between items-start p-5 border border-default bg-card rounded shadow-none">
           <div className="flex flex-col gap-1.5 min-w-0 flex-1 pr-2">
-            <span className="text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider block">Potential Fits</span>
+            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Potential Fits</span>
             <span className="text-3xl font-bold text-primary block my-0.5">42</span>
             <span className="text-xs text-secondary block leading-normal">Candidates matching initial criteria</span>
           </div>
-          <div className="p-2 bg-slate-50 dark:bg-slate-900 border border-default rounded text-slate-450 shrink-0">
+          <div className="p-2 bg-slate-50 dark:bg-slate-900 border border-default rounded text-slate-500 dark:text-slate-400 shrink-0">
             <Target className="h-4.5 w-4.5" />
           </div>
         </Card>
 
         <Card className="flex justify-between items-start p-5 border border-default bg-card rounded shadow-none">
           <div className="flex flex-col gap-1.5 min-w-0 flex-1 pr-2">
-            <span className="text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider block">High Alignment</span>
+            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">High Alignment</span>
             <span className="text-3xl font-bold text-primary block my-0.5">{companies.filter(c => c.fitLevel === 'HIGH FIT').length}</span>
             <span className="text-xs text-secondary block leading-normal">Strong acquisition alignment targets</span>
           </div>
-          <div className="p-2 bg-slate-50 dark:bg-slate-900 border border-default rounded text-slate-450 shrink-0">
+          <div className="p-2 bg-slate-50 dark:bg-slate-900 border border-default rounded text-slate-500 dark:text-slate-400 shrink-0">
             <Award className="h-4.5 w-4.5" />
           </div>
         </Card>

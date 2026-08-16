@@ -150,23 +150,23 @@ export const ResearchStrategy: React.FC = () => {
               </p>
               <ul className="space-y-2 text-base text-slate-700 dark:text-slate-300 font-semibold pl-1">
                 <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-blue-600 dark:bg-blue-500" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#5F735F] dark:bg-emerald-400" />
                   Industry directories (e.g. Manufacturing registers)
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-blue-600 dark:bg-blue-500" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#5F735F] dark:bg-emerald-400" />
                   National company registries (ASIC data sets)
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-blue-600 dark:bg-blue-500" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#5F735F] dark:bg-emerald-400" />
                   Manufacturing trade associations and lists
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-blue-600 dark:bg-blue-500" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#5F735F] dark:bg-emerald-400" />
                   Public filings and corporate disclosures
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-blue-600 dark:bg-blue-500" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#5F735F] dark:bg-emerald-400" />
                   Specialist business brokerage registers & networks
                 </li>
               </ul>
@@ -181,7 +181,7 @@ export const ResearchStrategy: React.FC = () => {
           {/* Research Sources card */}
           <Card className="p-6 border border-default bg-card shadow-none flex flex-col gap-4">
             <h3 className="text-base font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2 border-b border-default pb-3">
-              <Database className="h-5 w-5 text-slate-450 dark:text-slate-500" />
+              <Database className="h-5 w-5 text-slate-500 dark:text-slate-400" />
               Research Sources
             </h3>
             <div className="flex flex-col gap-3">

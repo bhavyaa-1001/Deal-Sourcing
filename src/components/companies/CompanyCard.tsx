@@ -57,19 +57,19 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, onView }) => 
       {/* 2. Structured Metrics Block */}
       <div className="grid grid-cols-3 gap-3 text-sm">
         <div>
-          <span className="text-xs font-bold text-slate-450 uppercase tracking-wider block">Revenue</span>
+          <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Revenue</span>
           <span className="text-base font-bold text-primary block mt-0.5">
             {company.revenueRange}
           </span>
         </div>
         <div>
-          <span className="text-xs font-bold text-slate-450 uppercase tracking-wider block">Employees</span>
+          <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Employees</span>
           <span className="text-base font-bold text-primary block mt-0.5">
             {company.employeeRange}
           </span>
         </div>
         <div>
-          <span className="text-xs font-bold text-slate-450 uppercase tracking-wider block">Ownership</span>
+          <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Ownership</span>
           <span className="text-base font-bold text-primary block mt-0.5 truncate">
             {company.ownership.replace(' (Founder Owned)', '')}
           </span>
@@ -80,7 +80,7 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, onView }) => 
 
       {/* 3. Fit Description Rationale */}
       <div className="flex-1 text-sm">
-        <span className="font-bold text-xs text-slate-450 uppercase tracking-wider block mb-1">
+        <span className="font-bold text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">
           Acquisition Alignment
         </span>
         <p className="text-base text-secondary leading-relaxed line-clamp-3">
