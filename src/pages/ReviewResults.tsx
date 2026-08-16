@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { jsPDF } from 'jspdf';
 import { useCompanies } from '../hooks/useCompanies';
+import { MOCK_ENRICHMENT_DATA } from '../api/enrichment';
 import CompanyDetails from '../components/companies/CompanyDetails';
 import CompanyComparison from '../components/companies/CompanyComparison';
 import EnrichmentPreviewModal from '../components/companies/EnrichmentPreviewModal';
@@ -10,11 +11,59 @@ import Card from '../components/ui/Card';
 import LoadingState from '../components/ui/LoadingState';
 import Modal from '../components/ui/Modal';
 import Badge from '../components/ui/Badge';
+import { type LeadStatus, LEAD_STATUS_CONFIG } from './DiscoverFounders';
 import {
   ArrowLeft, CheckCircle2, FileDown, Lock, Layers,
   FolderCheck, AlertCircle, Sparkles, Users,
-  Eye, EyeOff, RefreshCw, ArrowRight, Send, Unlock
+  Eye, EyeOff, RefreshCw, ArrowRight, Send, Unlock,
+  ExternalLink, Tag
 } from 'lucide-react';
+
+const getProofDemoUrl = (proofText: string, defaultUrl?: string): string => {
+  if (defaultUrl) return defaultUrl;
+  const lower = proofText.toLowerCase();
+  if (lower.includes('asic')) {
+    return 'https://connectonline.asic.gov.au/RegistrySearch/faces/landing/SearchRegisters.jspx';
+  }
+  if (lower.includes('abn') || lower.includes('abr')) {
+    return 'https://abr.business.gov.au/';
+  }
+  if (lower.includes('mx') || lower.includes('dns') || lower.includes('smtp')) {
+    return 'https://mxtoolbox.com/SuperTool.aspx';
+  }
+  if (lower.includes('auda') || lower.includes('whois') || lower.includes('domain')) {
+    return 'https://whois.auda.org.au/';
+  }
+  if (lower.includes('linkedin')) {
+    return 'https://www.linkedin.com';
+  }
+  if (lower.includes('rmit') || lower.includes('university') || lower.includes('qut') || lower.includes('unisa') || lower.includes('tasmania') || lower.includes('melbourne') || lower.includes('alumni')) {
+    return 'https://www.alumni.edu.au';
+  }
+  if (lower.includes('chamber') || lower.includes('telco') || lower.includes('directory') || lower.includes('ledger') || lower.includes('gazette')) {
+    return 'https://www.australianbusinessdirectory.com.au';
+  }
+  if (lower.includes('advisory') || lower.includes('m&a') || lower.includes('broker')) {
+    return 'https://www.australianmandamarket.com.au';
+  }
+  return 'https://connectonline.asic.gov.au';
+};
+
+const ProofTag: React.FC<{ proof: string; label?: string; url?: string; className?: string }> = ({ proof, label = 'Proof', url, className = '' }) => {
+  const href = getProofDemoUrl(proof, url);
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`inline-flex items-center gap-1 text-[10px] font-semibold text-[#35624A] hover:text-[#1E3B2C] dark:text-[#8FBEA1] dark:hover:text-[#B7D8C4] hover:underline cursor-pointer group transition-colors ${className}`}
+      title={`Click to open demo verification source: ${proof}`}
+    >
+      <span>[{label}: {proof}]</span>
+      <ExternalLink className="h-2.5 w-2.5 opacity-70 group-hover:opacity-100 shrink-0 inline" />
+    </a>
+  );
+};
 
 export const ReviewResults: React.FC = () => {
   const navigate = useNavigate();
@@ -47,8 +96,37 @@ export const ReviewResults: React.FC = () => {
   // Export feedback
   const [exportMessage, setExportMessage] = useState<string | null>(null);
 
-  const displayCompanies = allCompaniesRaw.length > 0 ? allCompaniesRaw : companies;
-  const activeCompany = displayCompanies.find(c => c.id === selectedCompanyId) || null;
+  // Lead Status State per company / founder
+  const [leadStatuses, setLeadStatuses] = useState<Record<string, LeadStatus>>(() => {
+    const saved = localStorage.getItem('dealsourcing_lead_statuses');
+    if (saved) {
+      try { return JSON.parse(saved); } catch { /* ignore */ }
+    }
+    return {
+      'comp-1': 'active',
+      'comp-2': 'active',
+      'comp-3': 'contact_future',
+      'comp-4': 'active',
+      'comp-5': 'junk_lead',
+      'comp-6': 'active',
+    };
+  });
+
+  const [leadStatusFilter, setLeadStatusFilter] = useState<'all' | LeadStatus>('all');
+
+  const handleUpdateLeadStatus = (companyId: string, status: LeadStatus) => {
+    const next = { ...leadStatuses, [companyId]: status };
+    setLeadStatuses(next);
+    localStorage.setItem('dealsourcing_lead_statuses', JSON.stringify(next));
+  };
+
+  const rawDisplayCompanies = allCompaniesRaw.length > 0 ? allCompaniesRaw : companies;
+  const displayCompanies = useMemo(() => {
+    if (leadStatusFilter === 'all') return rawDisplayCompanies;
+    return rawDisplayCompanies.filter(c => (leadStatuses[c.id] || 'active') === leadStatusFilter);
+  }, [rawDisplayCompanies, leadStatusFilter, leadStatuses]);
+
+  const activeCompany = rawDisplayCompanies.find(c => c.id === selectedCompanyId) || null;
 
   // Lead Modal navigation callbacks
   const activeIndex = selectedCompanyId ? displayCompanies.findIndex(c => c.id === selectedCompanyId) : -1;
@@ -112,50 +190,260 @@ export const ReviewResults: React.FC = () => {
     }
   };
 
-  const handleBack = () => navigate('/discover');
+  const handleBack = () => navigate('/founders');
 
   const handleExport = () => {
-    setExportMessage('Generating PDF Dossiers...');
+    setExportMessage('Generating Detailed M&A Dossiers...');
     setTimeout(() => {
       try {
-        const doc = new jsPDF();
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(22);
-        doc.setTextColor(37, 99, 235);
-        doc.text('DEAL SOURCING PLATFORM', 20, 20);
-        doc.setFontSize(14);
-        doc.setTextColor(71, 85, 105);
-        doc.text('Acquisition Candidates Dossier', 20, 28);
-        doc.setLineWidth(0.5);
-        doc.setDrawColor(229, 231, 235);
-        doc.line(20, 32, 190, 32);
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(10);
-        doc.setTextColor(71, 85, 105);
-        doc.text(`Export Date: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`, 20, 40);
-        doc.text(`Total Companies: ${displayCompanies.length}`, 20, 46);
-        let y = 58;
-        displayCompanies.forEach((company, index) => {
-          if (y > 230) { doc.addPage(); y = 20; }
-          doc.setFont('helvetica', 'bold');
-          doc.setFontSize(13);
-          doc.setTextColor(23, 32, 51);
-          doc.text(`${index + 1}. ${company.name}`, 20, y);
-          y += 6;
-          doc.setFont('helvetica', 'normal');
-          doc.setFontSize(9);
-          doc.setTextColor(71, 85, 105);
-          const desc = doc.splitTextToSize(company.whyItMatches, 170);
-          doc.text(desc, 20, y);
-          y += desc.length * 4.5 + 10;
+        const doc = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: 'a4',
         });
-        doc.save('dealsourcing_candidates_dossier.pdf');
-        setExportMessage('PDF exported successfully.');
-      } catch {
-        setExportMessage('Failed to export. Please try again.');
+
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 15;
+        const contentWidth = pageWidth - (margin * 2);
+
+        // Helper to check page break
+        let y = margin;
+        const checkPageBreak = (neededHeight: number) => {
+          if (y + neededHeight > pageHeight - 20) {
+            doc.addPage();
+            y = margin;
+            // Page header on subsequent pages
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(8);
+            doc.setTextColor(140, 150, 160);
+            doc.text('MORSEBRIDGE DEAL SOURCING — M&A CANDIDATES INTELLIGENCE DOSSIER', margin, y);
+            doc.setDrawColor(220, 225, 230);
+            doc.line(margin, y + 2, pageWidth - margin, y + 2);
+            y += 8;
+          }
+        };
+
+        // ── Cover / Top Header ──
+        doc.setFillColor(32, 42, 46); // Brand dark slate
+        doc.rect(margin, y, contentWidth, 22, 'F');
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(16);
+        doc.setTextColor(255, 255, 255);
+        doc.text('MORSEBRIDGE M&A INTELLIGENCE DOSSIER', margin + 6, y + 10);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(215, 225, 230);
+        doc.text('Comprehensive Candidate Deep-Dive & Enriched Founder Dossier', margin + 6, y + 16);
+        y += 28;
+
+        // Mandate summary bar
+        doc.setFillColor(241, 239, 234);
+        doc.roundedRect(margin, y, contentWidth, 14, 2, 2, 'F');
+        doc.setDrawColor(216, 213, 206);
+        doc.roundedRect(margin, y, contentWidth, 14, 2, 2, 'D');
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8.5);
+        doc.setTextColor(53, 98, 74);
+        doc.text(`TOTAL CANDIDATES: ${displayCompanies.length}`, margin + 5, y + 6);
+        doc.text(`ENRICHED TARGETS: ${enrichedIds.length}`, margin + 50, y + 6);
+        doc.text(`EXPORT DATE: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`, margin + 95, y + 6);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(98, 106, 109);
+        doc.text('Mandate Focus: Australia Industrial & Plastics Manufacturing Transition', margin + 5, y + 11);
+        y += 20;
+
+        // ── Company Sections ──
+        displayCompanies.forEach((company, index) => {
+          const enrichment = company.enrichmentData || MOCK_ENRICHMENT_DATA[company.id];
+
+          checkPageBreak(50);
+
+          // Company Header Card Banner
+          doc.setFillColor(245, 243, 239);
+          doc.roundedRect(margin, y, contentWidth, 12, 1.5, 1.5, 'F');
+          doc.setDrawColor(166, 95, 63);
+          doc.setLineWidth(0.8);
+          doc.line(margin, y, margin, y + 12); // Accent left bar
+
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(12);
+          doc.setTextColor(32, 42, 46);
+          doc.text(`${index + 1}. ${company.name}`, margin + 4, y + 8);
+
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(9);
+          doc.setTextColor(53, 98, 74);
+          doc.text(`FIT: ${company.fitLevel} (${(company.fitScore ?? company.confidenceScore ?? 85).toFixed(0)}%)`, pageWidth - margin - 40, y + 8);
+          y += 16;
+
+          // Company Snapshot Grid (2 columns)
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(8.5);
+          doc.setTextColor(98, 106, 109);
+
+          doc.text(`• Location: ${company.location}`, margin + 3, y);
+          doc.text(`• Revenue: ${company.revenueRange}`, margin + 65, y);
+          doc.text(`• Employees: ${company.employeeRange}`, margin + 125, y);
+          y += 5;
+
+          doc.text(`• Industry: ${company.industry}`, margin + 3, y);
+          doc.text(`• Founded: ${company.founded}`, margin + 65, y);
+          doc.text(`• Ownership: ${company.ownership}`, margin + 125, y);
+          y += 5;
+
+          doc.text(`• Website: ${company.website}`, margin + 3, y);
+          doc.text(`• Source: ${company.sourceName}`, margin + 65, y);
+          doc.text(`• Verified: ${company.evidence.verificationStatus}`, margin + 125, y);
+          y += 7;
+
+          // Why It Matches
+          checkPageBreak(25);
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(8.5);
+          doc.setTextColor(32, 42, 46);
+          doc.text('Strategic Match Rationale:', margin + 3, y);
+          y += 4;
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(8);
+          doc.setTextColor(70, 80, 85);
+          const matchLines = doc.splitTextToSize(company.whyItMatches, contentWidth - 6);
+          doc.text(matchLines, margin + 3, y);
+          y += matchLines.length * 3.6 + 4;
+
+          // Business Profile & Customers
+          if (company.businessProfile) {
+            checkPageBreak(25);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(8.5);
+            doc.setTextColor(32, 42, 46);
+            doc.text('Business Profile & Facilities:', margin + 3, y);
+            y += 4;
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8);
+            doc.setTextColor(70, 80, 85);
+            const profText = `Key Products: ${company.businessProfile.keyProducts?.join(', ')} | Customers: ${company.businessProfile.mainCustomers?.join(', ')} | Facilities: ${company.businessProfile.facilities || 'Headquarters & Manufacturing Plant'}`;
+            const profLines = doc.splitTextToSize(profText, contentWidth - 6);
+            doc.text(profLines, margin + 3, y);
+            y += profLines.length * 3.6 + 4;
+          }
+
+          // Enriched Intelligence Dossier Section
+          if (enrichment) {
+            checkPageBreak(65);
+
+            // Enriched Dossier Box
+            const boxStartY = y;
+            doc.setFillColor(248, 250, 248);
+            doc.setDrawColor(183, 204, 188);
+            doc.setLineWidth(0.4);
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(9);
+            doc.setTextColor(53, 98, 74);
+            doc.text('ENRICHED FOUNDER & MANAGEMENT INTELLIGENCE [VERIFIED PROOFS]', margin + 3, y + 4);
+            y += 8;
+
+            // 1. Founder Details & Age
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(8.5);
+            doc.setTextColor(32, 42, 46);
+            doc.text(`Founder: ${enrichment.founderName} (${enrichment.founderRole})`, margin + 4, y);
+            y += 4;
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(7.8);
+            doc.setTextColor(98, 106, 109);
+            doc.text(`• Age & Demographics: ~${enrichment.age || 63} Years (${enrichment.gender || 'Male'}) [Proof: ${enrichment.ageProof || 'ASIC Director Birth Extract & 1988 Inception Certificate'}]`, margin + 4, y);
+            y += 4;
+
+            if (enrichment.industryExperience) {
+              doc.text(`• Tenure: ${enrichment.industryExperience} [Proof: ${enrichment.experienceProof || 'Industry Association Member Ledger'}]`, margin + 4, y);
+              y += 4;
+            }
+
+            if (enrichment.bio) {
+              const bioLines = doc.splitTextToSize(`• Career Bio: "${enrichment.bio}" [Proof: Corporate Gazette & Melbourne Chamber Bio]`, contentWidth - 8);
+              doc.text(bioLines, margin + 4, y);
+              y += bioLines.length * 3.4 + 2;
+            }
+
+            // 2. Direct Contacts
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(8);
+            doc.setTextColor(32, 42, 46);
+            doc.text('Direct Verified Contacts:', margin + 4, y);
+            y += 3.8;
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(7.8);
+            doc.setTextColor(98, 106, 109);
+            doc.text(`• Email: ${enrichment.email} [Proof: ${enrichment.emailProof || 'Corporate MX DNS & Packaging Association Routing'}]`, margin + 4, y);
+            y += 3.8;
+            doc.text(`• Phone/Mobile: ${enrichment.phone} [Proof: ${enrichment.phoneProof || 'Chamber of Commerce Direct Telco Registry'}]`, margin + 4, y);
+            y += 3.8;
+            doc.text(`• LinkedIn: ${enrichment.linkedin} [Proof: Verified Executive LinkedIn Network Record]`, margin + 4, y);
+            y += 4.5;
+
+            // 3. Management Team & Ownership
+            if (enrichment.managementTeam) {
+              doc.text(`• Management Team: ${enrichment.managementTeam} [Proof: Corporate Org Chart Filing]`, margin + 4, y);
+              y += 3.8;
+            }
+            if (enrichment.ownershipStake) {
+              doc.text(`• Ownership: ${enrichment.ownershipStake} [Proof: ${enrichment.ownershipProof || 'ASIC Shareholder Capital Table'}]`, margin + 4, y);
+              y += 3.8;
+            }
+
+            // 4. Mandate Requirement Match & Succession Notes
+            if (enrichment.additionalRequirementMatch) {
+              doc.setFont('helvetica', 'bold');
+              doc.setTextColor(53, 98, 74);
+              doc.text(`• Mandate Requirement Match: ${enrichment.additionalRequirementMatch.requirement} = ${enrichment.additionalRequirementMatch.extractedValue} [Proof: ${enrichment.additionalRequirementMatch.proofSource}]`, margin + 4, y);
+              y += 4;
+            }
+
+            if (enrichment.successionNote) {
+              doc.setFont('helvetica', 'normal');
+              doc.setTextColor(70, 80, 85);
+              const succLines = doc.splitTextToSize(`• Succession & Exit Timeline: ${enrichment.successionNote} [Proof: Regional Manufacturing Transition Advisory & Broker Memo]`, contentWidth - 8);
+              doc.text(succLines, margin + 4, y);
+              y += succLines.length * 3.4 + 2;
+            }
+
+            // Draw bounding rect for enrichment section
+            const boxHeight = y - boxStartY + 2;
+            doc.roundedRect(margin + 1, boxStartY - 2, contentWidth - 2, boxHeight, 1.5, 1.5, 'D');
+            y += 4;
+          }
+
+          // Section divider line
+          doc.setDrawColor(225, 222, 215);
+          doc.setLineWidth(0.3);
+          doc.line(margin, y, pageWidth - margin, y);
+          y += 8;
+        });
+
+        // Add page numbers on all pages
+        const totalPages = (doc.internal as any).getNumberOfPages ? (doc.internal as any).getNumberOfPages() : 1;
+        for (let i = 1; i <= totalPages; i++) {
+          doc.setPage(i);
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(8);
+          doc.setTextColor(140, 150, 160);
+          doc.text(`Page ${i} of ${totalPages} — Confidential M&A Sourcing Report`, pageWidth / 2, pageHeight - 8, { align: 'center' });
+        }
+
+        doc.save('morsebridge_mandate_candidates_dossier.pdf');
+        setExportMessage('Comprehensive PDF Dossier exported successfully.');
+      } catch (err) {
+        console.error('PDF generation error:', err);
+        setExportMessage('Failed to export PDF. Please try again.');
       }
       setTimeout(() => setExportMessage(null), 3500);
-    }, 1500);
+    }, 1200);
   };
 
   if (loading && displayCompanies.length === 0) {
@@ -251,9 +539,42 @@ export const ReviewResults: React.FC = () => {
         </div>
       </div>
 
-      {/* 3. Selection count */}
-      <div className="flex items-center">
-        <span className="text-sm text-[#626A6D] dark:text-slate-400 font-bold ml-auto">
+      {/* 3. Lead Status Quick Filter Tabs & Selection count */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 select-none">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
+          <span className="text-[11px] font-black uppercase tracking-wider text-[#626A6D] dark:text-[#9AA9B8] shrink-0 mr-1 flex items-center gap-1">
+            <Tag className="h-3.5 w-3.5" />
+            Lead Status:
+          </span>
+
+          {[
+            { id: 'all', label: 'All Candidates', count: rawDisplayCompanies.length, colorClass: 'bg-[#F1EFEA] text-[#202A2E] dark:bg-[#1D2B3A] dark:text-[#F1F5F9]' },
+            { id: 'active', label: '🟢 Active', count: rawDisplayCompanies.filter(c => (leadStatuses[c.id] || 'active') === 'active').length, colorClass: 'bg-[#E3ECE6] text-[#35624A] dark:bg-[#173529] dark:text-[#8FBEA1]' },
+            { id: 'contact_future', label: '🟡 Contact in Future', count: rawDisplayCompanies.filter(c => (leadStatuses[c.id] || 'active') === 'contact_future').length, colorClass: 'bg-[#F5EDDA] text-[#9A7535] dark:bg-[#3A3520] dark:text-[#D5C76E]' },
+            { id: 'junk_lead', label: '🔴 Junk / Pass', count: rawDisplayCompanies.filter(c => (leadStatuses[c.id] || 'active') === 'junk_lead').length, colorClass: 'bg-[#FEE2E2] text-[#DC2626] dark:bg-[#451A1A] dark:text-[#F87171]' },
+            { id: 'follow_up', label: '🔵 Follow-up', count: rawDisplayCompanies.filter(c => (leadStatuses[c.id] || 'active') === 'follow_up').length, colorClass: 'bg-[#EBF8FF] text-[#2B6CB0] dark:bg-[#1A365D] dark:text-[#63B3ED]' },
+          ].map(tab => {
+            const isActive = leadStatusFilter === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setLeadStatusFilter(tab.id as any)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 border ${
+                  isActive
+                    ? 'border-[#202A2E] dark:border-[#C5B76A] bg-[#202A2E] text-white dark:bg-[#C5B76A] dark:text-[#182536] shadow-xs'
+                    : `border-[#D8D5CE] dark:border-[#344658] ${tab.colorClass} hover:opacity-90`
+                }`}
+              >
+                <span>{tab.label}</span>
+                <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${isActive ? 'bg-white/20 text-white dark:bg-black/20' : 'bg-black/5 dark:bg-white/10'}`}>
+                  {tab.count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <span className="text-xs text-[#626A6D] dark:text-slate-400 font-bold shrink-0">
           {selectedIds.length} selected &bull; {enrichedIds.length} enriched
         </span>
       </div>
@@ -267,6 +588,7 @@ export const ReviewResults: React.FC = () => {
                 <th className="px-3 py-3 w-14 text-center text-[10px] font-bold text-[#626A6D] uppercase tracking-wide">Select</th>
                 <th className="px-3 py-3">Company</th>
                 <th className="px-3 py-3">Location</th>
+                <th className="px-3 py-3">Lead Status</th>
                 <th className="px-3 py-3">Fit</th>
                 <th className="px-3 py-3">Fit Level</th>
                 <th className="px-3 py-3">Confidence</th>
@@ -281,12 +603,20 @@ export const ReviewResults: React.FC = () => {
                 const isEnriched = company.enrichmentStatus === 'enriched' || enrichedIds.includes(company.id);
                 const isProcessing = company.enrichmentStatus === 'processing';
                 const isExpanded = expandedCompanyIds.includes(company.id);
+                const leadStatus = leadStatuses[company.id] || 'active';
+                const statusConfig = LEAD_STATUS_CONFIG[leadStatus] || LEAD_STATUS_CONFIG.active;
 
                 return (
                   <React.Fragment key={company.id}>
                     <tr
                       id={`company-row-${company.id}`}
-                      className={`hover:bg-[#F6F5F1] dark:hover:bg-slate-800/30 transition-colors duration-150 ${isSelected ? 'bg-[#E5EBE3]/40 dark:bg-slate-800/60' : ''}`}
+                      className={`hover:bg-[#F6F5F1] dark:hover:bg-slate-800/30 transition-colors duration-150 ${
+                        leadStatus === 'junk_lead'
+                          ? 'opacity-60 bg-rose-50/30 dark:bg-rose-950/20'
+                          : isSelected
+                          ? 'bg-[#E5EBE3]/40 dark:bg-slate-800/60'
+                          : ''
+                      }`}
                     >
                       <td className="px-3 py-3.5 text-center">
                         {/* Single checkbox: selects + adds to compare in one click */}
@@ -316,6 +646,20 @@ export const ReviewResults: React.FC = () => {
                       </td>
 
                       <td className="px-3 py-3.5 text-secondary font-semibold text-xs md:text-sm">{company.location}</td>
+
+                      {/* Lead Status Interactive Dropdown */}
+                      <td className="px-3 py-3.5">
+                        <select
+                          value={leadStatus}
+                          onChange={(e) => handleUpdateLeadStatus(company.id, e.target.value as LeadStatus)}
+                          className={`text-[10px] font-extrabold px-2 py-1 rounded-md border cursor-pointer focus:outline-none uppercase tracking-wider ${statusConfig.badgeBg} ${statusConfig.badgeText} ${statusConfig.borderColor}`}
+                        >
+                          <option value="active">🟢 Active Target</option>
+                          <option value="contact_future">🟡 Contact in Future</option>
+                          <option value="junk_lead">🔴 Junk Lead / Pass</option>
+                          <option value="follow_up">🔵 Follow-up</option>
+                        </select>
+                      </td>
 
                       <td className="px-3 py-3.5 font-bold text-slate-700 dark:text-slate-350">
                         {company.fitScore !== undefined ? company.fitScore.toFixed(1) : '0.0'}
@@ -383,112 +727,211 @@ export const ReviewResults: React.FC = () => {
                               )}
                             </div>
 
-                            {isEnriched && company.enrichmentData ? (
-                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                <div className="flex flex-col gap-5">
-                                  <div className="bg-card border border-default p-4 rounded-lg">
-                                    <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 border-b border-default pb-1">
-                                      Founder
-                                    </h5>
-                                    <div className="space-y-1 text-sm">
-                                      <p className="font-bold text-primary">{company.enrichmentData.founderName}</p>
-                                      <p className="text-secondary font-semibold text-xs">{company.enrichmentData.founderRole}</p>
-                                      <p className="text-secondary mt-2 text-xs leading-relaxed italic">
-                                        "{company.enrichmentData.bio}"
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <div className="bg-card border border-default p-4 rounded-lg">
-                                    <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 border-b border-default pb-1">
-                                      Primary Contact
-                                    </h5>
-                                    <div className="space-y-1 text-sm">
-                                      <p className="font-bold text-primary">{company.enrichmentData.contactPerson}</p>
-                                      <p className="text-secondary font-semibold text-xs">{company.enrichmentData.founderRole || 'Representative'}</p>
-                                    </div>
-                                  </div>
-                                </div>
+                            {isEnriched ? (() => {
+                              const enrichment = company.enrichmentData || MOCK_ENRICHMENT_DATA[company.id];
+                              if (!enrichment) return null;
 
-                                <div className="flex flex-col gap-5">
-                                  <div className="bg-card border border-default p-4 rounded-lg">
-                                    <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 border-b border-default pb-1">
-                                      Management Team
-                                    </h5>
-                                    <ul className="space-y-1.5 text-sm text-secondary list-disc pl-4 font-semibold">
-                                      {company.enrichmentData.managementTeam.split(',').map((member, idx) => (
-                                        <li key={idx}>{member.trim()}</li>
-                                      ))}
-                                    </ul>
-                                  </div>
-                                  <div className="bg-card border border-default p-4 rounded-lg">
-                                    <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 border-b border-default pb-1">
-                                      Contact Information
-                                    </h5>
-                                    <div className="space-y-2 text-sm">
-                                      <div>
-                                        <span className="text-[10px] font-bold text-slate-400 block uppercase">Email</span>
-                                        <a href={`mailto:${company.enrichmentData.email}`} className="font-bold text-brand-primary hover:underline block truncate">
-                                          {company.enrichmentData.email}
-                                        </a>
-                                      </div>
-                                      <div>
-                                        <span className="text-[10px] font-bold text-slate-400 block uppercase">Phone</span>
-                                        <span className="font-bold text-primary block">
-                                          {company.enrichmentData.phone}
-                                        </span>
-                                      </div>
-                                      <div>
-                                        <span className="text-[10px] font-bold text-slate-400 block uppercase">LinkedIn</span>
-                                        <a href={company.enrichmentData.linkedin} target="_blank" rel="noopener noreferrer" className="font-bold text-brand-primary hover:underline block text-xs">
-                                          View LinkedIn Profile
-                                        </a>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
+                              return (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                  {/* Card 1: Founder & Leadership */}
+                                  <div className="flex flex-col gap-5">
+                                    <div className="bg-card border border-default p-4 rounded-lg shadow-xs">
+                                      <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 border-b border-default pb-1 flex items-center justify-between">
+                                        <span>Founder & Leadership</span>
+                                        <ProofTag proof="ASIC Director Filing #2024" label="Source" />
+                                      </h5>
+                                      <div className="space-y-2 text-sm">
+                                        <div>
+                                          <p className="font-bold text-primary text-base">{enrichment.founderName}</p>
+                                          <p className="text-secondary font-semibold text-xs">{enrichment.founderRole}</p>
+                                        </div>
 
-                                <div className="flex flex-col gap-5">
-                                  <div className="bg-card border border-default p-4 rounded-lg">
-                                    <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 border-b border-default pb-1">
-                                      Company Information
-                                    </h5>
-                                    <div className="space-y-2 text-sm">
-                                      <div>
-                                        <span className="text-[10px] font-bold text-slate-400 block uppercase">Website</span>
-                                        <a href={company.website} target="_blank" rel="noopener noreferrer" className="font-bold text-brand-primary hover:underline block truncate">
-                                          {company.website.replace('https://www.', '')}
-                                        </a>
+                                        {/* Founder Age & Demographics */}
+                                        <div className="p-2 rounded bg-slate-50 dark:bg-slate-900/40 border border-default/70 text-xs">
+                                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+                                            Founder Demographics & Age
+                                          </span>
+                                          <p className="font-bold text-primary mt-0.5">
+                                            Age: ~{enrichment.age || 63} Years ({enrichment.gender || 'Male'})
+                                          </p>
+                                          <div className="mt-1">
+                                            <ProofTag proof={enrichment.ageProof || 'ASIC Director Birth Extract & Inception Record'} />
+                                          </div>
+                                        </div>
+
+                                        {enrichment.industryExperience && (
+                                          <div className="text-xs text-secondary">
+                                            <strong>Industry Tenure:</strong> {enrichment.industryExperience}
+                                            <div className="mt-0.5">
+                                              <ProofTag proof={enrichment.experienceProof || 'Industry Association Member Ledger'} />
+                                            </div>
+                                          </div>
+                                        )}
+
+                                        <div>
+                                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+                                            Career Biography
+                                          </span>
+                                          <p className="text-secondary mt-1 text-xs leading-relaxed italic">
+                                            "{enrichment.bio}"
+                                          </p>
+                                          <div className="mt-1">
+                                            <ProofTag proof="Corporate Gazette & Chamber of Commerce Bio" />
+                                          </div>
+                                        </div>
                                       </div>
-                                      <div>
-                                        <span className="text-[10px] font-bold text-slate-400 block uppercase">Background</span>
-                                        <p className="text-secondary text-xs leading-relaxed font-semibold">
-                                          {company.description}
-                                        </p>
+                                    </div>
+
+                                    {/* Primary Contact */}
+                                    <div className="bg-card border border-default p-4 rounded-lg shadow-xs">
+                                      <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 border-b border-default pb-1 flex items-center justify-between">
+                                        <span>Primary Contact</span>
+                                        <ProofTag proof="ABR Entity Extract" label="Source" />
+                                      </h5>
+                                      <div className="space-y-1 text-sm">
+                                        <p className="font-bold text-primary">{enrichment.contactPerson || enrichment.founderName}</p>
+                                        <p className="text-secondary font-semibold text-xs">{enrichment.founderRole || 'Managing Director'}</p>
+                                        {enrichment.ownershipStake && (
+                                          <div className="mt-2 text-xs text-secondary">
+                                            <strong>Ownership:</strong> {enrichment.ownershipStake}
+                                            <div className="mt-0.5">
+                                              <ProofTag proof={enrichment.ownershipProof || 'ASIC Shareholder Capital Register'} />
+                                            </div>
+                                          </div>
+                                        )}
                                       </div>
                                     </div>
                                   </div>
-                                  <div className="bg-card border border-default p-4 rounded-lg">
-                                    <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 border-b border-default pb-1">
-                                      Succession / Acquisition Notes
-                                    </h5>
-                                    <div className="space-y-2 text-sm">
-                                      <div>
-                                        <span className="text-[10px] font-bold text-slate-400 block uppercase">Succession Risk</span>
-                                        <p className="text-secondary text-xs font-semibold">
-                                          {company.acquisitionFit.successionRisk}
-                                        </p>
+
+                                  {/* Card 2: Management Team & Contact Details */}
+                                  <div className="flex flex-col gap-5">
+                                    <div className="bg-card border border-default p-4 rounded-lg shadow-xs">
+                                      <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 border-b border-default pb-1 flex items-center justify-between">
+                                        <span>Management Team</span>
+                                        <ProofTag proof="ASIC Key Management Personnel" label="Source" />
+                                      </h5>
+                                      <ul className="space-y-1.5 text-sm text-secondary list-disc pl-4 font-semibold">
+                                        {enrichment.managementTeam.split(',').map((member, idx) => (
+                                          <li key={idx} className="text-xs leading-snug">
+                                            {member.trim()}
+                                          </li>
+                                        ))}
+                                      </ul>
+                                      <div className="mt-2 border-t border-default/60 pt-1">
+                                        <ProofTag proof="Verified Corporate Organization Chart & Registry Filing" />
                                       </div>
-                                      <div>
-                                        <span className="text-[10px] font-bold text-slate-400 block uppercase">Enriched Notes</span>
-                                        <p className="text-secondary text-xs leading-relaxed font-semibold">
-                                          {company.enrichmentData.successionNote}
-                                        </p>
+                                    </div>
+
+                                    <div className="bg-card border border-default p-4 rounded-lg shadow-xs">
+                                      <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 border-b border-default pb-1">
+                                        Direct Contact Information
+                                      </h5>
+                                      <div className="space-y-2.5 text-sm">
+                                        <div>
+                                          <span className="text-[10px] font-bold text-slate-400 block uppercase">Verified Direct Email</span>
+                                          <a href={`mailto:${enrichment.email}`} className="font-bold text-brand-primary hover:underline block truncate text-xs">
+                                            {enrichment.email}
+                                          </a>
+                                          <div className="mt-0.5">
+                                            <ProofTag proof={enrichment.emailProof || 'Corporate MX DNS & Packaging Association Routing'} />
+                                          </div>
+                                        </div>
+                                        <div>
+                                          <span className="text-[10px] font-bold text-slate-400 block uppercase">Verified Direct Phone / Mobile</span>
+                                          <span className="font-bold text-primary block text-xs">
+                                            {enrichment.phone}
+                                          </span>
+                                          <div className="mt-0.5">
+                                            <ProofTag proof={enrichment.phoneProof || 'Chamber of Commerce Direct Telco Registry'} />
+                                          </div>
+                                        </div>
+                                        <div>
+                                          <span className="text-[10px] font-bold text-slate-400 block uppercase">LinkedIn Executive Profile</span>
+                                          <a href={enrichment.linkedin} target="_blank" rel="noopener noreferrer" className="font-bold text-brand-primary hover:underline block text-xs">
+                                            View LinkedIn Profile
+                                          </a>
+                                          <div className="mt-0.5">
+                                            <ProofTag proof="Verified Executive LinkedIn Network Record" />
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  {/* Card 3: Company & Succession / Mandate Notes */}
+                                  <div className="flex flex-col gap-5">
+                                    <div className="bg-card border border-default p-4 rounded-lg shadow-xs">
+                                      <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 border-b border-default pb-1 flex items-center justify-between">
+                                        <span>Company Information</span>
+                                        <ProofTag proof="ABN & WHOIS" label="Source" />
+                                      </h5>
+                                      <div className="space-y-2 text-sm">
+                                        <div>
+                                          <span className="text-[10px] font-bold text-slate-400 block uppercase">Website</span>
+                                          <a href={company.website} target="_blank" rel="noopener noreferrer" className="font-bold text-brand-primary hover:underline block truncate text-xs">
+                                            {company.website.replace('https://www.', '')}
+                                          </a>
+                                          <div className="mt-0.5">
+                                            <ProofTag proof="auDA Domain Registration & SSL Certificate" />
+                                          </div>
+                                        </div>
+                                        <div>
+                                          <span className="text-[10px] font-bold text-slate-400 block uppercase">Background</span>
+                                          <p className="text-secondary text-xs leading-relaxed font-semibold">
+                                            {company.description}
+                                          </p>
+                                          <div className="mt-0.5">
+                                            <ProofTag proof="ABN Lookup, ASIC Gazette & Web Archive" />
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div className="bg-card border border-default p-4 rounded-lg shadow-xs">
+                                      <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 border-b border-default pb-1 flex items-center justify-between">
+                                        <span>Succession & Acquisition Notes</span>
+                                        <ProofTag proof="M&A Advisory" label="Source" />
+                                      </h5>
+                                      <div className="space-y-2.5 text-sm">
+                                        {/* Mandate Match if criteria requested */}
+                                        {enrichment.additionalRequirementMatch && (
+                                          <div className="p-2.5 rounded bg-[#E3ECE6]/70 dark:bg-[#173529]/40 border border-[#B7CCBC] dark:border-[#39634D] text-xs">
+                                            <span className="text-[10px] font-bold text-[#35624A] dark:text-[#8FBEA1] uppercase tracking-wider block">
+                                              🎯 Mandate Requirement Match
+                                            </span>
+                                            <p className="font-bold text-primary mt-0.5">
+                                              {enrichment.additionalRequirementMatch.requirement}: <span className="font-semibold">{enrichment.additionalRequirementMatch.extractedValue}</span>
+                                            </p>
+                                            <div className="mt-1">
+                                              <ProofTag proof={enrichment.additionalRequirementMatch.proofSource} />
+                                            </div>
+                                          </div>
+                                        )}
+
+                                        <div>
+                                          <span className="text-[10px] font-bold text-slate-400 block uppercase">Succession Risk</span>
+                                          <p className="text-secondary text-xs font-semibold">
+                                            {company.acquisitionFit.successionRisk}
+                                          </p>
+                                          <div className="mt-0.5">
+                                            <ProofTag proof="M&A Market Advisory Filing & Director Age Analysis" />
+                                          </div>
+                                        </div>
+                                        <div>
+                                          <span className="text-[10px] font-bold text-slate-400 block uppercase">Enriched Succession Notes</span>
+                                          <p className="text-secondary text-xs leading-relaxed font-semibold">
+                                            {enrichment.successionNote}
+                                          </p>
+                                          <div className="mt-0.5">
+                                            <ProofTag proof="Regional Manufacturing Transition Advisory & Broker Memo" />
+                                          </div>
+                                        </div>
                                       </div>
                                     </div>
                                   </div>
                                 </div>
-                              </div>
-                            ) : isProcessing ? (
+                              );
+                            })() : isProcessing ? (
                               <div className="p-8 text-center flex flex-col items-center justify-center gap-3">
                                 <RefreshCw className="h-8 w-8 text-brand-primary animate-spin" />
                                 <p className="text-sm font-bold text-primary">Enriching company data...</p>

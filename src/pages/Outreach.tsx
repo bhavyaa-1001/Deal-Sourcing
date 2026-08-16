@@ -14,10 +14,16 @@ import type {
 
 import LoadingState from '../components/ui/LoadingState';
 import Button from '../components/ui/Button';
+import CompanyKanban from '../components/companies/CompanyKanban';
+import CompanyDetails from '../components/companies/CompanyDetails';
+import GmailConnectModal, { type ConnectedEmailAccount } from '../components/outreach/GmailConnectModal';
+import SendEmailModal from '../components/outreach/SendEmailModal';
+import AutomateCampaignModal from '../components/outreach/AutomateCampaignModal';
 import {
   ArrowLeft, Sparkles, AlertTriangle, Users, Search,
   Target, Mail, Link2, MessageSquare, Copy, CheckCheck,
-  RefreshCw, ChevronRight, ChevronDown, Pencil,
+  RefreshCw, ChevronRight, ChevronDown, Pencil, Kanban,
+  Send, Zap, CheckCircle2
 } from 'lucide-react';
 
 // STEP_LABELS removed because it is unused
@@ -53,11 +59,13 @@ interface MessageCardProps {
   isRegenerating: boolean;
   onRegenerate: () => void;
   onEdit: (subject: string, body: string) => void;
+  onSendEmail?: (subject: string, body: string) => void;
+  isSent?: boolean;
 }
 
 const MessageCard: React.FC<MessageCardProps> = ({
   script, channel, label, angleNote, sourceNote, ctaNote,
-  iconKey, isRegenerating, onRegenerate, onEdit,
+  iconKey, isRegenerating, onRegenerate, onEdit, onSendEmail, isSent,
 }) => {
   const [subject, setSubject] = useState(script.subject);
   const [body, setBody]       = useState(script.body);
@@ -190,6 +198,31 @@ const MessageCard: React.FC<MessageCardProps> = ({
           </button>
         )}
 
+        {/* ── Direct Gmail Send Action ── */}
+        {onSendEmail && channel === 'email' && (
+          <button
+            onClick={() => onSendEmail(subject, body)}
+            disabled={isRegenerating || !body}
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border text-xs font-extrabold transition-all cursor-pointer ${
+              isSent
+                ? 'border-[#35624A] bg-[#E3ECE6] text-[#35624A] dark:bg-[#173529] dark:text-[#8FBEA1]'
+                : 'border-[#35624A] bg-[#35624A] text-white hover:bg-[#274A37] shadow-xs'
+            }`}
+          >
+            {isSent ? (
+              <>
+                <CheckCircle2 className="h-3.5 w-3.5 text-[#35624A] dark:text-[#8FBEA1]" />
+                <span>Dispatched via Gmail</span>
+              </>
+            ) : (
+              <>
+                <Send className="h-3.5 w-3.5" />
+                <span>Send via Gmail</span>
+              </>
+            )}
+          </button>
+        )}
+
         <button
           onClick={onRegenerate}
           disabled={isRegenerating}
@@ -246,6 +279,93 @@ const Outreach: React.FC = () => {
   const [regenerating, setRegenerating] = useState(false);
   const [researchOpen, setResearchOpen] = useState(false);
   const [saveDropdownOpen, setSaveDropdownOpen] = useState(false);
+  const [outreachViewMode, setOutreachViewMode] = useState<'kanban' | 'scripts'>('kanban');
+  const [selectedModalCompanyId, setSelectedModalCompanyId] = useState<string | null>(null);
+
+  // ── Connected Gmail Account State ──
+  const [connectedAccount, setConnectedAccount] = useState<ConnectedEmailAccount | null>(() => {
+    const saved = localStorage.getItem('dealsourcing_connected_email');
+    if (saved) {
+      try { return JSON.parse(saved); } catch { /* ignore */ }
+    }
+    return {
+      email: 'bhavya.acquisitions@gmail.com',
+      senderName: 'Bhavya — M&A Partner',
+      provider: 'gmail',
+      connectedAt: new Date().toISOString(),
+      dailyQuotaRemaining: 492,
+    };
+  });
+
+  const [connectModalOpen, setConnectModalOpen] = useState(false);
+  const [sendEmailModalConfig, setSendEmailModalConfig] = useState<{
+    company: any;
+    subject: string;
+    body: string;
+  } | null>(null);
+  const [automateCampaignModalOpen, setAutomateCampaignModalOpen] = useState(false);
+  const [sentCompanyIds, setSentCompanyIds] = useState<string[]>(() => {
+    const saved = localStorage.getItem('dealsourcing_sent_emails');
+    if (saved) {
+      try { return JSON.parse(saved); } catch { /* ignore */ }
+    }
+    return [];
+  });
+  const [outreachToast, setOutreachToast] = useState<string | null>(null);
+
+  const handleConnectAccount = (account: ConnectedEmailAccount) => {
+    setConnectedAccount(account);
+    localStorage.setItem('dealsourcing_connected_email', JSON.stringify(account));
+    setOutreachToast(`Connected Gmail: ${account.email}`);
+    setTimeout(() => setOutreachToast(null), 3500);
+  };
+
+  const handleDisconnectAccount = () => {
+    setConnectedAccount(null);
+    localStorage.removeItem('dealsourcing_connected_email');
+    setOutreachToast('Disconnected email account.');
+    setTimeout(() => setOutreachToast(null), 3500);
+  };
+
+  const handleSendEmailSuccess = (companyId: string, isAutomatedSequence: boolean) => {
+    const updatedSent = Array.from(new Set([...sentCompanyIds, companyId]));
+    setSentCompanyIds(updatedSent);
+    localStorage.setItem('dealsourcing_sent_emails', JSON.stringify(updatedSent));
+
+    // Update Kanban stage to 'contacted'
+    const savedStages = localStorage.getItem('dealsourcing_kanban_stages');
+    let stagesObj: Record<string, string> = {};
+    if (savedStages) {
+      try { stagesObj = JSON.parse(savedStages); } catch { /* ignore */ }
+    }
+    stagesObj[companyId] = 'contacted';
+    localStorage.setItem('dealsourcing_kanban_stages', JSON.stringify(stagesObj));
+
+    setOutreachToast(
+      isAutomatedSequence
+        ? '3-Touch Automated Cadence launched via Gmail!'
+        : 'Email dispatched successfully via Gmail!'
+    );
+    setTimeout(() => setOutreachToast(null), 4000);
+  };
+
+  const handleBulkCampaignSuccess = (companyIds: string[]) => {
+    const updatedSent = Array.from(new Set([...sentCompanyIds, ...companyIds]));
+    setSentCompanyIds(updatedSent);
+    localStorage.setItem('dealsourcing_sent_emails', JSON.stringify(updatedSent));
+
+    // Update Kanban stage for all to 'contacted'
+    const savedStages = localStorage.getItem('dealsourcing_kanban_stages');
+    let stagesObj: Record<string, string> = {};
+    if (savedStages) {
+      try { stagesObj = JSON.parse(savedStages); } catch { /* ignore */ }
+    }
+    companyIds.forEach(id => { stagesObj[id] = 'contacted'; });
+    localStorage.setItem('dealsourcing_kanban_stages', JSON.stringify(stagesObj));
+
+    setOutreachToast(`Automated acquisition sequence launched for ${companyIds.length} target companies!`);
+    setTimeout(() => setOutreachToast(null), 4500);
+  };
 
   const activeCompany    = displayCompanies.find(c => c.id === activeCompanyId) ?? null;
   const isActiveEnriched = activeCompanyId ? enrichedIds.includes(activeCompanyId) : false;
@@ -463,112 +583,176 @@ const Outreach: React.FC = () => {
   return (
     <div className="flex flex-col gap-6 text-left">
 
-      {/* Page heading with save actions dropdown */}
-      <div className="flex justify-between items-start gap-4 flex-wrap">
+      {/* View Mode Toggle: Kanban Deal Tracker vs Script Generator */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#D8D5CE] dark:border-[#263544] pb-4">
         <div>
-          <h2 className="text-3xl font-extrabold text-primary tracking-tight">Outreach Plan</h2>
-          <p className="text-base text-secondary mt-1">
-            Ultra-personalized messages for each selected prospect, based on in-depth research.
+          <h2 className="text-2xl md:text-3xl font-extrabold text-primary tracking-tight">
+            {outreachViewMode === 'kanban' ? 'Deal Pipeline & Stage Tracking' : 'Outreach Communications Plan'}
+          </h2>
+          <p className="text-sm text-secondary mt-1">
+            {outreachViewMode === 'kanban'
+              ? 'Track each selected candidate across M&A stages and mark priority tiers (HIGH, MEDIUM, LOW).'
+              : 'Ultra-personalized messages for each selected prospect, based on verified founder research.'}
           </p>
         </div>
 
-        {/* Dropdown save container */}
-        <div className="relative shrink-0 z-40">
+        <div className="flex items-center gap-2.5 flex-wrap">
+          {/* Connected Gmail Account Pill */}
           <button
-            onClick={() => setSaveDropdownOpen(v => !v)}
-            className="flex items-center gap-1.5 px-3 py-2 border border-default bg-card hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-semibold rounded-lg text-primary cursor-pointer transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
-            title="Save options"
+            onClick={() => setConnectModalOpen(true)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all cursor-pointer ${
+              connectedAccount
+                ? 'border-[#B7CCBC] dark:border-[#39634D] bg-[#E3ECE6]/80 dark:bg-[#173529]/60 text-[#35624A] dark:text-[#8FBEA1] hover:bg-[#E3ECE6]'
+                : 'border-[#E3D4B3] bg-[#F5EDDA] text-[#9A7535] hover:bg-[#EBDDBF]'
+            }`}
+            title={connectedAccount ? 'Manage connected Gmail account' : 'Connect Gmail for direct outreach'}
           >
-            {/* Standard save icon and chevron */}
-            <svg className="h-4 w-4 text-[#A855F7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20" />
-            </svg>
-            <ChevronDown className="h-4 w-4 text-[#A855F7]" />
+            <Mail className="h-3.5 w-3.5" />
+            <span>
+              {connectedAccount ? `Gmail: ${connectedAccount.email.split('@')[0]}` : 'Connect Gmail'}
+            </span>
+            {connectedAccount && (
+              <span className="w-1.5 h-1.5 rounded-full bg-[#35624A] dark:bg-[#8FBEA1]" />
+            )}
           </button>
 
-          {saveDropdownOpen && (
-            <>
-              {/* Overlay click catcher */}
-              <div className="fixed inset-0 z-40" onClick={() => setSaveDropdownOpen(false)} />
-              
-              <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-slate-900 border border-default rounded-xl shadow-xl z-50 py-1.5 text-left divide-y divide-default animate-fadeIn">
-                <div className="py-1">
-                  <button
-                    onClick={() => { handleSaveAction('single-new'); setSaveDropdownOpen(false); }}
-                    className="w-full px-4 py-2 text-xs font-semibold text-primary hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 cursor-pointer text-left"
-                  >
-                    <svg className="h-4 w-4 text-[#A855F7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 13h6m-3-3v6m-9 1V4a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-                    </svg>
-                    Save this prospect only (new save)
-                  </button>
-                  <button
-                    onClick={() => { handleSaveAction('single-add'); setSaveDropdownOpen(false); }}
-                    className="w-full px-4 py-2 text-xs font-semibold text-primary hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 cursor-pointer text-left"
-                  >
-                    <svg className="h-4 w-4 text-[#A855F7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Add this prospect to current save
-                  </button>
-                </div>
-                <div className="py-1">
-                  <button
-                    onClick={() => { handleSaveAction('full-new'); setSaveDropdownOpen(false); }}
-                    className="w-full px-4 py-2 text-xs font-semibold text-primary hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 cursor-pointer text-left"
-                  >
-                    <svg className="h-4 w-4 text-[#A855F7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
-                    </svg>
-                    Save full analysis (new save)
-                  </button>
-                  <button
-                    onClick={() => { handleSaveAction('full-overwrite'); setSaveDropdownOpen(false); }}
-                    className="w-full px-4 py-2 text-xs font-semibold text-primary hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 cursor-pointer text-left"
-                  >
-                    <svg className="h-4 w-4 text-[#A855F7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17m-6 3a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                    Overwrite current save with full analysis
-                  </button>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
+          {/* Automate Sequences Button */}
+          <button
+            onClick={() => setAutomateCampaignModalOpen(true)}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-[#A65F3F] bg-[#A65F3F] text-white hover:bg-[#8E4E32] text-xs font-extrabold shadow-xs cursor-pointer transition-colors"
+          >
+            <Zap className="h-3.5 w-3.5" />
+            <span>Automate Sequences</span>
+          </button>
 
-      {/* ── Contact tabs ─────────────────────────────────────────────────── */}
-      <div className="flex flex-wrap gap-2">
-        {companiesToProcess.map(company => {
-          const isActive   = company.id === activeCompanyId;
-          const isEnriched = enrichedIds.includes(company.id);
-          const contactName = company.enrichmentData?.contactPerson
-            || company.enrichmentData?.founderName
-            || company.name;
-          return (
+          {/* View toggle */}
+          <div className="flex bg-[#F1EFEA] dark:bg-[#141F2C] p-1 rounded-lg border border-[#D8D5CE] dark:border-[#2D4053] select-none">
             <button
-              key={company.id}
-              onClick={() => handleCompanySelect(company.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-semibold transition-all duration-150 cursor-pointer ${
-                isActive
-                  ? 'border-[#202A2E] bg-[#EDEBE5] dark:bg-slate-800 text-[#202A2E] dark:text-white shadow-sm'
-                  : 'border-[#D8D5CE] bg-white dark:bg-card text-[#202A2E] dark:text-slate-200 hover:bg-[#F1EFEA] dark:hover:bg-slate-800/50'
+              onClick={() => setOutreachViewMode('kanban')}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-md cursor-pointer transition-colors ${
+                outreachViewMode === 'kanban'
+                  ? 'bg-white dark:bg-[#1D2B3A] text-primary shadow-xs'
+                  : 'text-secondary hover:text-primary'
               }`}
             >
-              <Users className={`h-3.5 w-3.5 shrink-0 ${isActive ? 'text-[#202A2E] dark:text-white' : isEnriched ? 'text-[#35624A]' : 'text-[#9A7535]'}`} />
-              {contactName}
+              <Kanban className="h-3.5 w-3.5" />
+              <span>Deal Kanban</span>
             </button>
-          );
-        })}
+            <button
+              onClick={() => setOutreachViewMode('scripts')}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-md cursor-pointer transition-colors ${
+                outreachViewMode === 'scripts'
+                  ? 'bg-white dark:bg-[#1D2B3A] text-primary shadow-xs'
+                  : 'text-secondary hover:text-primary'
+              }`}
+            >
+              <Mail className="h-3.5 w-3.5" />
+              <span>Outreach Scripts</span>
+            </button>
+          </div>
+
+          {/* Dropdown save container */}
+          <div className="relative shrink-0 z-40">
+            <button
+              onClick={() => setSaveDropdownOpen(v => !v)}
+              className="flex items-center gap-1.5 px-3 py-2 border border-default bg-card hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-semibold rounded-lg text-primary cursor-pointer transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
+              title="Save options"
+            >
+              <svg className="h-4 w-4 text-[#A855F7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20" />
+              </svg>
+              <ChevronDown className="h-4 w-4 text-[#A855F7]" />
+            </button>
+
+            {saveDropdownOpen && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setSaveDropdownOpen(false)} />
+                <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-slate-900 border border-default rounded-xl shadow-xl z-50 py-1.5 text-left divide-y divide-default animate-fadeIn">
+                  <div className="py-1">
+                    <button
+                      onClick={() => { handleSaveAction('single-new'); setSaveDropdownOpen(false); }}
+                      className="w-full px-4 py-2 text-xs font-semibold text-primary hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 cursor-pointer text-left"
+                    >
+                      <svg className="h-4 w-4 text-[#A855F7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 13h6m-3-3v6m-9 1V4a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                      </svg>
+                      Save this prospect only (new save)
+                    </button>
+                    <button
+                      onClick={() => { handleSaveAction('single-add'); setSaveDropdownOpen(false); }}
+                      className="w-full px-4 py-2 text-xs font-semibold text-primary hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 cursor-pointer text-left"
+                    >
+                      <svg className="h-4 w-4 text-[#A855F7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Add this prospect to current save
+                    </button>
+                  </div>
+                  <div className="py-1">
+                    <button
+                      onClick={() => { handleSaveAction('full-new'); setSaveDropdownOpen(false); }}
+                      className="w-full px-4 py-2 text-xs font-semibold text-primary hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 cursor-pointer text-left"
+                    >
+                      <svg className="h-4 w-4 text-[#A855F7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                      </svg>
+                      Save full analysis (new save)
+                    </button>
+                    <button
+                      onClick={() => { handleSaveAction('full-overwrite'); setSaveDropdownOpen(false); }}
+                      className="w-full px-4 py-2 text-xs font-semibold text-primary hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 cursor-pointer text-left"
+                    >
+                      <svg className="h-4 w-4 text-[#A855F7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17m-6 3a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                      Overwrite current save with full analysis
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* ── Main content ─────────────────────────────────────────────────── */}
-      {!activeCompany ? (
-        <div className="border border-[#D8D5CE] dark:border-slate-800 rounded-xl p-10 text-center text-[#626A6D] bg-white dark:bg-card">
-          Select a company above to begin.
-        </div>
-      ) : !isActiveEnriched ? (
+      {outreachViewMode === 'kanban' ? (
+        <CompanyKanban
+          companies={companiesToProcess}
+          onView={(id) => setSelectedModalCompanyId(id)}
+        />
+      ) : (
+        <>
+          {/* ── Contact tabs ─────────────────────────────────────────────────── */}
+          <div className="flex flex-wrap gap-2">
+            {companiesToProcess.map(company => {
+              const isActive   = company.id === activeCompanyId;
+              const isEnriched = enrichedIds.includes(company.id);
+              const contactName = company.enrichmentData?.contactPerson
+                || company.enrichmentData?.founderName
+                || company.name;
+              return (
+                <button
+                  key={company.id}
+                  onClick={() => handleCompanySelect(company.id)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-semibold transition-all duration-150 cursor-pointer ${
+                    isActive
+                      ? 'border-[#202A2E] bg-[#EDEBE5] dark:bg-slate-800 text-[#202A2E] dark:text-white shadow-sm'
+                      : 'border-[#D8D5CE] bg-white dark:bg-card text-[#202A2E] dark:text-slate-200 hover:bg-[#F1EFEA] dark:hover:bg-slate-800/50'
+                  }`}
+                >
+                  <Users className={`h-3.5 w-3.5 shrink-0 ${isActive ? 'text-[#202A2E] dark:text-white' : isEnriched ? 'text-[#35624A]' : 'text-[#9A7535]'}`} />
+                  {contactName}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* ── Main content ─────────────────────────────────────────────────── */}
+          {!activeCompany ? (
+            <div className="border border-[#D8D5CE] dark:border-slate-800 rounded-xl p-10 text-center text-[#626A6D] bg-white dark:bg-card">
+              Select a company above to begin.
+            </div>
+          ) : !isActiveEnriched ? (
         <div className="border border-[#D8D5CE] dark:border-slate-800 rounded-xl p-10 flex flex-col items-center gap-5 text-center bg-white dark:bg-card">
           <div className="p-4 bg-[#F5EDDA] dark:bg-amber-950/30 rounded-full">
             <AlertTriangle className="h-8 w-8 text-[#9A7535] dark:text-amber-400" />
@@ -708,6 +892,14 @@ const Outreach: React.FC = () => {
                       handleRegenerate(script.type);
                     }}
                     onEdit={(subj, bod) => handleEdit(script.type, subj, bod)}
+                    onSendEmail={cardChannel === 'email' ? (subj, bod) => {
+                      setSendEmailModalConfig({
+                        company: activeCompany,
+                        subject: subj,
+                        body: bod,
+                      });
+                    } : undefined}
+                    isSent={sentCompanyIds.includes(activeCompany.id)}
                   />
                 );
               })}
@@ -715,6 +907,62 @@ const Outreach: React.FC = () => {
           )}
         </div>
       )}
+        </>
+      )}
+
+      {/* ── Direct Send Email Modal ── */}
+      {sendEmailModalConfig && (
+        <SendEmailModal
+          isOpen={sendEmailModalConfig !== null}
+          onClose={() => setSendEmailModalConfig(null)}
+          company={sendEmailModalConfig.company}
+          connectedAccount={connectedAccount}
+          onOpenConnectModal={() => {
+            setSendEmailModalConfig(null);
+            setConnectModalOpen(true);
+          }}
+          defaultSubject={sendEmailModalConfig.subject}
+          defaultBody={sendEmailModalConfig.body}
+          onSendSuccess={handleSendEmailSuccess}
+        />
+      )}
+
+      {/* ── Connect Gmail Account Modal ── */}
+      <GmailConnectModal
+        isOpen={connectModalOpen}
+        onClose={() => setConnectModalOpen(false)}
+        onConnect={handleConnectAccount}
+        currentAccount={connectedAccount}
+        onDisconnect={handleDisconnectAccount}
+      />
+
+      {/* ── Automate Campaign Modal ── */}
+      <AutomateCampaignModal
+        isOpen={automateCampaignModalOpen}
+        onClose={() => setAutomateCampaignModalOpen(false)}
+        companies={companiesToProcess}
+        connectedAccount={connectedAccount}
+        onOpenConnectModal={() => {
+          setAutomateCampaignModalOpen(false);
+          setConnectModalOpen(true);
+        }}
+        onLaunchSuccess={handleBulkCampaignSuccess}
+      />
+
+      {/* ── Outreach Action Notification Toast ── */}
+      {outreachToast && (
+        <div className="fixed bottom-20 right-8 z-50 bg-[#202A2E] text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 border border-[#35624A] animate-fadeIn">
+          <CheckCircle2 className="h-5 w-5 text-[#8FBEA1] shrink-0" />
+          <span className="text-xs font-bold">{outreachToast}</span>
+        </div>
+      )}
+
+      {/* Details Modal */}
+      <CompanyDetails
+        company={displayCompanies.find(c => c.id === selectedModalCompanyId) || null}
+        isOpen={selectedModalCompanyId !== null}
+        onClose={() => setSelectedModalCompanyId(null)}
+      />
 
       {/* Sticky Footer nav */}
       <div className="sticky bottom-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-default py-4.5 px-6 -mx-6 -mb-6 flex items-center justify-between z-25 shadow-[0_-8px_30px_rgba(0,0,0,0.04)] mt-6 rounded-b">

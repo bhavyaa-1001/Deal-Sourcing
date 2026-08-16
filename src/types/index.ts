@@ -92,9 +92,28 @@ export interface EnrichmentData {
   website: string;
   bio: string;
   successionNote: string;
+  age?: number | string;
+  ageProof?: string;
+  gender?: string;
+  genderProof?: string;
+  industryExperience?: string;
+  experienceProof?: string;
+  ownershipStake?: string;
+  ownershipProof?: string;
+  priorExits?: string;
+  exitsProof?: string;
+  education?: string;
+  educationProof?: string;
+  emailProof?: string;
+  phoneProof?: string;
+  additionalRequirementMatch?: {
+    requirement: string;
+    extractedValue: string;
+    proofSource: string;
+  };
 }
 
-// ─── Company ──────────────────────────────────────────────────────────────────
+export type PipelineStage = 'shortlisted' | 'contacted' | 'discussion' | 'due_diligence' | 'closing';
 
 export interface Company {
   id: string;
@@ -113,6 +132,8 @@ export interface Company {
   website: string;
   sourceName: string;
   description: string;
+  pipelineStage?: PipelineStage;
+  priority?: 'HIGH' | 'MEDIUM' | 'LOW';
   businessProfile: {
     keyProducts: string[];
     mainCustomers: string[];

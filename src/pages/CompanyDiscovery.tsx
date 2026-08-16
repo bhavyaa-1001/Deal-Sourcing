@@ -5,14 +5,11 @@ import CompanyFilters from '../components/companies/CompanyFilters';
 import CompanyCard from '../components/companies/CompanyCard';
 import CompanyTable from '../components/companies/CompanyTable';
 import CompanyDetails from '../components/companies/CompanyDetails';
-import CompanyKanban from '../components/companies/CompanyKanban';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import EmptyState from '../components/ui/EmptyState';
 import LoadingState from '../components/ui/LoadingState';
-import { LayoutGrid, Table, Kanban, ArrowLeft, ArrowRight, Database, Target, Award } from 'lucide-react';
-import type { FitLevel } from '../types';
-import { useMemo } from 'react';
+import { LayoutGrid, Table, ArrowLeft, ArrowRight, Database, Target, Award } from 'lucide-react';
 
 export const CompanyDiscovery: React.FC = () => {
   const navigate = useNavigate();
@@ -26,33 +23,19 @@ export const CompanyDiscovery: React.FC = () => {
     clearFilters,
   } = useCompanies();
 
-  const [viewMode, setViewMode] = useState<'cards' | 'table' | 'kanban'>('kanban');
+  const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
   const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
-  const [fitLevelOverrides, setFitLevelOverrides] = useState<Record<string, FitLevel>>({});
 
   const handleBack = () => navigate('/mandate');
-  const handleContinue = () => navigate('/review');
+  const handleContinue = () => navigate('/founders');
 
-  const displayCompanies = useMemo(() => {
-    return companies.map(c => ({
-      ...c,
-      fitLevel: fitLevelOverrides[c.id] || c.fitLevel
-    }));
-  }, [companies, fitLevelOverrides]);
-
+  const displayCompanies = companies;
   const activeCompany = displayCompanies.find(c => c.id === selectedCompanyId) || null;
 
   // Lead Modal navigation callbacks
   const activeIndex = selectedCompanyId ? displayCompanies.findIndex(c => c.id === selectedCompanyId) : -1;
   const onPrevious = activeIndex > 0 ? () => setSelectedCompanyId(displayCompanies[activeIndex - 1].id) : undefined;
   const onNext = activeIndex >= 0 && activeIndex < displayCompanies.length - 1 ? () => setSelectedCompanyId(displayCompanies[activeIndex + 1].id) : undefined;
-
-  const handleMoveCompany = (id: string, newFit: FitLevel) => {
-    setFitLevelOverrides(prev => ({
-      ...prev,
-      [id]: newFit
-    }));
-  };
 
   if (loading && companies.length === 0) {
     return <LoadingState message="Discovering candidate companies matching mandate..." />;
@@ -80,16 +63,8 @@ export const CompanyDiscovery: React.FC = () => {
           </p>
         </div>
 
-        {/* Toggle Grid/Table/Kanban view */}
+        {/* Toggle Grid/Table view */}
         <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-md border border-default self-start md:self-auto select-none">
-          <button
-            onClick={() => setViewMode('kanban')}
-            className={`flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded cursor-pointer transition-colors ${viewMode === 'kanban' ? 'bg-card text-brand-primary shadow-sm' : 'text-secondary hover:text-primary'}`}
-            aria-label="Kanban view mode"
-          >
-            <Kanban className="h-4 w-4" />
-            <span>Kanban</span>
-          </button>
           <button
             onClick={() => setViewMode('cards')}
             className={`flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded cursor-pointer transition-colors ${viewMode === 'cards' ? 'bg-card text-brand-primary shadow-sm' : 'text-secondary hover:text-primary'}`}
@@ -161,12 +136,6 @@ export const CompanyDiscovery: React.FC = () => {
           actionText="Clear Filters"
           onAction={clearFilters}
         />
-      ) : viewMode === 'kanban' ? (
-        <CompanyKanban
-          companies={displayCompanies}
-          onView={(id) => setSelectedCompanyId(id)}
-          onMoveCompany={handleMoveCompany}
-        />
       ) : viewMode === 'cards' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {displayCompanies.map(company => (
@@ -208,10 +177,10 @@ export const CompanyDiscovery: React.FC = () => {
           variant="primary"
           onClick={handleContinue}
           rightIcon={<ArrowRight className="h-5 w-5" />}
-          className="min-w-[200px]"
-          id="continue-to-review-btn"
+          className="min-w-[220px]"
+          id="continue-to-founders-btn"
         >
-          Continue to Review Results
+          Continue to Discover Founders
         </Button>
       </div>
     </div>
