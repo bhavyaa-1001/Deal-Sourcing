@@ -13,6 +13,7 @@ interface SendEmailModalProps {
   company: Company | null;
   connectedAccount: ConnectedEmailAccount | null;
   onOpenConnectModal: () => void;
+  onOpenAutomateCampaignModal?: () => void;
   defaultSubject: string;
   defaultBody: string;
   onSendSuccess: (companyId: string, isAutomatedSequence: boolean) => void;
@@ -24,6 +25,7 @@ export const SendEmailModal: React.FC<SendEmailModalProps> = ({
   company,
   connectedAccount,
   onOpenConnectModal,
+  onOpenAutomateCampaignModal,
   defaultSubject,
   defaultBody,
   onSendSuccess,
@@ -169,6 +171,25 @@ export const SendEmailModal: React.FC<SendEmailModalProps> = ({
               </p>
             </button>
           </div>
+
+          {onOpenAutomateCampaignModal && (
+            <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#F4E8E2]/60 dark:bg-[#3A281F]/40 border border-[#A65F3F]/30 dark:border-[#C27A56]/30 mt-1">
+              <div className="flex items-center gap-2 text-xs text-[#202A2E] dark:text-[#F1F5F9]">
+                <Zap className="h-4 w-4 text-[#A65F3F] shrink-0" />
+                <span className="font-bold">Want to automate sequences across all targets?</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onOpenAutomateCampaignModal();
+                }}
+                className="text-xs font-black text-[#A65F3F] dark:text-[#C27A56] hover:underline cursor-pointer ml-2 shrink-0"
+              >
+                Launch Bulk Campaign ➔
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Subject */}

@@ -225,8 +225,6 @@ export const CompanyDetails: React.FC<CompanyDetailsProps> = ({
             ENRICHED
           </Badge>
         )}
-        <Button variant="outline" size="sm" className="hidden sm:inline-flex">Send Email</Button>
-        <Button variant="outline" size="sm" className="hidden sm:inline-flex">Convert</Button>
         
         {/* Navigation buttons */}
         <div className="flex items-center border border-default rounded-lg bg-card shadow-sm ml-1 select-none">

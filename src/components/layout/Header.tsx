@@ -38,9 +38,6 @@ export const Header: React.FC<HeaderProps> = ({ themeState, sidebarCollapsed, on
             <h1 className="text-base md:text-lg font-black text-[#202A2E] dark:text-[#F3F5F7] tracking-tight leading-none m-0">
               DEAL SOURCING
             </h1>
-            <span className="hidden sm:inline-block text-[11px] font-bold text-[#626A6D] dark:text-[#94A3B8] tracking-wider uppercase">
-              Platform
-            </span>
           </div>
         </div>
 

@@ -23,7 +23,7 @@ import {
   ArrowLeft, Sparkles, AlertTriangle, Users, Search,
   Target, Mail, Link2, MessageSquare, Copy, CheckCheck,
   RefreshCw, ChevronRight, ChevronDown, Pencil, Kanban,
-  Send, Zap, CheckCircle2
+  Send, CheckCircle2, Building2
 } from 'lucide-react';
 
 // STEP_LABELS removed because it is unused
@@ -279,7 +279,7 @@ const Outreach: React.FC = () => {
   const [regenerating, setRegenerating] = useState(false);
   const [researchOpen, setResearchOpen] = useState(false);
   const [saveDropdownOpen, setSaveDropdownOpen] = useState(false);
-  const [outreachViewMode, setOutreachViewMode] = useState<'kanban' | 'scripts'>('kanban');
+  const [outreachViewMode, setOutreachViewMode] = useState<'kanban' | 'scripts'>('scripts');
   const [selectedModalCompanyId, setSelectedModalCompanyId] = useState<string | null>(null);
 
   // ── Connected Gmail Account State ──
@@ -597,34 +597,6 @@ const Outreach: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2.5 flex-wrap">
-          {/* Connected Gmail Account Pill */}
-          <button
-            onClick={() => setConnectModalOpen(true)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all cursor-pointer ${
-              connectedAccount
-                ? 'border-[#B7CCBC] dark:border-[#39634D] bg-[#E3ECE6]/80 dark:bg-[#173529]/60 text-[#35624A] dark:text-[#8FBEA1] hover:bg-[#E3ECE6]'
-                : 'border-[#E3D4B3] bg-[#F5EDDA] text-[#9A7535] hover:bg-[#EBDDBF]'
-            }`}
-            title={connectedAccount ? 'Manage connected Gmail account' : 'Connect Gmail for direct outreach'}
-          >
-            <Mail className="h-3.5 w-3.5" />
-            <span>
-              {connectedAccount ? `Gmail: ${connectedAccount.email.split('@')[0]}` : 'Connect Gmail'}
-            </span>
-            {connectedAccount && (
-              <span className="w-1.5 h-1.5 rounded-full bg-[#35624A] dark:bg-[#8FBEA1]" />
-            )}
-          </button>
-
-          {/* Automate Sequences Button */}
-          <button
-            onClick={() => setAutomateCampaignModalOpen(true)}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-[#A65F3F] bg-[#A65F3F] text-white hover:bg-[#8E4E32] text-xs font-extrabold shadow-xs cursor-pointer transition-colors"
-          >
-            <Zap className="h-3.5 w-3.5" />
-            <span>Automate Sequences</span>
-          </button>
-
           {/* View toggle */}
           <div className="flex bg-[#F1EFEA] dark:bg-[#141F2C] p-1 rounded-lg border border-[#D8D5CE] dark:border-[#2D4053] select-none">
             <button
@@ -722,26 +694,23 @@ const Outreach: React.FC = () => {
         />
       ) : (
         <>
-          {/* ── Contact tabs ─────────────────────────────────────────────────── */}
+          {/* ── Company selector tabs ────────────────────────────────────────── */}
           <div className="flex flex-wrap gap-2">
             {companiesToProcess.map(company => {
               const isActive   = company.id === activeCompanyId;
               const isEnriched = enrichedIds.includes(company.id);
-              const contactName = company.enrichmentData?.contactPerson
-                || company.enrichmentData?.founderName
-                || company.name;
               return (
                 <button
                   key={company.id}
                   onClick={() => handleCompanySelect(company.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-semibold transition-all duration-150 cursor-pointer ${
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-lg border text-xs md:text-sm font-bold transition-all duration-150 cursor-pointer ${
                     isActive
-                      ? 'border-[#202A2E] bg-[#EDEBE5] dark:bg-slate-800 text-[#202A2E] dark:text-white shadow-sm'
-                      : 'border-[#D8D5CE] bg-white dark:bg-card text-[#202A2E] dark:text-slate-200 hover:bg-[#F1EFEA] dark:hover:bg-slate-800/50'
+                      ? 'border-[#202A2E] dark:border-[#C5B76A] bg-[#EDEBE5] dark:bg-slate-800 text-[#202A2E] dark:text-white shadow-xs'
+                      : 'border-[#D8D5CE] dark:border-[#344658] bg-white dark:bg-card text-[#202A2E] dark:text-slate-200 hover:bg-[#F1EFEA] dark:hover:bg-slate-800/50'
                   }`}
                 >
-                  <Users className={`h-3.5 w-3.5 shrink-0 ${isActive ? 'text-[#202A2E] dark:text-white' : isEnriched ? 'text-[#35624A]' : 'text-[#9A7535]'}`} />
-                  {contactName}
+                  <Building2 className={`h-3.5 w-3.5 shrink-0 ${isActive ? 'text-[#202A2E] dark:text-[#C5B76A]' : isEnriched ? 'text-[#35624A] dark:text-[#8FBEA1]' : 'text-[#9A7535]'}`} />
+                  <span>{company.name}</span>
                 </button>
               );
             })}
@@ -920,6 +889,10 @@ const Outreach: React.FC = () => {
           onOpenConnectModal={() => {
             setSendEmailModalConfig(null);
             setConnectModalOpen(true);
+          }}
+          onOpenAutomateCampaignModal={() => {
+            setSendEmailModalConfig(null);
+            setAutomateCampaignModalOpen(true);
           }}
           defaultSubject={sendEmailModalConfig.subject}
           defaultBody={sendEmailModalConfig.body}

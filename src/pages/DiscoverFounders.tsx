@@ -25,35 +25,35 @@ export const LEAD_STATUS_CONFIG: Record<LeadStatus, {
 }> = {
   active: {
     label: 'Active Target',
-    badgeBg: 'bg-[#E3ECE6] dark:bg-[#173529]',
-    badgeText: 'text-[#35624A] dark:text-[#8FBEA1]',
-    borderColor: 'border-[#B7CCBC] dark:border-[#39634D]',
-    iconColor: 'bg-[#35624A]',
+    badgeBg: 'bg-[#EDEBE5] dark:bg-slate-800',
+    badgeText: 'text-[#202A2E] dark:text-[#F1F5F9]',
+    borderColor: 'border-[#D8D5CE] dark:border-[#344658]',
+    iconColor: 'bg-[#202A2E]',
     description: 'High-priority founder ready for immediate acquisition outreach.',
   },
   contact_future: {
     label: 'Contact in Future',
-    badgeBg: 'bg-[#F5EDDA] dark:bg-[#3A3520]',
-    badgeText: 'text-[#9A7535] dark:text-[#D5C76E]',
-    borderColor: 'border-[#E3D4B3] dark:border-[#625A2F]',
-    iconColor: 'bg-[#9A7535]',
+    badgeBg: 'bg-[#EDEBE5] dark:bg-slate-800',
+    badgeText: 'text-[#202A2E] dark:text-[#F1F5F9]',
+    borderColor: 'border-[#D8D5CE] dark:border-[#344658]',
+    iconColor: 'bg-[#626A6D]',
     description: 'Founder considering exit in 1-3 years; nurture pipeline.',
   },
   junk_lead: {
     label: 'Junk Lead / Pass',
-    badgeBg: 'bg-[#FEE2E2] dark:bg-[#451A1A]',
-    badgeText: 'text-[#DC2626] dark:text-[#F87171]',
-    borderColor: 'border-[#FCA5A5] dark:border-[#991B1B]',
-    iconColor: 'bg-[#DC2626]',
+    badgeBg: 'bg-[#EDEBE5] dark:bg-slate-800',
+    badgeText: 'text-[#626A6D] dark:text-[#9AA9B8]',
+    borderColor: 'border-[#D8D5CE] dark:border-[#344658]',
+    iconColor: 'bg-[#626A6D]',
     description: 'Not a strategic fit or founder unviable for acquisition.',
   },
   follow_up: {
     label: 'Follow-up Scheduled',
-    badgeBg: 'bg-[#EBF8FF] dark:bg-[#1A365D]',
-    badgeText: 'text-[#2B6CB0] dark:text-[#63B3ED]',
-    borderColor: 'border-[#BEE3F8] dark:border-[#2A4365]',
-    iconColor: 'bg-[#2B6CB0]',
-    description: 'Revisit founder after key operational milestone.',
+    badgeBg: 'bg-[#EDEBE5] dark:bg-slate-800',
+    badgeText: 'text-[#202A2E] dark:text-[#F1F5F9]',
+    borderColor: 'border-[#D8D5CE] dark:border-[#344658]',
+    iconColor: 'bg-[#202A2E]',
+    description: 'Scheduled touchpoint or meeting follow-up pending.',
   },
 };
 
@@ -315,25 +315,32 @@ export const DiscoverFounders: React.FC = () => {
         </span>
 
         {[
-          { id: 'all', label: 'All Leads', count: totalFounders, colorClass: 'bg-[#F1EFEA] text-[#202A2E] dark:bg-[#1D2B3A] dark:text-[#F1F5F9]' },
-          { id: 'active', label: '🟢 Active Targets', count: founderProfiles.filter(p => p.leadStatus === 'active').length, colorClass: 'bg-[#E3ECE6] text-[#35624A] dark:bg-[#173529] dark:text-[#8FBEA1]' },
-          { id: 'contact_future', label: '🟡 Contact in Future', count: founderProfiles.filter(p => p.leadStatus === 'contact_future').length, colorClass: 'bg-[#F5EDDA] text-[#9A7535] dark:bg-[#3A3520] dark:text-[#D5C76E]' },
-          { id: 'junk_lead', label: '🔴 Junk Leads / Pass', count: founderProfiles.filter(p => p.leadStatus === 'junk_lead').length, colorClass: 'bg-[#FEE2E2] text-[#DC2626] dark:bg-[#451A1A] dark:text-[#F87171]' },
-          { id: 'follow_up', label: '🔵 Follow-up Scheduled', count: founderProfiles.filter(p => p.leadStatus === 'follow_up').length, colorClass: 'bg-[#EBF8FF] text-[#2B6CB0] dark:bg-[#1A365D] dark:text-[#63B3ED]' },
+          { id: 'all', label: 'All Leads', count: totalFounders },
+          { id: 'active', label: 'Active Targets', count: founderProfiles.filter(p => p.leadStatus === 'active').length, dotColor: 'bg-emerald-500' },
+          { id: 'contact_future', label: 'Contact in Future', count: founderProfiles.filter(p => p.leadStatus === 'contact_future').length, dotColor: 'bg-amber-500' },
+          { id: 'junk_lead', label: 'Junk Leads / Pass', count: founderProfiles.filter(p => p.leadStatus === 'junk_lead').length, dotColor: 'bg-rose-500' },
+          { id: 'follow_up', label: 'Follow-up Scheduled', count: founderProfiles.filter(p => p.leadStatus === 'follow_up').length, dotColor: 'bg-blue-500' },
         ].map(tab => {
           const isActive = leadStatusFilter === tab.id;
           return (
             <button
               key={tab.id}
               onClick={() => setLeadStatusFilter(tab.id as any)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 border ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-2 shrink-0 border ${
                 isActive
                   ? 'border-[#202A2E] dark:border-[#C5B76A] bg-[#202A2E] text-white dark:bg-[#C5B76A] dark:text-[#182536] shadow-xs'
-                  : `border-[#D8D5CE] dark:border-[#344658] ${tab.colorClass} hover:opacity-90`
+                  : 'border-[#D8D5CE] dark:border-[#344658] bg-white dark:bg-[#182536] text-[#202A2E] dark:text-[#F1F5F9] hover:bg-[#F1EFEA] dark:hover:bg-slate-800'
               }`}
             >
+              {tab.dotColor && (
+                <span className={`w-2 h-2 rounded-full ${tab.dotColor} shrink-0`} />
+              )}
               <span>{tab.label}</span>
-              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${isActive ? 'bg-white/20 text-white dark:bg-black/20' : 'bg-black/5 dark:bg-white/10'}`}>
+              <span className={`text-[10.5px] px-1.5 py-0.2 rounded-full font-black ${
+                isActive
+                  ? 'bg-white/20 text-white dark:bg-black/20'
+                  : 'bg-[#EDEBE5] dark:bg-slate-800 text-[#626A6D] dark:text-[#9AA9B8]'
+              }`}>
                 {tab.count}
               </span>
             </button>

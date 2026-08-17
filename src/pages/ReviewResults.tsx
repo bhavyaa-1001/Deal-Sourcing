@@ -114,6 +114,22 @@ export const ReviewResults: React.FC = () => {
 
   const [leadStatusFilter, setLeadStatusFilter] = useState<'all' | LeadStatus>('all');
 
+  // User Fit Levels State (User decided priority in Discover Companies)
+  const [userFitLevels] = useState<Record<string, 'HIGH' | 'MEDIUM' | 'LOW'>>(() => {
+    const saved = localStorage.getItem('dealsourcing_user_fit_levels');
+    if (saved) {
+      try { return JSON.parse(saved); } catch { /* ignore */ }
+    }
+    return {
+      'comp-1': 'HIGH',
+      'comp-2': 'HIGH',
+      'comp-3': 'HIGH',
+      'comp-4': 'MEDIUM',
+      'comp-5': 'MEDIUM',
+      'comp-6': 'LOW',
+    };
+  });
+
   const handleUpdateLeadStatus = (companyId: string, status: LeadStatus) => {
     const next = { ...leadStatuses, [companyId]: status };
     setLeadStatuses(next);
@@ -548,25 +564,32 @@ export const ReviewResults: React.FC = () => {
           </span>
 
           {[
-            { id: 'all', label: 'All Candidates', count: rawDisplayCompanies.length, colorClass: 'bg-[#F1EFEA] text-[#202A2E] dark:bg-[#1D2B3A] dark:text-[#F1F5F9]' },
-            { id: 'active', label: '🟢 Active', count: rawDisplayCompanies.filter(c => (leadStatuses[c.id] || 'active') === 'active').length, colorClass: 'bg-[#E3ECE6] text-[#35624A] dark:bg-[#173529] dark:text-[#8FBEA1]' },
-            { id: 'contact_future', label: '🟡 Contact in Future', count: rawDisplayCompanies.filter(c => (leadStatuses[c.id] || 'active') === 'contact_future').length, colorClass: 'bg-[#F5EDDA] text-[#9A7535] dark:bg-[#3A3520] dark:text-[#D5C76E]' },
-            { id: 'junk_lead', label: '🔴 Junk / Pass', count: rawDisplayCompanies.filter(c => (leadStatuses[c.id] || 'active') === 'junk_lead').length, colorClass: 'bg-[#FEE2E2] text-[#DC2626] dark:bg-[#451A1A] dark:text-[#F87171]' },
-            { id: 'follow_up', label: '🔵 Follow-up', count: rawDisplayCompanies.filter(c => (leadStatuses[c.id] || 'active') === 'follow_up').length, colorClass: 'bg-[#EBF8FF] text-[#2B6CB0] dark:bg-[#1A365D] dark:text-[#63B3ED]' },
+            { id: 'all', label: 'All Candidates', count: rawDisplayCompanies.length },
+            { id: 'active', label: 'Active', count: rawDisplayCompanies.filter(c => (leadStatuses[c.id] || 'active') === 'active').length, dotColor: 'bg-emerald-500' },
+            { id: 'contact_future', label: 'Contact in Future', count: rawDisplayCompanies.filter(c => (leadStatuses[c.id] || 'active') === 'contact_future').length, dotColor: 'bg-amber-500' },
+            { id: 'junk_lead', label: 'Junk / Pass', count: rawDisplayCompanies.filter(c => (leadStatuses[c.id] || 'active') === 'junk_lead').length, dotColor: 'bg-rose-500' },
+            { id: 'follow_up', label: 'Follow-up', count: rawDisplayCompanies.filter(c => (leadStatuses[c.id] || 'active') === 'follow_up').length, dotColor: 'bg-blue-500' },
           ].map(tab => {
             const isActive = leadStatusFilter === tab.id;
             return (
               <button
                 key={tab.id}
                 onClick={() => setLeadStatusFilter(tab.id as any)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 border ${
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-2 shrink-0 border ${
                   isActive
                     ? 'border-[#202A2E] dark:border-[#C5B76A] bg-[#202A2E] text-white dark:bg-[#C5B76A] dark:text-[#182536] shadow-xs'
-                    : `border-[#D8D5CE] dark:border-[#344658] ${tab.colorClass} hover:opacity-90`
+                    : 'border-[#D8D5CE] dark:border-[#344658] bg-white dark:bg-[#182536] text-[#202A2E] dark:text-[#F1F5F9] hover:bg-[#F1EFEA] dark:hover:bg-slate-800'
                 }`}
               >
+                {tab.dotColor && (
+                  <span className={`w-2 h-2 rounded-full ${tab.dotColor} shrink-0`} />
+                )}
                 <span>{tab.label}</span>
-                <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${isActive ? 'bg-white/20 text-white dark:bg-black/20' : 'bg-black/5 dark:bg-white/10'}`}>
+                <span className={`text-[10.5px] px-1.5 py-0.2 rounded-full font-black ${
+                  isActive
+                    ? 'bg-white/20 text-white dark:bg-black/20'
+                    : 'bg-[#EDEBE5] dark:bg-slate-800 text-[#626A6D] dark:text-[#9AA9B8]'
+                }`}>
                   {tab.count}
                 </span>
               </button>
@@ -589,7 +612,6 @@ export const ReviewResults: React.FC = () => {
                 <th className="px-3 py-3">Company</th>
                 <th className="px-3 py-3">Location</th>
                 <th className="px-3 py-3">Lead Status</th>
-                <th className="px-3 py-3">Fit</th>
                 <th className="px-3 py-3">Fit Level</th>
                 <th className="px-3 py-3">Confidence</th>
                 <th className="px-3 py-3">Revenue</th>
@@ -605,6 +627,7 @@ export const ReviewResults: React.FC = () => {
                 const isExpanded = expandedCompanyIds.includes(company.id);
                 const leadStatus = leadStatuses[company.id] || 'active';
                 const statusConfig = LEAD_STATUS_CONFIG[leadStatus] || LEAD_STATUS_CONFIG.active;
+                const currentFit = userFitLevels[company.id] || (company.fitLevel === 'HIGH FIT' ? 'HIGH' : company.fitLevel === 'MEDIUM FIT' ? 'MEDIUM' : 'LOW');
 
                 return (
                   <React.Fragment key={company.id}>
@@ -661,14 +684,23 @@ export const ReviewResults: React.FC = () => {
                         </select>
                       </td>
 
-                      <td className="px-3 py-3.5 font-bold text-slate-700 dark:text-slate-350">
-                        {company.fitScore !== undefined ? company.fitScore.toFixed(1) : '0.0'}
-                      </td>
-
+                      {/* Deployed User-Decided Fit Level Badge */}
                       <td className="px-3 py-3.5">
-                        {company.fitLevel === 'HIGH FIT' && <Badge variant="success" className="text-[10px] px-1 py-0.5">HIGH</Badge>}
-                        {company.fitLevel === 'MEDIUM FIT' && <Badge variant="warning" className="text-[10px] px-1 py-0.5">MEDIUM</Badge>}
-                        {company.fitLevel === 'LOW FIT' && <Badge variant="danger" className="text-[10px] px-1 py-0.5">LOW</Badge>}
+                        {currentFit === 'HIGH' && (
+                          <Badge variant="success" className="text-[10px] px-2 py-0.5 font-bold uppercase">
+                            HIGH FIT
+                          </Badge>
+                        )}
+                        {currentFit === 'MEDIUM' && (
+                          <Badge variant="warning" className="text-[10px] px-2 py-0.5 font-bold uppercase">
+                            MEDIUM FIT
+                          </Badge>
+                        )}
+                        {currentFit === 'LOW' && (
+                          <Badge variant="danger" className="text-[10px] px-2 py-0.5 font-bold uppercase">
+                            LOW FIT
+                          </Badge>
+                        )}
                       </td>
 
                       <td className="px-3 py-3.5">

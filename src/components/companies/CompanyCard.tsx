@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { Company } from '../../types';
 import Card from '../ui/Card';
-import Badge from '../ui/Badge';
 import { Database } from 'lucide-react';
 import Button from '../ui/Button';
 
@@ -11,22 +10,31 @@ interface CompanyCardProps {
 }
 
 export const CompanyCard: React.FC<CompanyCardProps> = ({ company, onView }) => {
-  const getFitBadge = (fit: Company['fitLevel']) => {
-    switch (fit) {
-      case 'HIGH FIT':
-        return <Badge variant="success">HIGH FIT</Badge>;
-      case 'MEDIUM FIT':
-        return <Badge variant="warning">MEDIUM FIT</Badge>;
-      case 'LOW FIT':
-        return <Badge variant="danger">LOW FIT</Badge>;
-      default:
-        return <Badge variant="neutral">{fit}</Badge>;
+  const [fitLevel, setFitLevel] = useState<'HIGH' | 'MEDIUM' | 'LOW'>(() => {
+    const saved = localStorage.getItem('dealsourcing_user_fit_levels');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed[company.id]) return parsed[company.id];
+      } catch { /* ignore */ }
     }
+    return company.fitLevel === 'HIGH FIT' ? 'HIGH' : company.fitLevel === 'MEDIUM FIT' ? 'MEDIUM' : 'LOW';
+  });
+
+  const handleSetFitLevel = (level: 'HIGH' | 'MEDIUM' | 'LOW') => {
+    setFitLevel(level);
+    let savedObj: Record<string, string> = {};
+    const saved = localStorage.getItem('dealsourcing_user_fit_levels');
+    if (saved) {
+      try { savedObj = JSON.parse(saved); } catch { /* ignore */ }
+    }
+    savedObj[company.id] = level;
+    localStorage.setItem('dealsourcing_user_fit_levels', JSON.stringify(savedObj));
   };
 
   return (
     <Card className="text-left flex flex-col gap-4 border border-default bg-card rounded shadow-none p-5">
-      {/* 1. Header: Name & Fit */}
+      {/* 1. Header: Name, Match & User-decided Fit Level */}
       <div className="flex justify-between items-start gap-4">
         <div className="min-w-0">
           <h3
@@ -41,13 +49,39 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, onView }) => 
             <span>{company.industry}</span>
           </div>
         </div>
+
+        {/* User Fit Level Toggle */}
         <div className="shrink-0 flex flex-col items-end gap-1.5">
-          {getFitBadge(company.fitLevel)}
-          <span className="text-sm font-bold text-[#9A8056] mt-0.5 block text-right">
+          <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/90 p-1 rounded-lg border border-default select-none">
+            {(['HIGH', 'MEDIUM', 'LOW'] as const).map(level => {
+              const isSelected = fitLevel === level;
+              const activeClass =
+                level === 'HIGH'
+                  ? 'bg-emerald-600 text-white shadow-xs'
+                  : level === 'MEDIUM'
+                  ? 'bg-amber-600 text-white shadow-xs'
+                  : 'bg-rose-600 text-white shadow-xs';
+
+              return (
+                <button
+                  key={level}
+                  type="button"
+                  onClick={() => handleSetFitLevel(level)}
+                  className={`px-2 py-0.5 rounded text-[10px] font-black uppercase transition-all cursor-pointer ${
+                    isSelected
+                      ? activeClass
+                      : 'text-secondary hover:text-primary hover:bg-slate-200/60 dark:hover:bg-slate-700/60'
+                  }`}
+                  title={`Mark as ${level} Fit`}
+                >
+                  {level}
+                </button>
+              );
+            })}
+          </div>
+
+          <span className="text-xs font-bold text-[#9A8056] mt-0.5 block text-right">
             {(company.confidenceScore ?? 0).toFixed(1)}% Match
-          </span>
-          <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 block text-right">
-            Fit: {(company.fitScore ?? 0).toFixed(1)}
           </span>
         </div>
       </div>
@@ -98,15 +132,14 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, onView }) => 
       <div className="mt-1">
         <Button
           variant="outline"
-          size="sm"
-          onClick={onView}
           className="w-full"
+          onClick={onView}
         >
-          View Company
+          View Company Dossier
         </Button>
       </div>
     </Card>
   );
 };
-export default CompanyCard;
 
+export default CompanyCard;

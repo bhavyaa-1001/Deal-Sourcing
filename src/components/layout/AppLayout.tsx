@@ -367,10 +367,9 @@ export const AppLayout: React.FC = () => {
     navigate(location.pathname, { replace: true });
   };
 
-  const isMandatePage = location.pathname === '/mandate' || location.pathname === '/';
 
   return (
-    <div className={`${isMandatePage ? 'h-screen max-h-screen overflow-hidden' : 'min-h-screen'} bg-app flex flex-col text-primary`}>
+    <div className="min-h-screen bg-app flex flex-col text-primary">
       {/* Top Header with Integrated Hamburger Sidebar Toggle */}
       <Header
         themeState={themeState}
@@ -379,7 +378,7 @@ export const AppLayout: React.FC = () => {
       />
 
       {/* Main layout splitting sidebar and content */}
-      <div className={`flex-1 ${isMandatePage ? 'min-h-0 overflow-hidden' : ''} flex flex-row items-stretch relative`}>
+      <div className="flex-1 flex flex-row items-stretch relative">
         
         {/* Desktop & Tablet Sidebar — fixed, does not scroll with content */}
         {!sidebarCollapsed && (
@@ -393,7 +392,7 @@ export const AppLayout: React.FC = () => {
         )}
 
         {/* Workspace content block — shifts right when sidebar is open */}
-        <div className={`flex-1 ${isMandatePage ? 'min-h-0 overflow-hidden' : ''} flex flex-col min-w-0 transition-all duration-200 ${!sidebarCollapsed ? 'md:ml-64 lg:ml-72' : ''}`}>
+        <div className={`flex-1 flex flex-col min-w-0 transition-all duration-200 ${!sidebarCollapsed ? 'md:ml-64 lg:ml-72' : ''}`}>
           {/* Horizontal Workflow Stepper */}
           <div className="shrink-0">
             <WorkflowStepper
@@ -401,17 +400,29 @@ export const AppLayout: React.FC = () => {
             />
           </div>
 
-          {/* Main Content Area — strict fit on Mandate, normal scrollable on all other pages */}
-          <main className={
-            isMandatePage
-              ? "flex-1 min-h-0 max-w-7xl w-full mx-auto px-3.5 md:px-5 py-2 flex flex-col overflow-hidden"
-              : "flex-1 max-w-7xl w-full mx-auto px-4 md:px-6 py-5 md:py-6 flex flex-col gap-5"
-          }>
+          {/* Main Content Area */}
+          <main className="flex-1 max-w-7xl w-full mx-auto px-4 md:px-6 py-4 md:py-6 flex flex-col gap-4">
             <Outlet context={{
               refreshApprovals: checkApprovals,
               refreshSavedOutreach: loadSavedOutreach
             }} />
           </main>
+
+          {/* Footer - Visible upon scrolling */}
+          <footer className="w-full py-6 border-t border-[#D8D5CE] dark:border-[#263544] bg-[#EDEBE5]/70 dark:bg-[#141F2C] text-center text-secondary text-sm mt-auto">
+            <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#626A6D] dark:text-[#9AA9B8]">
+              <div className="flex items-center gap-2 font-bold text-[#202A2E] dark:text-[#F1F5F9]">
+                <span>&copy; {new Date().getFullYear()} DEAL SOURCING</span>
+                <span>&bull;</span>
+                <span className="text-secondary font-normal">All rights reserved.</span>
+              </div>
+              <div className="flex items-center gap-3 font-semibold">
+                <span>Enterprise M&A Platform</span>
+                <span>&bull;</span>
+                <span className="text-brand-primary font-bold">Confidential & Verified</span>
+              </div>
+            </div>
+          </footer>
         </div>
       </div>
       
@@ -512,12 +523,7 @@ export const AppLayout: React.FC = () => {
         </Modal>
       )}
       
-      {/* Footer */}
-      <footer className="w-full py-6 border-t border-default bg-card text-center text-secondary text-sm">
-        <div className="max-w-7xl mx-auto px-6">
-          &copy; {new Date().getFullYear()} DEAL SOURCING. All rights reserved. Deal Sourcing Platform.
-        </div>
-      </footer>
+
 
       {/* 4-Step Sourcing Workflow Help Modal */}
       <Modal
