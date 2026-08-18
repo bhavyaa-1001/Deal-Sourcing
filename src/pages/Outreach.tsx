@@ -569,11 +569,11 @@ const Outreach: React.FC = () => {
         <div>
           <h2 className="text-2xl font-extrabold text-primary mb-2">No Companies Selected</h2>
           <p className="text-secondary text-base max-w-md">
-            Please return to Review Results and select at least one company to continue to outreach.
+            Please return to Enrich Leads and select at least one company to continue to outreach.
           </p>
         </div>
         <Button variant="outline" onClick={() => navigate('/review')} leftIcon={<ArrowLeft className="h-4 w-4" />}>
-          Back to Review Results
+          Back to Enrich Leads
         </Button>
       </div>
     );
@@ -733,7 +733,7 @@ const Outreach: React.FC = () => {
             </p>
           </div>
           <Button variant="outline" onClick={() => navigate('/review')} leftIcon={<ArrowLeft className="h-4 w-4" />}>
-            Go to Review Results to Enrich
+            Go to Enrich Leads
           </Button>
         </div>
       ) : (

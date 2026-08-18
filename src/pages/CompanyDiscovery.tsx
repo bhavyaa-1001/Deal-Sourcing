@@ -59,7 +59,7 @@ export const CompanyDiscovery: React.FC = () => {
             Discover Companies
           </h2>
           <p className="text-lg text-secondary mt-2">
-            Explore companies matching your acquisition mandate. Select companies for deeper evaluation in Review Results.
+            Explore companies matching your acquisition mandate. Select companies for deeper evaluation in Enrich Leads.
           </p>
         </div>
 
@@ -180,7 +180,7 @@ export const CompanyDiscovery: React.FC = () => {
           className="min-w-[220px]"
           id="continue-to-review-btn"
         >
-          Continue to Review Results
+          Continue to Enrich Leads
         </Button>
       </div>
     </div>

@@ -14,8 +14,8 @@ import Badge from '../components/ui/Badge';
 import { type LeadStatus, LEAD_STATUS_CONFIG } from './DiscoverFounders';
 import {
   ArrowLeft, CheckCircle2, FileDown, Lock, Layers,
-  FolderCheck, AlertCircle, Sparkles, Users,
-  Eye, EyeOff, RefreshCw, ArrowRight, Send, Unlock,
+  FolderCheck, AlertCircle, Sparkles,
+  EyeOff, RefreshCw, ArrowRight, Send, Unlock,
   ExternalLink, Tag
 } from 'lucide-react';
 
@@ -151,11 +151,6 @@ export const ReviewResults: React.FC = () => {
     displayCompanies.filter(c => selectedIds.includes(c.id)),
     [displayCompanies, selectedIds]
   );
-
-  // Companies selected for enrichment payment
-  const selectedCompanies = displayCompanies.filter(c => selectedIds.includes(c.id));
-  // Not-yet-enriched selected companies
-  const unenrichedSelected = selectedCompanies.filter(c => !enrichedIds.includes(c.id));
 
   const metrics = useMemo(() => {
     const total = displayCompanies.length;
@@ -468,7 +463,8 @@ export const ReviewResults: React.FC = () => {
     <div className="flex flex-col gap-8">
       {/* Title — heading only, no subtitle */}
       <div className="text-left">
-        <h2 className="text-3xl font-extrabold text-primary tracking-tight">Review Acquisition Candidates</h2>
+        <h2 className="text-3xl font-extrabold text-primary tracking-tight">Enrich Leads</h2>
+        <p className="text-sm text-secondary mt-1">Select individual leads to enrich. Each enrichment unlocks founder contact details for outreach.</p>
       </div>
 
       {/* Toasts */}
@@ -703,19 +699,44 @@ export const ReviewResults: React.FC = () => {
                           >
                             View Details
                           </Button>
-                          <Button
-                            variant={isExpanded ? 'secondary' : 'primary'}
-                            size="sm"
-                            onClick={() => {
-                              setExpandedCompanyIds(prev =>
-                                isExpanded ? prev.filter(x => x !== company.id) : [...prev, company.id]
-                              );
-                            }}
-                            className="px-2 min-h-0 py-1 text-xs font-bold whitespace-nowrap"
-                            leftIcon={isExpanded ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-                          >
-                            {isExpanded ? 'Hide Enrichment' : 'View Enrichment'}
-                          </Button>
+
+                          {isEnriched ? (
+                            /* After enrichment: show Deep Dive button */
+                            <Button
+                              variant={isExpanded ? 'secondary' : 'primary'}
+                              size="sm"
+                              onClick={() => {
+                                setExpandedCompanyIds(prev =>
+                                  isExpanded ? prev.filter(x => x !== company.id) : [...prev, company.id]
+                                );
+                              }}
+                              className="px-2 min-h-0 py-1 text-xs font-bold whitespace-nowrap"
+                              leftIcon={isExpanded ? <EyeOff className="h-3.5 w-3.5" /> : <Sparkles className="h-3.5 w-3.5" />}
+                            >
+                              {isExpanded ? 'Close' : 'Deep Dive'}
+                            </Button>
+                          ) : isProcessing ? (
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              disabled
+                              className="px-2 min-h-0 py-1 text-xs font-bold whitespace-nowrap"
+                              leftIcon={<RefreshCw className="h-3.5 w-3.5 animate-spin" />}
+                            >
+                              Enriching...
+                            </Button>
+                          ) : (
+                            /* Not yet enriched: show Enrich button */
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              onClick={() => openEnrichPreview([company.id])}
+                              className="px-2 min-h-0 py-1 text-xs font-bold whitespace-nowrap"
+                              leftIcon={<Unlock className="h-3.5 w-3.5" />}
+                            >
+                              Enrich
+                            </Button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -1069,76 +1090,6 @@ export const ReviewResults: React.FC = () => {
           </div>
         )}
 
-        <div
-          className={`relative overflow-hidden rounded-xl border transition-all duration-300 ${
-            unenrichedSelected.length > 0
-              ? 'border-brand-primary-light dark:border-brand-primary-dark/80 shadow-premium-lg'
-              : 'border-default'
-          }`}
-        >
-          <div
-            className={`absolute inset-0 ${
-              unenrichedSelected.length > 0
-                ? 'bg-brand-primary-light/40 dark:bg-brand-primary-dark/20'
-                : 'bg-slate-50 dark:bg-slate-900/30'
-            }`}
-          />
-          <div className="relative flex flex-col sm:flex-row items-center justify-between gap-4 p-5">
-            <div className="flex items-center gap-4">
-              <div
-                className={`relative p-3 rounded-xl shrink-0 ${
-                  unenrichedSelected.length > 0
-                    ? 'bg-brand-primary shadow-premium'
-                    : 'bg-slate-200 dark:bg-slate-700'
-                }`}
-              >
-                <Users className={`h-5 w-5 ${unenrichedSelected.length > 0 ? 'text-white font-bold' : 'text-slate-500'}`} />
-                {unenrichedSelected.length > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 h-4 w-4 rounded-full bg-brand-warning text-[9px] font-black text-white flex items-center justify-center shadow">
-                    {unenrichedSelected.length}
-                  </span>
-                )}
-              </div>
-              <div className="text-left">
-                <p className={`text-base font-bold ${unenrichedSelected.length > 0 ? 'text-brand-primary dark:text-brand-primary-light' : 'text-secondary'}`}>
-                  {unenrichedSelected.length > 0
-                    ? `${unenrichedSelected.length} ${unenrichedSelected.length === 1 ? 'company' : 'companies'} ready for enrichment`
-                    : 'Select companies above to enrich them'}
-                </p>
-                <p className="text-xs text-secondary mt-0.5">
-                  {unenrichedSelected.length > 0
-                    ? 'Enrichment unlocks founder info, emails & LinkedIn for outreach'
-                    : 'Tick the top checkbox in each row to add companies to the enrichment queue'}
-                </p>
-              </div>
-            </div>
-
-            <button
-              disabled={unenrichedSelected.length === 0 || isEnriching}
-              onClick={() => openEnrichPreview(unenrichedSelected.map(c => c.id))}
-              id="enrich-selected-btn"
-              className={`
-                relative shrink-0 min-w-[220px] flex items-center justify-center gap-2.5
-                px-6 py-3 rounded-xl font-bold text-sm transition-all duration-200
-                focus:outline-none focus:ring-2 focus:ring-offset-2
-                ${unenrichedSelected.length > 0 && !isEnriching
-                  ? 'bg-brand-primary hover:bg-brand-primary-hover text-white shadow-premium cursor-pointer active:scale-95 focus:ring-brand-primary'
-                  : 'bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed'
-                }
-              `}
-            >
-              {isEnriching ? (
-                <><RefreshCw className="h-4 w-4 shrink-0 animate-spin" /> Enriching...</>
-              ) : (
-                <><Unlock className="h-4 w-4 shrink-0" />
-                {unenrichedSelected.length > 0
-                  ? `Enrich ${unenrichedSelected.length} Selected ${unenrichedSelected.length === 1 ? 'Company' : 'Companies'}`
-                  : 'Enrich Selected Companies'}
-                </>
-              )}
-            </button>
-          </div>
-        </div>
       </div>
 
       <CompanyDetails

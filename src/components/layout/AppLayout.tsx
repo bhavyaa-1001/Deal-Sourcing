@@ -597,7 +597,7 @@ export const AppLayout: React.FC = () => {
               </div>
               <div>
                 <h4 className="text-base font-bold text-primary flex items-center gap-1.5">
-                  4. Review Results
+                  3. Enrich Leads
                 </h4>
                 <p className="text-sm text-secondary mt-1.5 leading-relaxed">
                   Compare shortlisted companies side-by-side using the matrix tool, review succession risks, and export candidate dossiers as formatted PDF reports.

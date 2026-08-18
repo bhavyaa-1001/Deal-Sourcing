@@ -12,7 +12,7 @@ interface Step {
 const STEPS: Step[] = [
   { number: 1, label: 'Define Mandate', description: 'Describe what you want to acquire', path: '/mandate' },
   { number: 2, label: 'Discover Companies', description: 'Explore matching opportunities', path: '/discover' },
-  { number: 3, label: 'Review Results', description: 'Shortlist and compare deals', path: '/review' },
+  { number: 3, label: 'Enrich Leads', description: 'Select & enrich one lead at a time', path: '/review' },
   { number: 4, label: 'Outreach', description: 'Create personalized messages for selected contacts', path: '/outreach' },
 ];
 

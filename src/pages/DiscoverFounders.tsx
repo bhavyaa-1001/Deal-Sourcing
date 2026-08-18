@@ -819,7 +819,7 @@ export const DiscoverFounders: React.FC = () => {
           className="min-w-[200px] text-xs font-bold bg-[#202A2E] hover:bg-[#141B1E] dark:bg-[#E6E9E5] dark:text-[#101820]"
           id="continue-to-review-from-founders-btn"
         >
-          Continue to Review Results
+          Continue to Enrich Leads
         </Button>
       </div>
     </div>
