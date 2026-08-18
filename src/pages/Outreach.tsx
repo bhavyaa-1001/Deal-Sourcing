@@ -600,17 +600,6 @@ const Outreach: React.FC = () => {
           {/* View toggle */}
           <div className="flex bg-[#F1EFEA] dark:bg-[#141F2C] p-1 rounded-lg border border-[#D8D5CE] dark:border-[#2D4053] select-none">
             <button
-              onClick={() => setOutreachViewMode('kanban')}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-md cursor-pointer transition-colors ${
-                outreachViewMode === 'kanban'
-                  ? 'bg-white dark:bg-[#1D2B3A] text-primary shadow-xs'
-                  : 'text-secondary hover:text-primary'
-              }`}
-            >
-              <Kanban className="h-3.5 w-3.5" />
-              <span>Deal Kanban</span>
-            </button>
-            <button
               onClick={() => setOutreachViewMode('scripts')}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-md cursor-pointer transition-colors ${
                 outreachViewMode === 'scripts'
@@ -620,6 +609,17 @@ const Outreach: React.FC = () => {
             >
               <Mail className="h-3.5 w-3.5" />
               <span>Outreach Scripts</span>
+            </button>
+            <button
+              onClick={() => setOutreachViewMode('kanban')}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-md cursor-pointer transition-colors ${
+                outreachViewMode === 'kanban'
+                  ? 'bg-white dark:bg-[#1D2B3A] text-primary shadow-xs'
+                  : 'text-secondary hover:text-primary'
+              }`}
+            >
+              <Kanban className="h-3.5 w-3.5" />
+              <span>Deal Kanban</span>
             </button>
           </div>
 
