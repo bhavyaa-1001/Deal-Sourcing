@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import type { Company } from '../../types';
 import Modal from '../ui/Modal';
 import Badge from '../ui/Badge';
@@ -19,37 +19,9 @@ interface CompanyDetailsProps {
   onNext?: () => void;
 }
 
-type LeadStatus =
-  | 'Not Contacted'
-  | 'Attempted to Contact'
-  | 'Contact in Future'
-  | 'Contacted'
-  | 'Pre-Qualified'
-  | 'Not Qualified'
-  | 'Junk Lead'
-  | 'Lost Lead';
-
-const STATUSES: LeadStatus[] = [
-  'Not Contacted',
-  'Attempted to Contact',
-  'Contact in Future',
-  'Contacted',
-  'Pre-Qualified',
-  'Not Qualified',
-  'Junk Lead',
-  'Lost Lead'
-];
-
 const RELATED_LIST = [
   { label: 'Overview', icon: <FileText className="h-4 w-4" /> },
   { label: 'Founder Details', icon: <Users className="h-4 w-4" /> },
-];
-
-const TEAM_MEMBERS = [
-  { name: 'Bhavya Bansal', role: 'Lead Partner', initials: 'BB', color: 'bg-blue-600' },
-  { name: 'Sarah Jenkins', role: 'M&A Associate', initials: 'SJ', color: 'bg-purple-600' },
-  { name: 'David Vance', role: 'Investment Analyst', initials: 'DV', color: 'bg-emerald-600' },
-  { name: 'Unassigned', role: 'Team Pool', initials: '??', color: 'bg-slate-400' }
 ];
 
 export const CompanyDetails: React.FC<CompanyDetailsProps> = ({
@@ -61,35 +33,12 @@ export const CompanyDetails: React.FC<CompanyDetailsProps> = ({
   onNext
 }) => {
   const [activeTab, setActiveTab] = useState<'Overview' | 'Founder Details'>('Overview');
-  const [leadStatus, setLeadStatus] = useState<LeadStatus>('Not Contacted');
-  const [leadOwner, setLeadOwner] = useState('Bhavya Bansal');
-
-  // Load persistent lead status and owner for this company
-  useEffect(() => {
-    if (company) {
-      const storedStatus = localStorage.getItem(`dealsourcing_lead_status_${company.id}`);
-      setLeadStatus((storedStatus as LeadStatus) || 'Not Contacted');
-
-      const storedOwner = localStorage.getItem(`dealsourcing_lead_owner_${company.id}`);
-      setLeadOwner(storedOwner || 'Bhavya Bansal');
-    }
-  }, [company]);
 
   if (!company) return null;
 
   const isEnriched = company.enrichmentStatus === 'enriched';
   const isProcessing = company.enrichmentStatus === 'processing';
   const enrichment = company.enrichmentData || (isEnriched ? MOCK_ENRICHMENT_DATA[company.id] : undefined);
-
-  const handleStatusChange = (status: LeadStatus) => {
-    setLeadStatus(status);
-    localStorage.setItem(`dealsourcing_lead_status_${company.id}`, status);
-  };
-
-  const handleOwnerChange = (newOwner: string) => {
-    setLeadOwner(newOwner);
-    localStorage.setItem(`dealsourcing_lead_owner_${company.id}`, newOwner);
-  };
 
   // Mock profile picture initials
   const initials = company.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
@@ -180,33 +129,7 @@ export const CompanyDetails: React.FC<CompanyDetailsProps> = ({
           {crmTitle}
         </div>
 
-        {/* 1. Chevron Tracker Status Bar */}
-        <div className="w-full overflow-x-auto scrollbar-none pb-2 select-none">
-          <div className="flex items-center min-w-[800px] border border-default rounded-lg overflow-hidden bg-slate-50 dark:bg-slate-900/30">
-            {STATUSES.map((status) => {
-              const isActive = status === leadStatus;
-
-              return (
-                <button
-                  key={status}
-                  onClick={() => handleStatusChange(status)}
-                  className={`flex-1 relative py-2.5 px-4 text-xs font-bold transition-all duration-150 text-center cursor-pointer border-r border-default last:border-r-0 focus:outline-none
-                    ${isActive
-                      ? 'bg-brand-primary text-white shadow-inner font-extrabold font-sans'
-                      : 'bg-white dark:bg-slate-800 text-secondary hover:bg-slate-50 dark:hover:bg-slate-700/50 font-sans'
-                    }
-                  `}
-                >
-                  <div className="truncate flex items-center justify-center gap-1">
-                    {status}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* 2. Double-split layout: Related List Sidebar & Main Details */}
+        {/* Double-split layout: Related List Sidebar & Main Details */}
         <div className="flex flex-col md:flex-row items-stretch gap-6 min-h-[440px]">
           
           {/* Related List Sidebar (Left) — Only 2 Tabs */}
@@ -243,22 +166,12 @@ export const CompanyDetails: React.FC<CompanyDetailsProps> = ({
                 {/* CRM Key Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 border-b border-default pb-5 bg-slate-50/50 dark:bg-slate-900/10 p-4.5 rounded-xl">
                   <div>
-                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Lead Owner</span>
-                    <select
-                      value={leadOwner}
-                      onChange={(e) => handleOwnerChange(e.target.value)}
-                      className="text-[13px] font-extrabold text-primary bg-transparent border border-default rounded px-2.5 py-1.5 mt-1.5 focus:outline-none focus:ring-1 focus:ring-brand-primary cursor-pointer w-full max-w-[200px]"
-                    >
-                      {TEAM_MEMBERS.map(member => (
-                        <option key={member.name} value={member.name}>
-                          {member.name} ({member.role || 'Unassigned'})
-                        </option>
-                      ))}
-                    </select>
+                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Target Geography</span>
+                    <span className="text-[13px] font-extrabold text-primary block mt-1">{company.location}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Lead Status</span>
-                    <span className="text-[13px] font-extrabold text-brand-primary block mt-1">{leadStatus}</span>
+                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Discovery Source</span>
+                    <span className="text-[13px] font-bold text-primary block mt-1 truncate">{company.sourceName || 'ASIC & Industry Registry'}</span>
                   </div>
                   
                   {/* Email & Phone summary */}
