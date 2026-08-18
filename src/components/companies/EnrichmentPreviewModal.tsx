@@ -1,8 +1,8 @@
 import React from 'react';
 import type { Company } from '../../types';
 import {
-  X, Unlock, User, Mail, Phone, Link2, Users,
-  FileText, TrendingUp, Sparkles, ChevronRight,
+  X, Mail, Link2,
+  Award, TrendingUp, Sparkles, ChevronRight
 } from 'lucide-react';
 
 interface EnrichmentPreviewModalProps {
@@ -15,57 +15,33 @@ interface EnrichmentPreviewModalProps {
 
 const UNLOCK_ITEMS = [
   {
-    icon: <User className="h-4 w-4" />,
-    label: 'Founder Name & Role',
-    sample: 'Robert "Bob" Miller — Founder & Managing Director',
-    color: 'text-brand-primary dark:text-slate-300',
-    bg: 'bg-brand-primary-light/50 dark:bg-slate-800/40',
-    border: 'border-brand-primary-light dark:border-slate-800',
-  },
-  {
-    icon: <Users className="h-4 w-4" />,
-    label: 'Management Team',
-    sample: 'Sarah Wilson (Ops), James Crawford (Sales)',
-    color: 'text-brand-primary dark:text-slate-300',
-    bg: 'bg-brand-primary-light/50 dark:bg-slate-800/40',
-    border: 'border-brand-primary-light dark:border-slate-800',
-  },
-  {
     icon: <Mail className="h-4 w-4" />,
-    label: 'Direct Email Address',
-    sample: 'bob.miller@acmeplastics.com.au',
-    color: 'text-brand-success dark:text-green-400',
-    bg: 'bg-brand-success-light dark:bg-green-950/20',
-    border: 'border-brand-success-light/80 dark:border-green-900/40',
-  },
-  {
-    icon: <Phone className="h-4 w-4" />,
-    label: 'Direct Phone Number',
-    sample: '+61 3 9876 5432',
+    label: 'All Missing Direct Contacts',
+    description: 'Searches & extracts verified direct emails, mobile numbers, and executive direct lines',
     color: 'text-brand-success dark:text-green-400',
     bg: 'bg-brand-success-light dark:bg-green-950/20',
     border: 'border-brand-success-light/80 dark:border-green-900/40',
   },
   {
     icon: <Link2 className="h-4 w-4" />,
-    label: 'LinkedIn Profile',
-    sample: 'linkedin.com/in/robert-miller-acme',
-    color: 'text-brand-success dark:text-green-400',
-    bg: 'bg-brand-success-light dark:bg-green-950/20',
-    border: 'border-brand-success-light/80 dark:border-green-900/40',
+    label: 'Executive & Digital Profiles',
+    description: 'Finds verified executive LinkedIn URLs, corporate profiles, and public digital traces',
+    color: 'text-brand-primary dark:text-slate-300',
+    bg: 'bg-brand-primary-light/50 dark:bg-slate-800/40',
+    border: 'border-brand-primary-light dark:border-slate-800',
   },
   {
-    icon: <FileText className="h-4 w-4" />,
-    label: 'Founder Bio',
-    sample: 'Started Acme Plastics in 1988 with a single injection moulding machine…',
+    icon: <Award className="h-4 w-4" />,
+    label: 'Official Verification Proofs',
+    description: 'Extracts ASIC director filings, corporate inception records, and verifiable registry proofs',
     color: 'text-brand-primary dark:text-slate-300',
     bg: 'bg-brand-primary-light/50 dark:bg-slate-800/40',
     border: 'border-brand-primary-light dark:border-slate-800',
   },
   {
     icon: <TrendingUp className="h-4 w-4" />,
-    label: 'Succession Intelligence',
-    sample: 'Looking to retire in 12 months. No family succession planned.',
+    label: 'Succession & Ownership Intelligence',
+    description: 'Uncovers cap table breakdown, management lieutenants, and transition/exit timelines',
     color: 'text-brand-warning dark:text-amber-400',
     bg: 'bg-brand-warning-light dark:bg-amber-950/20',
     border: 'border-brand-warning-light dark:border-amber-900/40',
@@ -106,9 +82,9 @@ const EnrichmentPreviewModal: React.FC<EnrichmentPreviewModalProps> = ({
               <h2 className="text-lg font-extrabold text-primary">Enrichment Preview</h2>
             </div>
             <p className="text-sm text-secondary">
-              Here's exactly what you'll unlock for{' '}
+              Extract all missing information and verification proofs for{' '}
               <span className="font-bold text-primary">
-                {companies.length} {companies.length === 1 ? 'company' : 'companies'}
+                {companies.length} {companies.length === 1 ? 'lead' : 'leads'}
               </span>
             </p>
           </div>
@@ -124,7 +100,7 @@ const EnrichmentPreviewModal: React.FC<EnrichmentPreviewModalProps> = ({
 
         {/* Companies being enriched */}
         <div className="px-6 pt-5 pb-3">
-          <p className="text-xs font-bold text-secondary uppercase tracking-wider mb-2">Companies selected</p>
+          <p className="text-xs font-bold text-secondary uppercase tracking-wider mb-2">Selected Lead</p>
           <div className="flex flex-wrap gap-2">
             {companies.map(c => (
               <span
@@ -140,19 +116,19 @@ const EnrichmentPreviewModal: React.FC<EnrichmentPreviewModalProps> = ({
 
         {/* What you unlock */}
         <div className="px-6 pb-4">
-          <p className="text-xs font-bold text-secondary uppercase tracking-wider mb-3">What you'll receive</p>
+          <p className="text-xs font-bold text-secondary uppercase tracking-wider mb-3">All Missing Information Extracted</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {UNLOCK_ITEMS.map(item => (
               <div
                 key={item.label}
-                className={`flex items-start gap-3 p-3 rounded-xl border ${item.bg} ${item.border}`}
+                className={`flex items-start gap-3 p-3.5 rounded-xl border ${item.bg} ${item.border}`}
               >
                 <span className={`shrink-0 mt-0.5 p-1.5 rounded-lg bg-white dark:bg-slate-800 shadow-sm ${item.color}`}>
                   {item.icon}
                 </span>
                 <div className="min-w-0">
                   <p className={`text-xs font-extrabold uppercase tracking-wide ${item.color}`}>{item.label}</p>
-                  <p className="text-xs text-secondary mt-0.5 truncate font-medium italic">e.g. {item.sample}</p>
+                  <p className="text-xs text-secondary mt-1 font-medium leading-relaxed">{item.description}</p>
                 </div>
               </div>
             ))}
@@ -163,7 +139,7 @@ const EnrichmentPreviewModal: React.FC<EnrichmentPreviewModalProps> = ({
         <div className="mx-6 mb-4 p-3 rounded-xl bg-brand-primary-light/50 dark:bg-brand-primary-dark/20 border border-brand-primary-light dark:border-brand-primary-dark/40 flex items-start gap-2.5">
           <Sparkles className="h-4 w-4 text-brand-primary dark:text-brand-primary-light shrink-0 mt-0.5" />
           <p className="text-xs text-brand-primary dark:text-brand-primary-light font-medium">
-            Our AI model will research and generate enrichment data for each company. Results typically take a few seconds per company.
+            Our deep research model scans private databases, registry filings, and verification systems to extract and verify all missing company and founder details in a single complete package.
           </p>
         </div>
 
@@ -188,12 +164,12 @@ const EnrichmentPreviewModal: React.FC<EnrichmentPreviewModalProps> = ({
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                 </svg>
-                Enriching {companies.length} {companies.length === 1 ? 'Company' : 'Companies'}…
+                Enriching {companies.length} {companies.length === 1 ? 'Lead' : 'Leads'}…
               </>
             ) : (
               <>
-                <Unlock className="h-4 w-4 text-white" />
-                Confirm & Enrich {companies.length} {companies.length === 1 ? 'Company' : 'Companies'}
+                <Sparkles className="h-4 w-4 text-white" />
+                Confirm & Enrich {companies.length} {companies.length === 1 ? 'Lead' : 'Leads'}
                 <ChevronRight className="h-4 w-4 text-white" />
               </>
             )}
