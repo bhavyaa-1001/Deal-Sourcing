@@ -475,43 +475,43 @@ export const ReviewResults: React.FC = () => {
 
       {/* 1. Metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-left">
-        <Card className="flex items-center gap-4 p-5 bg-white border border-[#D8D5CE] shadow-[0_1px_3px_rgba(32,42,46,0.04)]">
-          <div className="p-3 bg-[#F1EFEA] rounded-full text-[#202A2E] shrink-0">
+        <Card className="flex items-center gap-4 p-5 bg-card border border-default dark:border-slate-800 shadow-[0_1px_3px_rgba(32,42,46,0.04)]">
+          <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-700 dark:text-slate-200 shrink-0">
             <FolderCheck className="h-6 w-6" />
           </div>
           <div>
-            <span className="text-xs font-bold text-[#626A6D] uppercase tracking-wider block">Total Companies</span>
-            <span className="text-2xl font-black text-[#202A2E] dark:text-white block mt-0.5">{metrics.total}</span>
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Total Companies</span>
+            <span className="text-2xl font-black text-primary dark:text-white block mt-0.5">{metrics.total}</span>
           </div>
         </Card>
 
-        <Card className="flex items-center gap-4 p-5 bg-white border border-[#D8D5CE] shadow-[0_1px_3px_rgba(32,42,46,0.04)]">
-          <div className="p-3 bg-[#E3ECE6] rounded-full text-[#35624A] shrink-0">
+        <Card className="flex items-center gap-4 p-5 bg-card border border-default dark:border-slate-800 shadow-[0_1px_3px_rgba(32,42,46,0.04)]">
+          <div className="p-3 bg-emerald-50 dark:bg-emerald-950/50 rounded-full text-emerald-700 dark:text-emerald-300 shrink-0">
             <CheckCircle2 className="h-6 w-6" />
           </div>
           <div>
-            <span className="text-xs font-bold text-[#626A6D] uppercase tracking-wider block">High Fit</span>
-            <span className="text-2xl font-black text-[#202A2E] dark:text-white block mt-0.5">{metrics.highFit}</span>
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">High Fit</span>
+            <span className="text-2xl font-black text-primary dark:text-white block mt-0.5">{metrics.highFit}</span>
           </div>
         </Card>
 
-        <Card className="flex items-center gap-4 p-5 bg-white border border-[#D8D5CE] shadow-[0_1px_3px_rgba(32,42,46,0.04)]">
-          <div className="p-3 bg-[#F5EDDA] rounded-full text-[#9A7535] shrink-0">
+        <Card className="flex items-center gap-4 p-5 bg-card border border-default dark:border-slate-800 shadow-[0_1px_3px_rgba(32,42,46,0.04)]">
+          <div className="p-3 bg-amber-50 dark:bg-amber-950/50 rounded-full text-amber-700 dark:text-amber-300 shrink-0">
             <AlertCircle className="h-6 w-6" />
           </div>
           <div>
-            <span className="text-xs font-bold text-[#626A6D] uppercase tracking-wider block">Selected</span>
-            <span className="text-2xl font-black text-[#202A2E] dark:text-white block mt-0.5">{metrics.selected}</span>
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Selected</span>
+            <span className="text-2xl font-black text-primary dark:text-white block mt-0.5">{metrics.selected}</span>
           </div>
         </Card>
 
-        <Card className="flex items-center gap-4 p-5 bg-white border border-[#D8D5CE] shadow-[0_1px_3px_rgba(32,42,46,0.04)]">
-          <div className="p-3 bg-[#E5EBE3] rounded-full text-[#5F735F] shrink-0">
+        <Card className="flex items-center gap-4 p-5 bg-card border border-default dark:border-slate-800 shadow-[0_1px_3px_rgba(32,42,46,0.04)]">
+          <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-700 dark:text-slate-300 shrink-0">
             <Sparkles className="h-6 w-6" />
           </div>
           <div>
-            <span className="text-xs font-bold text-[#626A6D] uppercase tracking-wider block">Enriched</span>
-            <span className="text-2xl font-black text-[#202A2E] dark:text-white block mt-0.5">{metrics.enriched}</span>
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Enriched</span>
+            <span className="text-2xl font-black text-primary dark:text-white block mt-0.5">{metrics.enriched}</span>
           </div>
         </Card>
       </div>
@@ -591,22 +591,22 @@ export const ReviewResults: React.FC = () => {
 
       {/* 4. Main table */}
       <div className="w-full flex flex-col gap-4 text-left">
-        <div className="w-full overflow-x-auto rounded-lg border border-[#D8D5CE] dark:border-slate-800 shadow-[0_1px_3px_rgba(32,42,46,0.04)] bg-white dark:bg-card">
+        <div className="w-full overflow-x-auto rounded-lg border border-default dark:border-slate-800 shadow-[0_1px_3px_rgba(32,42,46,0.04)] bg-card">
           <table className="w-full border-collapse text-left text-sm md:text-base">
             <thead>
-              <tr className="bg-[#F1EFEA] dark:bg-slate-900 border-b border-[#D8D5CE] dark:border-slate-800 text-[#202A2E] dark:text-white font-bold text-xs md:text-sm uppercase tracking-wider">
-                <th className="px-3 py-3 w-14 text-center text-[10px] font-bold text-[#626A6D] uppercase tracking-wide">Select</th>
-                <th className="px-3 py-3">Company</th>
-                <th className="px-3 py-3">Location</th>
-                <th className="px-3 py-3">Lead Status</th>
-                <th className="px-3 py-3">Fit Rate</th>
-                <th className="px-3 py-3">Revenue</th>
-                <th className="px-3 py-3">Employees</th>
-                <th className="px-3 py-3">Confidence</th>
-                <th className="px-3 py-3 text-right pr-5">Actions</th>
+              <tr className="bg-slate-100/80 dark:bg-slate-900 border-b border-default dark:border-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs md:text-sm uppercase tracking-wider">
+                <th className="px-3 py-3.5 w-14 text-center text-[10px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wide">Select</th>
+                <th className="px-3 py-3.5 text-slate-700 dark:text-slate-200">Company</th>
+                <th className="px-3 py-3.5 text-slate-700 dark:text-slate-200">Location</th>
+                <th className="px-3 py-3.5 text-slate-700 dark:text-slate-200">Lead Status</th>
+                <th className="px-3 py-3.5 text-slate-700 dark:text-slate-200">Fit Rate</th>
+                <th className="px-3 py-3.5 text-slate-700 dark:text-slate-200">Revenue</th>
+                <th className="px-3 py-3.5 text-slate-700 dark:text-slate-200">Employees</th>
+                <th className="px-3 py-3.5 text-slate-700 dark:text-slate-200">Confidence</th>
+                <th className="px-3 py-3.5 text-right pr-5 text-slate-700 dark:text-slate-200">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#D8D5CE] dark:divide-slate-800 text-primary">
+            <tbody className="divide-y divide-default dark:divide-slate-800 text-primary dark:text-slate-100">
               {displayCompanies.map(company => {
                 const isSelected = selectedIds.includes(company.id);
                 const isEnriched = company.enrichmentStatus === 'enriched' || enrichedIds.includes(company.id);
@@ -625,11 +625,11 @@ export const ReviewResults: React.FC = () => {
                   <React.Fragment key={company.id}>
                     <tr
                       id={`company-row-${company.id}`}
-                      className={`hover:bg-[#F6F5F1] dark:hover:bg-slate-800/30 transition-colors duration-150 ${
+                      className={`hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors duration-150 ${
                         leadStatus === 'junk_lead'
-                          ? 'opacity-60 bg-rose-50/30 dark:bg-rose-950/20'
+                          ? 'bg-rose-50/30 dark:bg-rose-950/25 text-slate-700 dark:text-slate-300'
                           : isSelected
-                          ? 'bg-[#E5EBE3]/40 dark:bg-slate-800/60'
+                          ? 'bg-emerald-50/40 dark:bg-slate-800/60'
                           : ''
                       }`}
                     >

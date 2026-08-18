@@ -67,7 +67,7 @@ export const CompanyDiscovery: React.FC = () => {
         <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-md border border-default self-start md:self-auto select-none">
           <button
             onClick={() => setViewMode('table')}
-            className={`flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded cursor-pointer transition-colors ${viewMode === 'table' ? 'bg-card text-brand-primary shadow-sm' : 'text-secondary hover:text-primary'}`}
+            className={`flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded cursor-pointer transition-colors ${viewMode === 'table' ? 'bg-card text-brand-primary dark:text-white shadow-sm' : 'text-secondary dark:text-slate-400 hover:text-primary dark:hover:text-white'}`}
             aria-label="Table view mode"
           >
             <Table className="h-4 w-4" />
@@ -75,7 +75,7 @@ export const CompanyDiscovery: React.FC = () => {
           </button>
           <button
             onClick={() => setViewMode('cards')}
-            className={`flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded cursor-pointer transition-colors ${viewMode === 'cards' ? 'bg-card text-brand-primary shadow-sm' : 'text-secondary hover:text-primary'}`}
+            className={`flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded cursor-pointer transition-colors ${viewMode === 'cards' ? 'bg-card text-brand-primary dark:text-white shadow-sm' : 'text-secondary dark:text-slate-400 hover:text-primary dark:hover:text-white'}`}
             aria-label="Cards view mode"
           >
             <LayoutGrid className="h-4 w-4" />

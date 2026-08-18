@@ -143,8 +143,8 @@ export const CompanyDetails: React.FC<CompanyDetailsProps> = ({
         <div className="flex flex-col md:flex-row items-stretch gap-6 min-h-[440px]">
           
           {/* Related List Sidebar (Left) — Only 2 Tabs */}
-          <aside className="w-full md:w-56 shrink-0 border border-default rounded-xl bg-slate-50/50 dark:bg-slate-900/10 p-3 flex flex-col gap-1.5 select-none">
-            <span className="text-[10px] font-black text-slate-450 dark:text-slate-500 uppercase tracking-widest pl-2 mb-2 block">
+          <aside className="w-full md:w-56 shrink-0 border border-default rounded-xl bg-slate-50/50 dark:bg-slate-900/40 p-3 flex flex-col gap-1.5 select-none">
+            <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-2 mb-2 block">
               Related Views
             </span>
             {RELATED_LIST.map((tab) => {
@@ -155,12 +155,12 @@ export const CompanyDetails: React.FC<CompanyDetailsProps> = ({
                   onClick={() => setActiveTab(tab.label as any)}
                   className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold rounded-lg text-left transition-colors cursor-pointer focus:outline-none
                     ${isSelected
-                      ? 'bg-brand-primary-light/80 text-brand-primary dark:bg-slate-800 dark:text-slate-200 shadow-xs'
-                      : 'text-secondary hover:bg-slate-100 dark:hover:bg-slate-850 hover:text-primary'
+                      ? 'bg-brand-primary-light/80 text-brand-primary dark:bg-slate-800 dark:text-white shadow-xs'
+                      : 'text-secondary dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-primary dark:hover:text-white'
                     }
                   `}
                 >
-                  <span className={`${isSelected ? 'text-brand-primary' : 'text-slate-450'}`}>{tab.icon}</span>
+                  <span className={`${isSelected ? 'text-brand-primary dark:text-[#C5B76A]' : 'text-slate-450 dark:text-slate-400'}`}>{tab.icon}</span>
                   <span className="text-[13px]">{tab.label}</span>
                 </button>
               );
@@ -174,22 +174,22 @@ export const CompanyDetails: React.FC<CompanyDetailsProps> = ({
             {activeTab === 'Overview' && (
               <div className="flex flex-col gap-6 text-left">
                 {/* CRM Key Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 border-b border-default pb-5 bg-slate-50/50 dark:bg-slate-900/10 p-4.5 rounded-xl">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 border-b border-default pb-5 bg-slate-50/50 dark:bg-slate-900/40 p-4.5 rounded-xl">
                   <div>
-                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Target Geography</span>
-                    <span className="text-[13px] font-extrabold text-primary block mt-1">{company.location}</span>
+                    <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Target Geography</span>
+                    <span className="text-[13px] font-extrabold text-primary dark:text-slate-100 block mt-1">{company.location}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Discovery Source</span>
-                    <span className="text-[13px] font-bold text-primary block mt-1 truncate">{company.sourceName || 'ASIC & Industry Registry'}</span>
+                    <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Discovery Source</span>
+                    <span className="text-[13px] font-bold text-primary dark:text-slate-100 block mt-1 truncate">{company.sourceName || 'ASIC & Industry Registry'}</span>
                   </div>
                   
                   {/* Email & Phone summary */}
                   <div>
-                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Direct Email</span>
+                    <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Direct Email</span>
                     {isEnriched && enrichment?.email ? (
                       <div className="mt-1">
-                        <a href={`mailto:${enrichment.email}`} className="text-[13px] font-extrabold text-brand-primary hover:underline block">
+                        <a href={`mailto:${enrichment.email}`} className="text-[13px] font-extrabold text-brand-primary dark:text-[#C5B76A] hover:underline block">
                           {enrichment.email}
                         </a>
                       </div>
@@ -200,10 +200,10 @@ export const CompanyDetails: React.FC<CompanyDetailsProps> = ({
                     )}
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Phone / Mobile</span>
+                    <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Phone / Mobile</span>
                     {isEnriched && enrichment?.phone ? (
                       <div className="mt-1">
-                        <span className="text-[13px] font-extrabold text-primary block">
+                        <span className="text-[13px] font-extrabold text-primary dark:text-slate-100 block">
                           {enrichment.phone}
                         </span>
                       </div>
