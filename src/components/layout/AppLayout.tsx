@@ -401,8 +401,8 @@ export const AppLayout: React.FC = () => {
             />
           </div>
 
-          {/* Main Content Area — capped at 1600px with generous padding for readability */}
-          <main className="flex-1 w-full max-w-[1600px] mx-auto px-6 md:px-10 py-6 md:py-8 flex flex-col gap-5">
+          {/* Main Content Area — capped at 1600px with balanced padding for viewport visibility */}
+          <main className="flex-1 w-full max-w-[1600px] mx-auto px-5 md:px-8 py-3 md:py-4 flex flex-col gap-3.5">
             <Outlet context={{
               refreshApprovals: checkApprovals,
               refreshSavedOutreach: loadSavedOutreach
