@@ -19,6 +19,8 @@ import CompanyDetails from '../components/companies/CompanyDetails';
 import GmailConnectModal, { type ConnectedEmailAccount } from '../components/outreach/GmailConnectModal';
 import SendEmailModal from '../components/outreach/SendEmailModal';
 import AutomateCampaignModal from '../components/outreach/AutomateCampaignModal';
+import Badge from '../components/ui/Badge';
+import { MOCK_ENRICHMENT_DATA } from '../api/enrichment';
 import {
   ArrowLeft, Sparkles, AlertTriangle, Users, Search,
   Target, Mail, Link2, MessageSquare, Copy, CheckCheck,
@@ -368,7 +370,6 @@ const Outreach: React.FC = () => {
   };
 
   const activeCompany    = displayCompanies.find(c => c.id === activeCompanyId) ?? null;
-  const isActiveEnriched = activeCompanyId ? enrichedIds.includes(activeCompanyId) : false;
   const activeOutreachSet = activeCompanyId ? outreachSets[activeCompanyId] : undefined;
   const hasScripts       = !!activeOutreachSet?.scripts?.length;
 
@@ -399,7 +400,7 @@ const Outreach: React.FC = () => {
         let changed = false;
         const next = { ...prev };
         allToProcess.forEach(c => {
-          if (!next[c.id] && enrichedIds.includes(c.id)) {
+          if (!next[c.id]) {
             next[c.id] = {
               companyId: c.id,
               channel: 'email',
@@ -412,7 +413,7 @@ const Outreach: React.FC = () => {
         return changed ? next : prev;
       });
     }
-  }, [companiesToProcess, mandate, enrichedIds, activeMandateId]);
+  }, [companiesToProcess, mandate, activeMandateId]);
 
   const getScript = useCallback((type: OutreachScriptType): OutreachScript | null => {
     if (!hasScripts || !activeCompanyId) return null;
@@ -721,41 +722,34 @@ const Outreach: React.FC = () => {
             <div className="border border-[#D8D5CE] dark:border-slate-800 rounded-xl p-10 text-center text-[#626A6D] bg-white dark:bg-card">
               Select a company above to begin.
             </div>
-          ) : !isActiveEnriched ? (
-        <div className="border border-[#D8D5CE] dark:border-slate-800 rounded-xl p-10 flex flex-col items-center gap-5 text-center bg-white dark:bg-card">
-          <div className="p-4 bg-[#F5EDDA] dark:bg-amber-950/30 rounded-full">
-            <AlertTriangle className="h-8 w-8 text-[#9A7535] dark:text-amber-400" />
-          </div>
-          <div>
-            <h3 className="text-xl font-bold text-[#202A2E] dark:text-white mb-2">Enrichment Required</h3>
-            <p className="text-[#626A6D] text-base max-w-md">
-              <strong>{activeCompany.name}</strong> needs to be enriched before outreach can be generated.
-            </p>
-          </div>
-          <Button variant="outline" onClick={() => navigate('/review')} leftIcon={<ArrowLeft className="h-4 w-4" />}>
-            Go to Enrich Leads
-          </Button>
-        </div>
-      ) : (
-        <div className="flex flex-col gap-4 animate-fadeIn">
+          ) : (
+            <div className="flex flex-col gap-4 animate-fadeIn">
 
-          {/* Contact card */}
-          <div className="border border-[#D8D5CE] dark:border-slate-800 rounded-xl px-5 py-4 bg-white dark:bg-card flex items-center gap-4 shadow-[0_1px_3px_rgba(32,42,46,0.04)]">
-            <div className="p-2.5 rounded-lg bg-[#EDEBE5] dark:bg-slate-800 shrink-0">
-              <Users className="h-5 w-5 text-[#202A2E] dark:text-white" />
-            </div>
-            <div>
-              <p className="text-sm font-bold text-primary">
-                {activeCompany.enrichmentData?.contactPerson || activeCompany.enrichmentData?.founderName || activeCompany.name}
-              </p>
-              <p className="text-xs text-secondary mt-0.5">
-                {activeCompany.enrichmentData?.founderRole && (
-                  <span>{activeCompany.enrichmentData.founderRole} · </span>
-                )}
-                <span className="text-brand-primary font-semibold">{activeCompany.name}</span>
-              </p>
-            </div>
-          </div>
+              {/* Contact card */}
+              <div className="border border-[#D8D5CE] dark:border-slate-800 rounded-xl px-5 py-4 bg-white dark:bg-card flex items-center justify-between gap-4 shadow-[0_1px_3px_rgba(32,42,46,0.04)] flex-wrap">
+                <div className="flex items-center gap-4">
+                  <div className="p-2.5 rounded-lg bg-[#EDEBE5] dark:bg-slate-800 shrink-0">
+                    <Users className="h-5 w-5 text-[#202A2E] dark:text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-primary">
+                      {activeCompany.enrichmentData?.contactPerson || activeCompany.enrichmentData?.founderName || MOCK_ENRICHMENT_DATA[activeCompany.id]?.founderName || activeCompany.name}
+                    </p>
+                    <p className="text-xs text-secondary mt-0.5">
+                      <span>{activeCompany.enrichmentData?.founderRole || MOCK_ENRICHMENT_DATA[activeCompany.id]?.founderRole || 'Founder & Principal'} · </span>
+                      <span className="text-brand-primary font-semibold">{activeCompany.name}</span>
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {enrichedIds.includes(activeCompany.id) ? (
+                    <Badge variant="success" className="text-xs">ENRICHED</Badge>
+                  ) : (
+                    <Badge variant="neutral" className="text-xs">PUBLIC INTEL</Badge>
+                  )}
+                </div>
+              </div>
 
           {/* Research Insights — collapsible */}
           <div className="border border-default rounded-xl overflow-hidden bg-card">

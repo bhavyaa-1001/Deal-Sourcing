@@ -6,6 +6,7 @@
  */
 
 import type { Company, Mandate, OutreachScript, OutreachScriptType, OutreachChannel } from '../types';
+import { MOCK_ENRICHMENT_DATA } from './enrichment';
 
 const delay = (ms: number) => new Promise(r => setTimeout(r, ms));
 
@@ -17,13 +18,16 @@ const firstName = (fullName: string): string => {
 const cityFromLocation = (location: string): string =>
   location?.split(',')[0]?.trim() || location || '';
 
+const getEnrichment = (company: Company) =>
+  company.enrichmentData || MOCK_ENRICHMENT_DATA[company.id];
+
 const generateProfessional = (
   company: Company,
   mandate: Mandate,
   _channel: OutreachChannel
 ): OutreachScript => {
-  const ed = company.enrichmentData;
-  const contact = ed?.contactPerson || ed?.founderName || 'Partner';
+  const ed = getEnrichment(company);
+  const contact = ed?.contactPerson || ed?.founderName || 'Founder & Director';
   const fName = firstName(contact) || 'there';
   const city = cityFromLocation(company.location);
 
@@ -42,8 +46,8 @@ const generateFounderFocused = (
   _mandate: Mandate,
   _channel: OutreachChannel
 ): OutreachScript => {
-  const ed = company.enrichmentData;
-  const contact = ed?.contactPerson || ed?.founderName || 'Partner';
+  const ed = getEnrichment(company);
+  const contact = ed?.contactPerson || ed?.founderName || 'Founder & Director';
   const fName = firstName(contact) || 'there';
   const city = cityFromLocation(company.location);
   const industryText = company.industry.toLowerCase();
@@ -61,8 +65,8 @@ const generateDirect = (
   _mandate: Mandate,
   _channel: OutreachChannel
 ): OutreachScript => {
-  const ed = company.enrichmentData;
-  const contact = ed?.contactPerson || ed?.founderName || 'Partner';
+  const ed = getEnrichment(company);
+  const contact = ed?.contactPerson || ed?.founderName || 'Founder & Director';
   const fName = firstName(contact) || 'there';
   const city = cityFromLocation(company.location);
   const industryText = company.industry.toLowerCase();
