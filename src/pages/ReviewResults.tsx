@@ -702,9 +702,9 @@ export const ReviewResults: React.FC = () => {
                           </Button>
 
                           {isEnriched ? (
-                            /* After enrichment: show verified Deep Dive button with slate styling */
+                            /* After enrichment: show verified Deep Dive button with primary styling */
                             <Button
-                              variant={isExpanded ? 'secondary' : 'success'}
+                              variant={isExpanded ? 'secondary' : 'primary'}
                               size="sm"
                               onClick={() => {
                                 setExpandedCompanyIds(prev =>
@@ -712,7 +712,7 @@ export const ReviewResults: React.FC = () => {
                                 );
                               }}
                               className="px-2.5 min-h-0 py-1 text-xs font-bold whitespace-nowrap"
-                              leftIcon={isExpanded ? <EyeOff className="h-3.5 w-3.5" /> : <Sparkles className="h-3.5 w-3.5" />}
+                              leftIcon={isExpanded ? <EyeOff className="h-3.5 w-3.5" /> : <Sparkles className="h-3.5 w-3.5 text-[#E9B63B]" />}
                             >
                               {isExpanded ? 'Close' : 'Deep Dive'}
                             </Button>
@@ -1077,14 +1077,14 @@ export const ReviewResults: React.FC = () => {
 
         {/* Compare action bar — appears when 2+ companies are checked */}
         {selectedIds.length >= 2 && (
-          <div className="p-3.5 border border-[#758A93]/40 bg-[#E8EEEF]/60 dark:bg-[#203038] rounded-lg flex items-center justify-between gap-4 animate-fadeIn">
-            <span className="text-sm md:text-base text-[#202A30] dark:text-[#F4F6F8] font-bold flex items-center gap-2">
-              <Layers className="h-5 w-5 text-[#758A93]" />
+          <div className="p-3.5 border border-[#CBD5E1] dark:border-[#334155] bg-white dark:bg-[#1E293B] shadow-lg rounded-xl flex items-center justify-between gap-4 animate-fadeIn">
+            <span className="text-sm md:text-base text-[#0F172A] dark:text-[#F8FAFC] font-bold flex items-center gap-2">
+              <Layers className="h-5 w-5 text-[#14532D] dark:text-[#4ADE80]" />
               {selectedIds.length} companies selected for comparison
             </span>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" onClick={() => clearSelection()}>Clear</Button>
-              <Button variant="success" size="sm" onClick={() => setCompareModalOpen(true)} leftIcon={<Layers className="h-4 w-4" />}>
+              <Button variant="primary" size="sm" onClick={() => setCompareModalOpen(true)} leftIcon={<Layers className="h-4 w-4" />}>
                 Compare ({selectedIds.length})
               </Button>
             </div>
@@ -1132,7 +1132,7 @@ export const ReviewResults: React.FC = () => {
         }}
       />
       {/* ── Sticky Page Footer Navigation — Export PDF + Continue to Outreach ── */}
-      <div className="sticky bottom-0 bg-[#F8F6F1]/95 dark:bg-[#13191D]/95 backdrop-blur-md border-t border-[#DED9D0] dark:border-[#2E3D47] py-4 px-6 -mx-6 -mb-6 flex items-center justify-between z-25 shadow-xs mt-6 rounded-b flex-wrap gap-3">
+      <div className="sticky bottom-0 bg-[#F8FAFC]/95 dark:bg-[#0B0F17]/95 backdrop-blur-md border-t border-[#E2E8F0] dark:border-[#334155] py-4 px-6 -mx-6 -mb-6 flex items-center justify-between z-25 shadow-xs mt-6 rounded-b flex-wrap gap-3">
         <Button
           variant="outline"
           onClick={handleBack}

@@ -67,7 +67,7 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
                       flex items-center gap-2.5 text-left focus-ring rounded-lg px-4 py-2 transition-all cursor-pointer shrink-0
                       disabled:cursor-not-allowed disabled:opacity-40
                       ${isActive 
-                        ? 'bg-[#0F172A] text-white dark:bg-[#F8FAFC] dark:text-[#0F172A] shadow-md border border-[#0F172A] dark:border-white' 
+                        ? 'bg-[#334155] text-white dark:bg-[#F8FAFC] dark:text-[#0F172A] shadow-md border border-[#334155] dark:border-white' 
                         : isCompleted
                           ? 'bg-[#F1F5F9] text-[#0F172A] dark:bg-[#1E293B] dark:text-[#F8FAFC] border border-[#CBD5E1] dark:border-[#475569] hover:bg-[#E2E8F0]'
                           : 'bg-transparent text-[#64748B] dark:text-[#94A3B8] border border-transparent hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B]'
