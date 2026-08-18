@@ -138,14 +138,6 @@ export const ReviewResults: React.FC = () => {
   const onPrevious = activeIndex > 0 ? () => setSelectedCompanyId(displayCompanies[activeIndex - 1].id) : undefined;
   const onNext = activeIndex >= 0 && activeIndex < displayCompanies.length - 1 ? () => setSelectedCompanyId(displayCompanies[activeIndex + 1].id) : undefined;
 
-  // Auto-select when companies first load
-  useEffect(() => {
-    if (displayCompanies.length > 0 && selectedIds.length === 0) {
-      const allIds = displayCompanies.map(c => c.id);
-      allIds.forEach(id => toggleSelection(id));
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [displayCompanies.length]);
 
   const comparisonTargets = useMemo(() =>
     displayCompanies.filter(c => selectedIds.includes(c.id)),

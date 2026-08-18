@@ -43,8 +43,8 @@
     --border-subtle: #E5E2DC;
     --shadow-color: rgba(32, 42, 46, 0.06);
     
-    font-size: 17.5px;
-    line-height: 1.65;
+    font-size: 15px;
+    line-height: 1.5;
   }
 
   .dark {
