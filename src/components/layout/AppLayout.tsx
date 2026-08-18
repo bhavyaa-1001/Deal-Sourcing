@@ -408,10 +408,8 @@ export const AppLayout: React.FC = () => {
             />
           </div>
 
-          {/* Main Content Area — full width on /outreach for Kanban & Scripts views */}
-          <main className={`flex-1 w-full mx-auto px-4 md:px-6 py-4 md:py-6 flex flex-col gap-4 ${
-            location.pathname.startsWith('/outreach') ? '' : 'max-w-7xl'
-          }`}>
+          {/* Main Content Area — full width across all sections */}
+          <main className="flex-1 w-full px-4 md:px-6 py-4 md:py-6 flex flex-col gap-4">
             <Outlet context={{
               refreshApprovals: checkApprovals,
               refreshSavedOutreach: loadSavedOutreach
