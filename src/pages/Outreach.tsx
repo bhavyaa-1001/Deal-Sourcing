@@ -41,12 +41,12 @@ const CHANNEL_ICONS: Record<string, React.ReactNode> = {
 };
 
 const CHANNEL_COLORS: Record<string, string> = {
-  email:    'bg-[#E3ECE6] text-[#35624A] dark:bg-emerald-900/30 dark:text-emerald-400',
-  linkedin: 'bg-[#E5EBE3] text-[#5F735F] dark:bg-slate-800 dark:text-slate-300',
-  direct:   'bg-[#E5EBE3] text-[#5F735F] dark:bg-slate-800 dark:text-slate-300',
-  followup: 'bg-[#F5EDDA] text-[#9A7535] dark:bg-amber-900/30 dark:text-amber-400',
-  professional: 'bg-[#E3ECE6] text-[#35624A] dark:bg-emerald-900/30 dark:text-emerald-400',
-  founder: 'bg-[#E3ECE6] text-[#35624A] dark:bg-emerald-900/30 dark:text-emerald-400',
+  email:        'bg-[#E8EEEF] text-[#53666F] dark:bg-[#203038] dark:text-[#A4BCC7]',
+  linkedin:     'bg-[#F8F6F1] text-[#5F6B72] dark:bg-[#243038] dark:text-[#A4B2BA]',
+  direct:       'bg-[#F8F6F1] text-[#5F6B72] dark:bg-[#243038] dark:text-[#A4B2BA]',
+  followup:     'bg-[#FDF7E8] text-[#997017] dark:bg-[#332B18] dark:text-[#E8C062]',
+  professional: 'bg-[#E8EEEF] text-[#53666F] dark:bg-[#203038] dark:text-[#A4BCC7]',
+  founder:      'bg-[#E8EEEF] text-[#53666F] dark:bg-[#203038] dark:text-[#A4BCC7]',
 };
 
 // ── Inline editable message card ─────────────────────────────────────────────

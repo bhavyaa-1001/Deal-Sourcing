@@ -64,10 +64,10 @@ export const CompanyDiscovery: React.FC = () => {
         </div>
 
         {/* Toggle Grid/Table view (Table on left, Cards on right) */}
-        <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-md border border-default self-start md:self-auto select-none">
+        <div className="flex bg-[#F1F5F9] dark:bg-[#1E293B] p-1 rounded-lg border border-[#E2E8F0] dark:border-[#334155] self-start md:self-auto select-none">
           <button
             onClick={() => setViewMode('table')}
-            className={`flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded cursor-pointer transition-colors ${viewMode === 'table' ? 'bg-card text-brand-primary dark:text-white shadow-sm' : 'text-secondary dark:text-slate-400 hover:text-primary dark:hover:text-white'}`}
+            className={`flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded-md cursor-pointer transition-all ${viewMode === 'table' ? 'bg-white text-[#0F172A] dark:bg-[#0F172A] dark:text-white shadow-xs border border-[#E2E8F0] dark:border-[#475569]' : 'text-[#64748B] dark:text-[#94A3B8] hover:text-[#0F172A] dark:hover:text-white'}`}
             aria-label="Table view mode"
           >
             <Table className="h-4 w-4" />
@@ -75,7 +75,7 @@ export const CompanyDiscovery: React.FC = () => {
           </button>
           <button
             onClick={() => setViewMode('cards')}
-            className={`flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded cursor-pointer transition-colors ${viewMode === 'cards' ? 'bg-card text-brand-primary dark:text-white shadow-sm' : 'text-secondary dark:text-slate-400 hover:text-primary dark:hover:text-white'}`}
+            className={`flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded-md cursor-pointer transition-all ${viewMode === 'cards' ? 'bg-white text-[#0F172A] dark:bg-[#0F172A] dark:text-white shadow-xs border border-[#E2E8F0] dark:border-[#475569]' : 'text-[#64748B] dark:text-[#94A3B8] hover:text-[#0F172A] dark:hover:text-white'}`}
             aria-label="Cards view mode"
           >
             <LayoutGrid className="h-4 w-4" />

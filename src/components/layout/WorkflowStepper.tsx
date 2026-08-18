@@ -45,8 +45,8 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
   };
 
   return (
-    <div className="w-full bg-[#EDEBE5] dark:bg-[#111B27] border-b border-[#D8D5CE] dark:border-[#263544] shadow-[0_1px_3px_rgba(32,42,46,0.04)] transition-colors duration-200">
-      <div className="max-w-7xl mx-auto px-6 py-3">
+    <div className="w-full bg-[#FFFFFF] dark:bg-[#0F172A] border-b border-[#E2E8F0] dark:border-[#334155] shadow-[0_1px_4px_rgba(0,0,0,0.04)] transition-colors duration-200">
+      <div className="max-w-7xl mx-auto px-6 py-2.5">
         {/* Desktop and Tablet Stepper Layout */}
         <nav aria-label="Progress Stepper" className="hidden md:block">
           <ol className="flex items-center justify-between w-full">
@@ -64,34 +64,43 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
                     onClick={() => handleStepClick(step)}
                     disabled={!isUnlocked}
                     className={`
-                      flex items-center gap-2.5 text-left focus-ring rounded-xl px-3.5 py-2 transition-all cursor-pointer
-                      disabled:cursor-not-allowed disabled:opacity-40 hover:bg-[#F1EFEA] dark:hover:bg-[#233447] shrink-0
-                      ${isActive ? 'bg-white dark:bg-[#1D2B3A] shadow-[0_1px_3px_rgba(32,42,46,0.08)] border border-[#D8D5CE] dark:border-[#756C36]' : ''}
+                      flex items-center gap-2.5 text-left focus-ring rounded-lg px-4 py-2 transition-all cursor-pointer shrink-0
+                      disabled:cursor-not-allowed disabled:opacity-40
+                      ${isActive 
+                        ? 'bg-[#0F172A] text-white dark:bg-[#F8FAFC] dark:text-[#0F172A] shadow-md border border-[#0F172A] dark:border-white' 
+                        : isCompleted
+                          ? 'bg-[#F1F5F9] text-[#0F172A] dark:bg-[#1E293B] dark:text-[#F8FAFC] border border-[#CBD5E1] dark:border-[#475569] hover:bg-[#E2E8F0]'
+                          : 'bg-transparent text-[#64748B] dark:text-[#94A3B8] border border-transparent hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B]'
+                      }
                     `}
                   >
                     {/* Circle Indicator */}
                     <span
                       className={`
-                        w-7.5 h-7.5 rounded-full flex items-center justify-center font-black text-xs md:text-[13px] border
+                        w-7 h-7 rounded-full flex items-center justify-center font-black text-xs border
                         transition-all duration-200 shrink-0
-                        ${isCompleted
-                          ? 'bg-[#E3ECE6] text-[#35624A] border-[#B7CCBC] dark:bg-[#173529] dark:text-[#8FBEA1] dark:border-[#39634D]'
-                          : isActive
-                            ? 'bg-[#A65F3F] text-white border-[#A65F3F] dark:bg-[#38351F] dark:text-[#D2C66D] dark:border-[#756C36] shadow-sm'
-                            : 'bg-white text-[#626A6D] border-[#D8D5CE] dark:bg-[#182536] dark:text-[#91A0AF] dark:border-[#344657]'
+                        ${isActive
+                          ? 'bg-white text-[#0F172A] border-white dark:bg-[#0F172A] dark:text-white dark:border-[#0F172A] font-black'
+                          : isCompleted
+                            ? 'bg-[#14532D] text-white border-[#14532D]'
+                            : 'bg-[#F8FAFC] text-[#64748B] border-[#CBD5E1] dark:bg-[#1E293B] dark:text-[#94A3B8] dark:border-[#475569]'
                         }
                       `}
                     >
-                      {isCompleted ? <Check className="h-4 w-4 stroke-[3px] text-[#35624A] dark:text-[#8FBEA1]" /> : `0${step.number}`}
+                      {isCompleted && !isActive ? (
+                        <Check className="h-4 w-4 stroke-[3px] text-white" />
+                      ) : (
+                        `0${step.number}`
+                      )}
                     </span>
 
-                    {/* Step Label only — clear high contrast, larger font */}
-                    <span className={`text-sm md:text-[15px] leading-tight whitespace-nowrap ${
+                    {/* Step Label only — high contrast and distinct */}
+                    <span className={`text-sm leading-tight whitespace-nowrap ${
                       isActive 
-                        ? 'font-black text-[#A65F3F] dark:text-[#E0D77F]' 
+                        ? 'font-black text-white dark:text-[#0F172A]' 
                         : isCompleted
-                          ? 'font-bold text-[#35624A] dark:text-[#9FC9AC]'
-                          : 'font-bold text-[#626A6D] dark:text-[#91A0AF]'
+                          ? 'font-bold text-[#0F172A] dark:text-[#F8FAFC]'
+                          : 'font-semibold text-[#64748B] dark:text-[#94A3B8]'
                     }`}>
                       {step.label}
                     </span>
@@ -101,12 +110,12 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
                   {idx !== STEPS.length - 1 && (
                     <div
                       className={`
-                        flex-1 h-[2.5px] mx-2.5 rounded-full transition-colors duration-300
+                        flex-1 h-[2px] mx-3 rounded-full transition-colors duration-300
                         ${isCompleted 
-                          ? 'bg-[#35624A] dark:bg-[#47705A]' 
+                          ? 'bg-[#14532D] dark:bg-[#166534]' 
                           : isStepUnlocked(step.number + 1) 
-                            ? 'bg-[#A65F3F]/40 dark:bg-[#756C36]/50' 
-                            : 'bg-[#D8D5CE] dark:bg-[#263544]'
+                            ? 'bg-[#CBD5E1] dark:bg-[#475569]' 
+                            : 'bg-[#E2E8F0] dark:bg-[#334155]'
                         }
                       `}
                     />
@@ -121,10 +130,10 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
         <div className="block md:hidden">
           <div className="flex items-center justify-between mb-2">
             <div>
-              <span className="text-[11px] font-black uppercase tracking-wider text-[#A65F3F] dark:text-[#E0D77F]">
+              <span className="text-[11px] font-black uppercase tracking-wider text-[#14532D] dark:text-[#4ADE80]">
                 Step {currentStep} of 4
               </span>
-              <h2 className="text-base font-bold text-[#202A2E] dark:text-[#F1F5F9] tracking-tight">
+              <h2 className="text-base font-bold text-[#0F172A] dark:text-[#F8FAFC] tracking-tight">
                 {STEPS[currentStep - 1]?.label}
               </h2>
             </div>
@@ -134,14 +143,14 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
               <button
                 onClick={() => handleStepClick(STEPS[currentStep - 2])}
                 disabled={currentStep === 1}
-                className="px-2.5 py-1 text-xs font-bold rounded border border-[#D8D5CE] dark:border-[#344658] bg-white dark:bg-[#182536] text-[#202A2E] dark:text-[#F1F5F9] disabled:opacity-40 disabled:cursor-not-allowed"
+                className="px-2.5 py-1 text-xs font-bold rounded border border-[#CBD5E1] dark:border-[#475569] bg-white dark:bg-[#1E293B] text-[#0F172A] dark:text-[#F8FAFC] disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Previous
               </button>
               <button
                 onClick={() => handleStepClick(STEPS[currentStep])}
                 disabled={currentStep === 4 || !isStepUnlocked(currentStep + 1)}
-                className="px-2.5 py-1 text-xs font-bold rounded border border-[#D8D5CE] dark:border-[#344658] bg-white dark:bg-[#182536] text-[#202A2E] dark:text-[#F1F5F9] disabled:opacity-40 disabled:cursor-not-allowed"
+                className="px-2.5 py-1 text-xs font-bold rounded border border-[#CBD5E1] dark:border-[#475569] bg-white dark:bg-[#1E293B] text-[#0F172A] dark:text-[#F8FAFC] disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Next
               </button>
@@ -149,9 +158,9 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
           </div>
 
           {/* Simple Visual Progress Bar Line for Mobile */}
-          <div className="w-full bg-[#E5E2DC] dark:bg-[#293746] h-1.5 rounded-full overflow-hidden">
+          <div className="w-full bg-[#E2E8F0] dark:bg-[#334155] h-1.5 rounded-full overflow-hidden">
             <div
-              className="bg-[#A65F3F] dark:bg-[#5F8F70] h-full transition-all duration-300"
+              className="bg-[#14532D] dark:bg-[#166534] h-full transition-all duration-300"
               style={{ width: `${(currentStep / 4) * 100}%` }}
             />
           </div>

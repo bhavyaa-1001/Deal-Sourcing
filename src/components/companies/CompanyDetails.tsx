@@ -59,7 +59,7 @@ export const CompanyDetails: React.FC<CompanyDetailsProps> = ({
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full select-none">
       {/* Profile Header Block */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-brand-primary text-white flex items-center justify-center font-extrabold text-sm shadow-premium">
+        <div className="w-10 h-10 rounded-full bg-[#202A30] text-white dark:bg-[#F4F6F8] dark:text-[#13191D] flex items-center justify-center font-extrabold text-sm shadow-xs">
           {initials}
         </div>
         <div className="text-left">
@@ -85,7 +85,7 @@ export const CompanyDetails: React.FC<CompanyDetailsProps> = ({
             size="sm"
             onClick={() => onEnrich(company.id)}
             disabled={isProcessing}
-            leftIcon={<Sparkles className="h-3.5 w-3.5" />}
+            leftIcon={<Sparkles className="h-3.5 w-3.5 text-[#E9B63B]" />}
           >
             {isProcessing ? 'Enriching...' : 'Enrich for Missing Details'}
           </Button>
@@ -97,11 +97,11 @@ export const CompanyDetails: React.FC<CompanyDetailsProps> = ({
         )}
         
         {/* Navigation buttons */}
-        <div className="flex items-center border border-default rounded-lg bg-card shadow-sm ml-1 select-none">
+        <div className="flex items-center border border-default rounded-lg bg-card shadow-xs ml-1 select-none">
           <button
             onClick={onPrevious}
             disabled={!onPrevious}
-            className="p-1.5 hover:bg-slate-50 dark:hover:bg-slate-800 text-secondary disabled:opacity-30 disabled:cursor-not-allowed border-r border-default cursor-pointer"
+            className="p-1.5 hover:bg-[#F8F6F1] dark:hover:bg-[#243038] text-secondary disabled:opacity-30 disabled:cursor-not-allowed border-r border-default cursor-pointer"
             title="Previous lead"
           >
             <ChevronLeft className="h-4 w-4" />
@@ -109,7 +109,7 @@ export const CompanyDetails: React.FC<CompanyDetailsProps> = ({
           <button
             onClick={onNext}
             disabled={!onNext}
-            className="p-1.5 hover:bg-slate-50 dark:hover:bg-slate-800 text-secondary disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+            className="p-1.5 hover:bg-[#F8F6F1] dark:hover:bg-[#243038] text-secondary disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
             title="Next lead"
           >
             <ChevronRight className="h-4 w-4" />
@@ -143,8 +143,8 @@ export const CompanyDetails: React.FC<CompanyDetailsProps> = ({
         <div className="flex flex-col md:flex-row items-stretch gap-6 min-h-[440px]">
           
           {/* Related List Sidebar (Left) — Only 2 Tabs */}
-          <aside className="w-full md:w-56 shrink-0 border border-default rounded-xl bg-slate-50/50 dark:bg-slate-900/40 p-3 flex flex-col gap-1.5 select-none">
-            <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-2 mb-2 block">
+          <aside className="w-full md:w-56 shrink-0 border border-default rounded-xl bg-[#F8F6F1]/50 dark:bg-[#172025]/50 p-3 flex flex-col gap-1.5 select-none">
+            <span className="text-[10px] font-black text-[#5F6B72] dark:text-[#A4B2BA] uppercase tracking-widest pl-2 mb-2 block">
               Related Views
             </span>
             {RELATED_LIST.map((tab) => {
@@ -155,12 +155,12 @@ export const CompanyDetails: React.FC<CompanyDetailsProps> = ({
                   onClick={() => setActiveTab(tab.label as any)}
                   className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold rounded-lg text-left transition-colors cursor-pointer focus:outline-none
                     ${isSelected
-                      ? 'bg-brand-primary-light/80 text-brand-primary dark:bg-slate-800 dark:text-white shadow-xs'
-                      : 'text-secondary dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-primary dark:hover:text-white'
+                      ? 'bg-[#E8EEEF] text-[#202A30] dark:bg-[#203038] dark:text-white shadow-xs'
+                      : 'text-secondary dark:text-[#A4B2BA] hover:bg-[#F8F6F1] dark:hover:bg-[#243038] hover:text-primary dark:hover:text-white'
                     }
                   `}
                 >
-                  <span className={`${isSelected ? 'text-brand-primary dark:text-[#C5B76A]' : 'text-slate-450 dark:text-slate-400'}`}>{tab.icon}</span>
+                  <span className={`${isSelected ? 'text-[#758A93] dark:text-[#A4BCC7]' : 'text-[#7D8589] dark:text-[#6E7E88]'}`}>{tab.icon}</span>
                   <span className="text-[13px]">{tab.label}</span>
                 </button>
               );

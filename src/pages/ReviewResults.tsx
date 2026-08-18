@@ -11,7 +11,7 @@ import Card from '../components/ui/Card';
 import LoadingState from '../components/ui/LoadingState';
 import Modal from '../components/ui/Modal';
 import Badge from '../components/ui/Badge';
-import { type LeadStatus, LEAD_STATUS_CONFIG } from './DiscoverFounders';
+import { type LeadStatus } from './DiscoverFounders';
 import {
   ArrowLeft, CheckCircle2, FileDown, Lock, Layers,
   FolderCheck, AlertCircle, Sparkles,
@@ -56,7 +56,7 @@ const ProofTag: React.FC<{ proof: string; label?: string; url?: string; classNam
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className={`inline-flex items-center gap-1 text-[10px] font-semibold text-[#35624A] hover:text-[#1E3B2C] dark:text-[#8FBEA1] dark:hover:text-[#B7D8C4] hover:underline cursor-pointer group transition-colors ${className}`}
+      className={`inline-flex items-center gap-1 text-[10px] font-semibold text-[#758A93] hover:text-[#202A30] dark:text-[#A4BCC7] dark:hover:text-[#F4F6F8] hover:underline cursor-pointer group transition-colors ${className}`}
       title={`Click to open demo verification source: ${proof}`}
     >
       <span>[{label}: {proof}]</span>
@@ -474,69 +474,69 @@ export const ReviewResults: React.FC = () => {
       )}
 
       {/* 1. Metrics */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-left">
-        <Card className="flex items-center gap-4 p-5 bg-card border border-default dark:border-slate-800 shadow-[0_1px_3px_rgba(32,42,46,0.04)]">
-          <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-700 dark:text-slate-200 shrink-0">
-            <FolderCheck className="h-6 w-6" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 text-left">
+        <Card className="flex items-center gap-4 p-5 bg-white dark:bg-[#1D272E] border border-[#DED9D0] dark:border-[#2E3D47] rounded-lg shadow-xs">
+          <div className="p-3 bg-[#F8F6F1] dark:bg-[#243038] rounded-full text-[#202A30] dark:text-[#F4F6F8] shrink-0 border border-[#DED9D0] dark:border-[#3E515E]">
+            <FolderCheck className="h-5 w-5" />
           </div>
           <div>
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Total Companies</span>
-            <span className="text-2xl font-black text-primary dark:text-white block mt-0.5">{metrics.total}</span>
+            <span className="text-xs font-bold text-[#5F6B72] dark:text-[#A4B2BA] uppercase tracking-wider block">Total Companies</span>
+            <span className="text-2xl font-black text-[#202A30] dark:text-[#F4F6F8] block mt-0.5">{metrics.total}</span>
           </div>
         </Card>
 
-        <Card className="flex items-center gap-4 p-5 bg-card border border-default dark:border-slate-800 shadow-[0_1px_3px_rgba(32,42,46,0.04)]">
-          <div className="p-3 bg-emerald-50 dark:bg-emerald-950/50 rounded-full text-emerald-700 dark:text-emerald-300 shrink-0">
-            <CheckCircle2 className="h-6 w-6" />
+        <Card className="flex items-center gap-4 p-5 bg-white dark:bg-[#1D272E] border border-[#DED9D0] dark:border-[#2E3D47] rounded-lg shadow-xs">
+          <div className="p-3 bg-[#E8EEEF] dark:bg-[#203038] rounded-full text-[#758A93] dark:text-[#A4BCC7] shrink-0 border border-[#758A93]/40">
+            <CheckCircle2 className="h-5 w-5" />
           </div>
           <div>
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">High Fit</span>
-            <span className="text-2xl font-black text-primary dark:text-white block mt-0.5">{metrics.highFit}</span>
+            <span className="text-xs font-bold text-[#5F6B72] dark:text-[#A4B2BA] uppercase tracking-wider block">High Fit</span>
+            <span className="text-2xl font-black text-[#202A30] dark:text-[#F4F6F8] block mt-0.5">{metrics.highFit}</span>
           </div>
         </Card>
 
-        <Card className="flex items-center gap-4 p-5 bg-card border border-default dark:border-slate-800 shadow-[0_1px_3px_rgba(32,42,46,0.04)]">
-          <div className="p-3 bg-amber-50 dark:bg-amber-950/50 rounded-full text-amber-700 dark:text-amber-300 shrink-0">
-            <AlertCircle className="h-6 w-6" />
+        <Card className="flex items-center gap-4 p-5 bg-white dark:bg-[#1D272E] border border-[#DED9D0] dark:border-[#2E3D47] rounded-lg shadow-xs">
+          <div className="p-3 bg-[#F8F6F1] dark:bg-[#243038] rounded-full text-[#5F6B72] dark:text-[#A4B2BA] shrink-0 border border-[#DED9D0] dark:border-[#3E515E]">
+            <AlertCircle className="h-5 w-5" />
           </div>
           <div>
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Selected</span>
-            <span className="text-2xl font-black text-primary dark:text-white block mt-0.5">{metrics.selected}</span>
+            <span className="text-xs font-bold text-[#5F6B72] dark:text-[#A4B2BA] uppercase tracking-wider block">Selected</span>
+            <span className="text-2xl font-black text-[#202A30] dark:text-[#F4F6F8] block mt-0.5">{metrics.selected}</span>
           </div>
         </Card>
 
-        <Card className="flex items-center gap-4 p-5 bg-card border border-default dark:border-slate-800 shadow-[0_1px_3px_rgba(32,42,46,0.04)]">
-          <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-700 dark:text-slate-300 shrink-0">
-            <Sparkles className="h-6 w-6" />
+        <Card className="flex items-center gap-4 p-5 bg-white dark:bg-[#1D272E] border border-[#DED9D0] dark:border-[#2E3D47] rounded-lg shadow-xs">
+          <div className="p-3 bg-[#FDF7E8] dark:bg-[#332B18] rounded-full text-[#997017] dark:text-[#E8C062] shrink-0 border border-[#E9B63B]/40">
+            <Sparkles className="h-5 w-5" />
           </div>
           <div>
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Enriched</span>
-            <span className="text-2xl font-black text-primary dark:text-white block mt-0.5">{metrics.enriched}</span>
+            <span className="text-xs font-bold text-[#5F6B72] dark:text-[#A4B2BA] uppercase tracking-wider block">Enriched</span>
+            <span className="text-2xl font-black text-[#202A30] dark:text-[#F4F6F8] block mt-0.5">{metrics.enriched}</span>
           </div>
         </Card>
       </div>
 
       {/* 2. Enrichment benefits info bar */}
-      <div className="bg-[#F5EDDA] dark:bg-amber-950/20 border border-[#E3D4B3] dark:border-amber-800 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-[#9A7535] dark:text-amber-300 shrink-0">
-          <Sparkles className="h-5 w-5" />
-          <span className="font-bold text-sm">Free profiles extracted below. Need missing details?</span>
+      <div className="bg-[#FDF7E8] dark:bg-[#332B18]/50 border border-[#E9B63B]/40 dark:border-[#6E5A2A] rounded-lg p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-left">
+        <div className="flex items-center gap-2 text-[#997017] dark:text-[#E8C062] shrink-0">
+          <Sparkles className="h-4 w-4 text-[#E9B63B]" />
+          <span className="font-bold text-xs md:text-sm">Free profiles extracted below. Need missing details?</span>
         </div>
-        <div className="flex flex-wrap items-center gap-3 text-xs md:text-sm text-[#9A7535] dark:text-amber-300 font-semibold">
+        <div className="flex flex-wrap items-center gap-3 text-xs text-[#997017] dark:text-[#E8C062] font-semibold">
           <span className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#9A7535] shrink-0" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#E9B63B] shrink-0" />
             Direct Verified Emails
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#9A7535] shrink-0" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#E9B63B] shrink-0" />
             Mobile Numbers
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#9A7535] shrink-0" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#E9B63B] shrink-0" />
             Executive LinkedIn
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#9A7535] shrink-0" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#E9B63B] shrink-0" />
             ASIC Verified Proofs
           </span>
         </div>
@@ -545,27 +545,27 @@ export const ReviewResults: React.FC = () => {
       {/* 3. Lead Status Quick Filter Tabs & Selection count */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 select-none">
         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
-          <span className="text-[11px] font-black uppercase tracking-wider text-[#626A6D] dark:text-[#9AA9B8] shrink-0 mr-1 flex items-center gap-1">
+          <span className="text-[11px] font-black uppercase tracking-wider text-[#5F6B72] dark:text-[#A4B2BA] shrink-0 mr-1 flex items-center gap-1">
             <Tag className="h-3.5 w-3.5" />
             Lead Status:
           </span>
 
           {[
             { id: 'all', label: 'All Candidates', count: rawDisplayCompanies.length },
-            { id: 'active', label: 'Active', count: rawDisplayCompanies.filter(c => (leadStatuses[c.id] || 'active') === 'active').length, dotColor: 'bg-emerald-500' },
-            { id: 'contact_future', label: 'Contact in Future', count: rawDisplayCompanies.filter(c => (leadStatuses[c.id] || 'active') === 'contact_future').length, dotColor: 'bg-amber-500' },
-            { id: 'junk_lead', label: 'Junk / Pass', count: rawDisplayCompanies.filter(c => (leadStatuses[c.id] || 'active') === 'junk_lead').length, dotColor: 'bg-rose-500' },
-            { id: 'follow_up', label: 'Follow-up', count: rawDisplayCompanies.filter(c => (leadStatuses[c.id] || 'active') === 'follow_up').length, dotColor: 'bg-blue-500' },
+            { id: 'active', label: 'Active', count: rawDisplayCompanies.filter(c => (leadStatuses[c.id] || 'active') === 'active').length, dotColor: 'bg-[#758A93]' },
+            { id: 'contact_future', label: 'Contact in Future', count: rawDisplayCompanies.filter(c => (leadStatuses[c.id] || 'active') === 'contact_future').length, dotColor: 'bg-[#E9B63B]' },
+            { id: 'junk_lead', label: 'Junk / Pass', count: rawDisplayCompanies.filter(c => (leadStatuses[c.id] || 'active') === 'junk_lead').length, dotColor: 'bg-[#C66E52]' },
+            { id: 'follow_up', label: 'Follow-up', count: rawDisplayCompanies.filter(c => (leadStatuses[c.id] || 'active') === 'follow_up').length, dotColor: 'bg-[#5F6B72]' },
           ].map(tab => {
             const isActive = leadStatusFilter === tab.id;
             return (
               <button
                 key={tab.id}
                 onClick={() => setLeadStatusFilter(tab.id as any)}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-2 shrink-0 border ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-2 shrink-0 border ${
                   isActive
-                    ? 'border-[#202A2E] dark:border-[#C5B76A] bg-[#202A2E] text-white dark:bg-[#C5B76A] dark:text-[#182536] shadow-xs'
-                    : 'border-[#D8D5CE] dark:border-[#344658] bg-white dark:bg-[#182536] text-[#202A2E] dark:text-[#F1F5F9] hover:bg-[#F1EFEA] dark:hover:bg-slate-800'
+                    ? 'border-[#202A30] bg-[#202A30] text-white dark:bg-[#F4F6F8] dark:text-[#13191D] shadow-xs'
+                    : 'border-[#DED9D0] bg-white text-[#202A30] hover:bg-[#F8F6F1] dark:bg-[#1D272E] dark:text-[#F4F6F8] dark:border-[#2E3D47] dark:hover:bg-[#243038]'
                 }`}
               >
                 {tab.dotColor && (
@@ -575,7 +575,7 @@ export const ReviewResults: React.FC = () => {
                 <span className={`text-[10.5px] px-1.5 py-0.2 rounded-full font-black ${
                   isActive
                     ? 'bg-white/20 text-white dark:bg-black/20'
-                    : 'bg-[#EDEBE5] dark:bg-slate-800 text-[#626A6D] dark:text-[#9AA9B8]'
+                    : 'bg-[#F8F6F1] dark:bg-[#243038] text-[#5F6B72] dark:text-[#A4B2BA]'
                 }`}>
                   {tab.count}
                 </span>
@@ -584,36 +584,35 @@ export const ReviewResults: React.FC = () => {
           })}
         </div>
 
-        <span className="text-xs text-[#626A6D] dark:text-slate-400 font-bold shrink-0">
+        <span className="text-xs text-[#5F6B72] dark:text-[#A4B2BA] font-bold shrink-0">
           {selectedIds.length} selected &bull; {enrichedIds.length} enriched
         </span>
       </div>
 
       {/* 4. Main table */}
       <div className="w-full flex flex-col gap-4 text-left">
-        <div className="w-full overflow-x-auto rounded-lg border border-default dark:border-slate-800 shadow-[0_1px_3px_rgba(32,42,46,0.04)] bg-card">
+        <div className="w-full overflow-x-auto rounded-lg border border-[#DED9D0] dark:border-[#2E3D47] shadow-xs bg-white dark:bg-[#1D272E]">
           <table className="w-full border-collapse text-left text-sm md:text-base">
             <thead>
-              <tr className="bg-slate-100/80 dark:bg-slate-900 border-b border-default dark:border-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs md:text-sm uppercase tracking-wider">
-                <th className="px-3 py-3.5 w-14 text-center text-[10px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wide">Select</th>
-                <th className="px-3 py-3.5 text-slate-700 dark:text-slate-200">Company</th>
-                <th className="px-3 py-3.5 text-slate-700 dark:text-slate-200">Location</th>
-                <th className="px-3 py-3.5 text-slate-700 dark:text-slate-200">Lead Status</th>
-                <th className="px-3 py-3.5 text-slate-700 dark:text-slate-200">Fit Rate</th>
-                <th className="px-3 py-3.5 text-slate-700 dark:text-slate-200">Revenue</th>
-                <th className="px-3 py-3.5 text-slate-700 dark:text-slate-200">Employees</th>
-                <th className="px-3 py-3.5 text-slate-700 dark:text-slate-200">Confidence</th>
-                <th className="px-3 py-3.5 text-right pr-5 text-slate-700 dark:text-slate-200">Actions</th>
+              <tr className="bg-[#F8F6F1] dark:bg-[#172025] border-b border-[#DED9D0] dark:border-[#2E3D47] text-[#5F6B72] dark:text-[#A4B2BA] font-bold text-xs uppercase tracking-wider">
+                <th className="px-3 py-3.5 w-14 text-center text-[10px] font-bold uppercase tracking-wide">Select</th>
+                <th className="px-3 py-3.5">Company</th>
+                <th className="px-3 py-3.5">Location</th>
+                <th className="px-3 py-3.5">Lead Status</th>
+                <th className="px-3 py-3.5">Fit Rate</th>
+                <th className="px-3 py-3.5">Revenue</th>
+                <th className="px-3 py-3.5">Employees</th>
+                <th className="px-3 py-3.5">Confidence</th>
+                <th className="px-3 py-3.5 text-right pr-5">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-default dark:divide-slate-800 text-primary dark:text-slate-100">
+            <tbody className="divide-y divide-[#DED9D0] dark:divide-[#2E3D47] text-[#202A30] dark:text-[#F4F6F8]">
               {displayCompanies.map(company => {
                 const isSelected = selectedIds.includes(company.id);
                 const isEnriched = company.enrichmentStatus === 'enriched' || enrichedIds.includes(company.id);
                 const isProcessing = company.enrichmentStatus === 'processing';
                 const isExpanded = expandedCompanyIds.includes(company.id);
                 const leadStatus = leadStatuses[company.id] || 'active';
-                const statusConfig = LEAD_STATUS_CONFIG[leadStatus] || LEAD_STATUS_CONFIG.active;
                 const fitScore = company.fitScore ?? (company.fitLevel === 'HIGH FIT' ? 90 : company.fitLevel === 'MEDIUM FIT' ? 70 : 40);
                 const isHigh = fitScore >= 80 || company.fitLevel === 'HIGH FIT';
                 const isMed = fitScore >= 50 || company.fitLevel === 'MEDIUM FIT';
@@ -625,12 +624,12 @@ export const ReviewResults: React.FC = () => {
                   <React.Fragment key={company.id}>
                     <tr
                       id={`company-row-${company.id}`}
-                      className={`hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors duration-150 ${
+                      className={`transition-colors duration-150 ${
                         leadStatus === 'junk_lead'
-                          ? 'bg-rose-50/30 dark:bg-rose-950/25 text-slate-700 dark:text-slate-300'
+                          ? 'bg-[#FEE2E2]/30 dark:bg-[#451A1A]/30 text-[#64748B] hover:bg-[#FEE2E2]/50'
                           : isSelected
-                          ? 'bg-emerald-50/40 dark:bg-slate-800/60'
-                          : ''
+                          ? 'bg-[#E2E8F0] dark:bg-[#334155]/85 hover:bg-[#CBD5E1] dark:hover:bg-[#334155] shadow-xs'
+                          : 'hover:bg-[#F1F5F9] dark:hover:bg-[#1E293B]/60'
                       }`}
                     >
                       <td className="px-3 py-3.5 text-center">
@@ -645,7 +644,7 @@ export const ReviewResults: React.FC = () => {
                             type="checkbox"
                             checked={isSelected}
                             onChange={() => {}}
-                            className="h-4 w-4 accent-[#202A2E] rounded border-[#D8D5CE] cursor-pointer"
+                            className="h-4 w-4 accent-[#0F172A] dark:accent-[#F8FAFC] rounded border-[#CBD5E1] cursor-pointer"
                           />
                         </button>
                       </td>
@@ -653,26 +652,26 @@ export const ReviewResults: React.FC = () => {
                       <td className="px-3 py-3.5 font-bold">
                         <span
                           onClick={() => setSelectedCompanyId(company.id)}
-                          className="text-primary text-sm md:text-base hover:text-brand-primary hover:underline cursor-pointer"
+                          className="text-[#202A30] dark:text-[#F4F6F8] text-sm md:text-base hover:text-[#758A93] hover:underline cursor-pointer"
                         >
                           {company.name}
                         </span>
-                        <span className="text-xs text-secondary block mt-0.5 font-semibold">{company.industry}</span>
+                        <span className="text-xs text-[#5F6B72] dark:text-[#A4B2BA] block mt-0.5 font-semibold">{company.industry}</span>
                       </td>
 
-                      <td className="px-3 py-3.5 text-secondary font-semibold text-xs md:text-sm">{company.location}</td>
+                      <td className="px-3 py-3.5 text-[#5F6B72] dark:text-[#A4B2BA] font-semibold text-xs md:text-sm">{company.location}</td>
 
                       {/* Lead Status Interactive Dropdown */}
                       <td className="px-3 py-3.5">
                         <select
                           value={leadStatus}
                           onChange={(e) => handleUpdateLeadStatus(company.id, e.target.value as LeadStatus)}
-                          className={`text-[10px] font-extrabold px-2 py-1 rounded-md border cursor-pointer focus:outline-none uppercase tracking-wider ${statusConfig.badgeBg} ${statusConfig.badgeText} ${statusConfig.borderColor}`}
+                          className="text-[10px] font-extrabold px-2 py-1 rounded-md border border-[#DED9D0] dark:border-[#2E3D47] bg-white dark:bg-[#1D272E] text-[#202A30] dark:text-[#F4F6F8] cursor-pointer focus:outline-none uppercase tracking-wider shadow-xs"
                         >
-                          <option value="active">🟢 Active Target</option>
-                          <option value="contact_future">🟡 Contact in Future</option>
-                          <option value="junk_lead">🔴 Junk Lead / Pass</option>
-                          <option value="follow_up">🔵 Follow-up</option>
+                          <option value="active">Active Target</option>
+                          <option value="contact_future">Contact in Future</option>
+                          <option value="junk_lead">Junk Lead / Pass</option>
+                          <option value="follow_up">Follow-up</option>
                         </select>
                       </td>
 
@@ -683,12 +682,12 @@ export const ReviewResults: React.FC = () => {
                         </Badge>
                       </td>
 
-                      <td className="px-3 py-3.5 font-bold text-slate-800 dark:text-slate-200 text-xs md:text-sm whitespace-nowrap">{company.revenueRange}</td>
+                      <td className="px-3 py-3.5 font-bold text-[#202A30] dark:text-[#F4F6F8] text-xs md:text-sm whitespace-nowrap">{company.revenueRange}</td>
 
-                      <td className="px-3 py-3.5 text-secondary font-semibold text-xs md:text-sm">{company.employeeRange}</td>
+                      <td className="px-3 py-3.5 text-[#5F6B72] dark:text-[#A4B2BA] font-semibold text-xs md:text-sm">{company.employeeRange}</td>
 
                       <td className="px-3 py-3.5">
-                        <span className="text-xs md:text-sm font-bold text-slate-700 dark:text-slate-300">{confidenceScore.toFixed(0)}%</span>
+                        <span className="text-xs md:text-sm font-bold text-[#5F6B72] dark:text-[#A4B2BA]">{confidenceScore.toFixed(0)}%</span>
                       </td>
 
                       <td className="px-3 py-3.5 text-right pr-5">
@@ -697,22 +696,22 @@ export const ReviewResults: React.FC = () => {
                             variant="outline"
                             size="sm"
                             onClick={() => setSelectedCompanyId(company.id)}
-                            className="px-2 min-h-0 py-1 text-xs whitespace-nowrap"
+                            className="px-2.5 min-h-0 py-1 text-xs whitespace-nowrap border-[#DED9D0]"
                           >
                             View Details
                           </Button>
 
                           {isEnriched ? (
-                            /* After enrichment: show Deep Dive button */
+                            /* After enrichment: show verified Deep Dive button with slate styling */
                             <Button
-                              variant={isExpanded ? 'secondary' : 'primary'}
+                              variant={isExpanded ? 'secondary' : 'success'}
                               size="sm"
                               onClick={() => {
                                 setExpandedCompanyIds(prev =>
                                   isExpanded ? prev.filter(x => x !== company.id) : [...prev, company.id]
                                 );
                               }}
-                              className="px-2 min-h-0 py-1 text-xs font-bold whitespace-nowrap"
+                              className="px-2.5 min-h-0 py-1 text-xs font-bold whitespace-nowrap"
                               leftIcon={isExpanded ? <EyeOff className="h-3.5 w-3.5" /> : <Sparkles className="h-3.5 w-3.5" />}
                             >
                               {isExpanded ? 'Close' : 'Deep Dive'}
@@ -722,19 +721,19 @@ export const ReviewResults: React.FC = () => {
                               variant="secondary"
                               size="sm"
                               disabled
-                              className="px-2 min-h-0 py-1 text-xs font-bold whitespace-nowrap"
+                              className="px-2.5 min-h-0 py-1 text-xs font-bold whitespace-nowrap"
                               leftIcon={<RefreshCw className="h-3.5 w-3.5 animate-spin" />}
                             >
                               Enriching...
                             </Button>
                           ) : (
-                            /* Not yet enriched: show Enrich button */
+                            /* Not yet enriched: show Enrich button with gold cue */
                             <Button
                               variant="primary"
                               size="sm"
                               onClick={() => openEnrichPreview([company.id])}
-                              className="px-2 min-h-0 py-1 text-xs font-bold whitespace-nowrap"
-                              leftIcon={<Unlock className="h-3.5 w-3.5" />}
+                              className="px-2.5 min-h-0 py-1 text-xs font-bold whitespace-nowrap"
+                              leftIcon={<Unlock className="h-3.5 w-3.5 text-[#E9B63B]" />}
                             >
                               Enrich
                             </Button>
@@ -1078,9 +1077,9 @@ export const ReviewResults: React.FC = () => {
 
         {/* Compare action bar — appears when 2+ companies are checked */}
         {selectedIds.length >= 2 && (
-          <div className="p-4 border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg flex items-center justify-between gap-4 animate-fadeIn">
-            <span className="text-base text-indigo-800 dark:text-indigo-300 font-bold flex items-center gap-2">
-              <Layers className="h-5 w-5" />
+          <div className="p-3.5 border border-[#758A93]/40 bg-[#E8EEEF]/60 dark:bg-[#203038] rounded-lg flex items-center justify-between gap-4 animate-fadeIn">
+            <span className="text-sm md:text-base text-[#202A30] dark:text-[#F4F6F8] font-bold flex items-center gap-2">
+              <Layers className="h-5 w-5 text-[#758A93]" />
               {selectedIds.length} companies selected for comparison
             </span>
             <div className="flex items-center gap-2">
@@ -1133,7 +1132,7 @@ export const ReviewResults: React.FC = () => {
         }}
       />
       {/* ── Sticky Page Footer Navigation — Export PDF + Continue to Outreach ── */}
-      <div className="sticky bottom-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-default py-4.5 px-6 -mx-6 -mb-6 flex items-center justify-between z-25 shadow-[0_-8px_30px_rgba(0,0,0,0.04)] mt-6 rounded-b flex-wrap gap-3">
+      <div className="sticky bottom-0 bg-[#F8F6F1]/95 dark:bg-[#13191D]/95 backdrop-blur-md border-t border-[#DED9D0] dark:border-[#2E3D47] py-4 px-6 -mx-6 -mb-6 flex items-center justify-between z-25 shadow-xs mt-6 rounded-b flex-wrap gap-3">
         <Button
           variant="outline"
           onClick={handleBack}
@@ -1165,7 +1164,7 @@ export const ReviewResults: React.FC = () => {
               Continue to Outreach
             </Button>
             {selectedIds.length === 0 && (
-              <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">
+              <span className="text-xs text-[#997017] dark:text-[#E8C062] font-medium">
                 Select at least one company first
               </span>
             )}

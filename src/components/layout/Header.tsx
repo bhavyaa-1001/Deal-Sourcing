@@ -23,20 +23,21 @@ export const Header: React.FC<HeaderProps> = ({ themeState, sidebarCollapsed, on
   };
 
   return (
-    <header className="w-full bg-[#EDEBE5] dark:bg-[#111B27] border-b border-[#D8D5CE] dark:border-[#263544] sticky top-0 z-40 shadow-[0_1px_3px_rgba(32,42,46,0.04)] transition-colors duration-200">
+    <header className="w-full bg-[#1E293B] dark:bg-[#0F172A] border-b border-[#334155] sticky top-0 z-40 shadow-[0_2px_8px_rgba(0,0,0,0.12)] transition-colors duration-200 text-white">
       <div className="w-full px-4 md:px-6 min-h-[60px] md:h-16 flex flex-wrap md:flex-nowrap items-center justify-between gap-3 py-2.5 md:py-0">
         {/* Left: Hamburger + Logo */}
         <div className="flex items-center gap-3">
           <button
             onClick={onToggleSidebar}
-            className="flex items-center justify-center w-9 h-9 border border-[#D8D5CE] dark:border-[#344658] bg-white dark:bg-[#1B2A3A] hover:bg-[#F1EFEA] dark:hover:bg-[#24384C] text-[#202A2E] dark:text-[#E2E8F0] transition-all cursor-pointer rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary shadow-[0_1px_2px_rgba(32,42,46,0.04)]"
+            className="flex items-center justify-center w-9 h-9 border border-[#334155] bg-[#334155]/60 hover:bg-[#334155] text-white transition-all cursor-pointer rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white shadow-xs"
             aria-label={sidebarCollapsed ? "Open mandates sidebar" : "Close mandates sidebar"}
           >
             <Menu className="h-4.5 w-4.5 stroke-[2.2px]" />
           </button>
           <div className="text-left flex items-baseline gap-2.5">
-            <h1 className="text-base md:text-lg font-black text-[#202A2E] dark:text-[#F3F5F7] tracking-tight leading-none m-0">
-              DEAL SOURCING
+            <h1 className="text-base md:text-lg font-black text-white tracking-wider leading-none m-0 flex items-center gap-2">
+              <span>DEAL SOURCING</span>
+              <span className="text-[10px] uppercase font-bold tracking-widest text-[#94A3B8] px-2 py-0.5 rounded bg-[#334155] border border-[#475569] hidden sm:inline-block">Terminal</span>
             </h1>
           </div>
         </div>
@@ -45,9 +46,9 @@ export const Header: React.FC<HeaderProps> = ({ themeState, sidebarCollapsed, on
         <div className="flex flex-wrap items-center gap-2 md:gap-3 justify-end">
           <a
             href="#help"
-            className="flex items-center gap-1.5 text-xs md:text-sm font-bold text-[#626A6D] dark:text-[#D7DEE6] hover:text-[#202A2E] dark:hover:text-[#FFFFFF] hover:bg-white/80 dark:hover:bg-[#1B2A3A] transition-colors focus-ring px-2.5 py-1.5 rounded-lg shrink-0"
+            className="flex items-center gap-1.5 text-xs md:text-sm font-bold text-[#94A3B8] hover:text-white hover:bg-[#334155]/60 transition-colors focus-ring px-2.5 py-1.5 rounded-lg shrink-0 border border-transparent hover:border-[#334155]"
           >
-            <HelpCircle className="h-4 w-4 text-[#626A6D] dark:text-[#94A3B8]" />
+            <HelpCircle className="h-4 w-4 text-[#94A3B8]" />
             <span>Help</span>
           </a>
 
@@ -56,7 +57,7 @@ export const Header: React.FC<HeaderProps> = ({ themeState, sidebarCollapsed, on
           {/* Reset Active Mandate Button */}
           <button
             onClick={handleResetFlow}
-            className="text-xs font-bold text-[#A44A42] dark:text-[#E89E9A] hover:text-[#823932] dark:hover:text-[#F1B5B2] transition-colors border border-[#E3C4C0] dark:border-[#4A2E30] bg-[#F4E4E1] hover:bg-[#EED9D5] dark:bg-[#2A1E20] dark:hover:bg-[#382427] px-2.5 py-1.5 rounded-lg cursor-pointer flex items-center justify-center shrink-0 shadow-[0_1px_2px_rgba(32,42,46,0.04)]"
+            className="text-xs font-bold text-[#E2937C] hover:text-white transition-colors border border-[#C66E52]/40 hover:border-[#C66E52] bg-[#C66E52]/15 hover:bg-[#C66E52]/30 px-2.5 py-1.5 rounded-lg cursor-pointer flex items-center justify-center shrink-0 shadow-xs"
           >
             <span className="hidden sm:inline">Reset Flow</span>
             <span className="inline sm:hidden">Reset</span>

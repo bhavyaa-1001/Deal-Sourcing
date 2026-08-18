@@ -13,11 +13,11 @@ export const Badge: React.FC<BadgeProps> = ({
   ...props
 }) => {
   const styles = {
-    primary: 'bg-[#EDEBE5] text-[#202A2E] border-[#D8D5CE] dark:bg-[#182536] dark:text-[#F1F5F9] dark:border-[#344658]',
-    success: 'bg-[#E3ECE6] text-[#35624A] border-[#B7CCBC] dark:bg-[#173529] dark:text-[#8FBEA1] dark:border-[#39634D]',
-    warning: 'bg-[#F5EDDA] text-[#9A7535] border-[#E3D4B3] dark:bg-[#3A3520] dark:text-[#D5C76E] dark:border-[#625A2F]',
-    danger: 'bg-[#F4E4E1] text-[#A44A42] border-[#E3C4C0] dark:bg-[#381E21] dark:text-[#E89E9A] dark:border-[#54282B]',
-    neutral: 'bg-[#F1EFEA] text-[#626A6D] border-[#D8D5CE] dark:bg-[#141F2C] dark:text-[#9AA9B8] dark:border-[#2D4053]'
+    primary: 'bg-[#E8EEEF] text-[#53666F] border-[#758A93]/40 dark:bg-[#203038] dark:text-[#A4BCC7] dark:border-[#3E5664]',
+    success: 'bg-[#E8EEEF] text-[#53666F] border-[#758A93]/50 dark:bg-[#203038] dark:text-[#A4BCC7] dark:border-[#3E5664]',
+    warning: 'bg-[#FDF7E8] text-[#997017] border-[#E9B63B]/40 dark:bg-[#332B18] dark:text-[#E8C062] dark:border-[#6E5A2A]',
+    danger: 'bg-[#F9ECE8] text-[#C66E52] border-[#F0D5CD] dark:bg-[#34201B] dark:text-[#E2937C] dark:border-[#5E3226]',
+    neutral: 'bg-[#F8F6F1] text-[#5F6B72] border-[#DED9D0] dark:bg-[#1D272E] dark:text-[#A4B2BA] dark:border-[#2E3D47]'
   };
 
   return (

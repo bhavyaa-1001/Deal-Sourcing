@@ -19,14 +19,14 @@ export const Button: React.FC<ButtonProps> = ({
   disabled,
   ...props
 }) => {
-  const baseStyles = 'inline-flex items-center justify-center font-semibold rounded-md transition-colors focus-ring cursor-pointer disabled:cursor-not-allowed disabled:opacity-50';
+  const baseStyles = 'inline-flex items-center justify-center font-bold rounded-lg transition-all duration-150 focus-ring cursor-pointer disabled:cursor-not-allowed disabled:opacity-50';
   
   const variants = {
-    primary: 'bg-brand-primary text-white hover:bg-brand-primary-hover active:bg-brand-primary-dark border border-brand-primary',
-    secondary: 'bg-white text-slate-800 border border-default hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700',
-    success: 'bg-white text-brand-success border border-brand-success hover:bg-brand-success-light dark:bg-slate-900 dark:hover:bg-brand-success-light/20',
-    danger: 'bg-white text-brand-danger border border-brand-danger hover:bg-brand-danger-light dark:bg-slate-900 dark:hover:bg-brand-danger-light/20',
-    outline: 'border border-default bg-transparent text-primary hover:bg-slate-50 dark:hover:bg-slate-800'
+    primary: 'bg-[#202A30] text-white hover:bg-[#151D22] active:bg-[#0E1418] border border-[#202A30] dark:bg-[#F4F6F8] dark:text-[#13191D] dark:hover:bg-[#E4E8EB] dark:border-[#F4F6F8] shadow-xs',
+    secondary: 'bg-white text-[#202A30] border border-default hover:bg-[#F8F6F1] dark:bg-[#1D272E] dark:text-[#F4F6F8] dark:border-[#2E3D47] dark:hover:bg-[#243038] shadow-xs',
+    success: 'bg-[#758A93] text-white border border-[#758A93] hover:bg-[#62767F] dark:bg-[#758A93] dark:text-white dark:hover:bg-[#859CA6] shadow-xs',
+    danger: 'bg-white text-[#C66E52] border border-[#F0D5CD] hover:bg-[#F9ECE8] dark:bg-[#1D272E] dark:text-[#E2937C] dark:border-[#52281D]',
+    outline: 'border border-default bg-white/90 dark:bg-card text-primary hover:bg-[#F8F6F1] dark:hover:bg-[#243038] shadow-xs'
   };
 
   const sizes = {

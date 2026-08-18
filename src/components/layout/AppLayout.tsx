@@ -79,20 +79,20 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
   return (
     <div className="flex flex-col h-full text-left select-none text-primary">
       <div className="mb-3">
-        <span className="text-[11px] font-black text-[#626A6D] dark:text-[#9AA9B8] uppercase tracking-widest block">
+        <span className="text-[11px] font-black text-[#5F6B72] dark:text-[#A4B2BA] uppercase tracking-widest block">
           MANDATES
         </span>
       </div>
 
       <button
         onClick={handleNew}
-        className="w-full flex items-center justify-center gap-2 px-3.5 py-2 border border-[#D8D5CE] hover:border-[#BDB9B0] dark:border-[#38516A] dark:hover:border-[#4E6E8E] text-[#202A2E] dark:text-[#F1F5F9] bg-white hover:bg-[#F1EFEA] dark:bg-[#1D3044] dark:hover:bg-[#253D54] rounded-lg font-bold text-[13px] cursor-pointer transition-all mb-4 min-h-[36px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-primary shadow-[0_1px_3px_rgba(32,42,46,0.04)]"
+        className="w-full flex items-center justify-center gap-2 px-3.5 py-2 border border-[#E2E8F0] hover:border-[#CBD5E1] dark:border-[#334155] dark:hover:border-[#475569] text-[#0F172A] dark:text-[#F8FAFC] bg-white hover:bg-[#F8FAFC] dark:bg-[#1E293B] dark:hover:bg-[#273549] rounded-lg font-bold text-[13px] cursor-pointer transition-all mb-4 min-h-[36px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#0F172A] shadow-xs"
       >
-        <span className="text-[#5F735F] dark:text-[#C5B76A] font-black text-sm">+</span>
+        <span className="text-[#14532D] dark:text-[#4ADE80] font-black text-base">+</span>
         <span>New Mandate</span>
       </button>
 
-      <span className="text-[10px] font-black text-[#626A6D] dark:text-[#9AA9B8] uppercase tracking-widest block mb-2">
+      <span className="text-[10px] font-black text-[#64748B] dark:text-[#94A3B8] uppercase tracking-widest block mb-2">
         RECENT MANDATES
       </span>
 
@@ -104,10 +104,10 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
           return (
             <div
               key={m.id}
-              className={`group relative w-full p-3.5 rounded-xl border text-left transition-all flex flex-col gap-1.5
+              className={`group relative w-full p-3.5 rounded-lg border text-left transition-all flex flex-col gap-1.5
                 ${isActive
-                  ? 'border-[#202A2E] dark:border-[#7E8350] dark:border-l-[3px] dark:border-l-[#C5B76A] bg-white dark:bg-[#1D2B3A] text-primary shadow-[0_2px_8px_rgba(32,42,46,0.08)]'
-                  : 'border-[#D8D5CE] dark:border-[#2D4053] bg-white dark:bg-[#182536] text-secondary hover:border-[#BDB9B0] dark:hover:bg-[#1D2B3A] dark:hover:border-[#40566A] shadow-[0_1px_3px_rgba(32,42,46,0.04)]'
+                  ? 'border-[#0F172A] border-l-[4px] border-l-[#14532D] bg-white dark:bg-[#1E293B] text-primary shadow-sm dark:border-l-[#4ADE80]'
+                  : 'border-[#E2E8F0] dark:border-[#334155] bg-white dark:bg-[#1E293B] text-secondary hover:border-[#CBD5E1] dark:hover:bg-[#273549] shadow-xs'
                 }
               `}
             >
@@ -119,17 +119,17 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
                 {/* Primary heading: Industry + Geography */}
                 <div className="flex justify-between items-start gap-2 pr-7">
                   <div className="min-w-0">
-                    <span className={`font-extrabold text-[14px] leading-tight block text-[#202A2E] dark:text-[#F1F5F9] ${isActive ? 'text-[#A65F3F] dark:text-[#E0D77F]' : ''}`}>
+                    <span className={`font-black text-[14px] leading-tight block ${isActive ? 'text-[#0F172A] dark:text-white font-black' : 'text-[#0F172A] dark:text-[#F8FAFC]'}`}>
                       {m.criteria.targetIndustry || 'Unspecified Industry'}
                     </span>
                     {m.criteria.geography && m.criteria.geography !== 'Not specified' && (
-                      <span className="text-[12px] font-bold text-[#626A6D] dark:text-[#9AA9B8] block mt-0.5">
+                      <span className={`text-[12px] block mt-0.5 ${isActive ? 'font-bold text-[#14532D] dark:text-[#86EFAC]' : 'font-medium text-[#64748B] dark:text-[#94A3B8]'}`}>
                         {m.criteria.geography}
                       </span>
                     )}
                   </div>
                   {isActive && (
-                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#F4E8E2] dark:bg-[#3A3520] text-[#A65F3F] dark:text-[#D5C76E] border border-[#A65F3F]/20 dark:border-[#625A2F] font-black uppercase tracking-wider shrink-0 mt-0.5">
+                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-[#14532D] text-white border border-[#14532D] font-black uppercase tracking-wider shrink-0 mt-0.5 shadow-xs">
                       Active
                     </span>
                   )}
@@ -139,25 +139,25 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
                 <div className="flex items-center gap-1.5 mt-2.5">
                   <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider border shrink-0
                     ${m.status === 'Approved' || m.status === 'Confirmed'
-                      ? 'border-[#B7CCBC] bg-[#E3ECE6] text-[#35624A] dark:bg-[#173529] dark:text-[#8FBEA1] dark:border-[#39634D]'
-                      : 'border-[#D8D5CE] bg-[#F1EFEA] text-[#626A6D] dark:bg-[#141F2C] dark:text-[#9AA9B8] dark:border-[#2D4053]'
+                      ? 'border-[#BBF7D0] bg-[#F0FDF4] text-[#14532D] dark:bg-[#14532D]/30 dark:text-[#86EFAC] dark:border-[#14532D]'
+                      : 'border-[#E2E8F0] bg-[#F8FAFC] text-[#64748B] dark:bg-[#0F172A] dark:text-[#94A3B8] dark:border-[#334155]'
                     }
                   `}>
                     {m.status === 'Approved' || m.status === 'Confirmed' ? 'Confirmed' : 'Draft'}
                   </span>
-                  <span className="text-[10px] font-bold text-[#899093] dark:text-[#9AA9B8]">•</span>
-                  <span className="text-[10px] font-bold text-[#899093] dark:text-[#9AA9B8]">{confirmedCount}/9</span>
+                  <span className="text-[10px] font-bold text-[#94A3B8] dark:text-[#64748B]">•</span>
+                  <span className={`text-[10px] font-bold ${isActive ? 'text-[#14532D] dark:text-[#86EFAC]' : 'text-[#64748B] dark:text-[#94A3B8]'}`}>{confirmedCount}/9</span>
                 </div>
               </div>
 
               {/* Hover Action Cluster: Strategy button + Delete button */}
-              <div className="absolute top-2.5 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 dark:bg-[#182536]/90 p-0.5 rounded-md backdrop-blur-xs border border-[#D8D5CE]/60 dark:border-[#344658]/60 shadow-sm">
+              <div className="absolute top-2.5 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white/95 dark:bg-[#1D272E]/95 p-0.5 rounded-md border border-[#DED9D0] dark:border-[#2E3D47] shadow-xs">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     onOpenStrategy(m.id, m.title);
                   }}
-                  className="px-1.5 py-0.5 rounded text-[10px] font-bold text-[#A65F3F] dark:text-[#C5B76A] hover:bg-[#F4E8E2] dark:hover:bg-[#3A3520] cursor-pointer transition-colors flex items-center gap-1"
+                  className="px-1.5 py-0.5 rounded text-[10px] font-bold text-[#5F6B72] hover:text-[#202A30] dark:text-[#A4B2BA] dark:hover:text-white hover:bg-[#F8F6F1] dark:hover:bg-[#243038] cursor-pointer transition-colors flex items-center gap-1"
                   title="View Research Strategy for this mandate"
                   aria-label={`View research strategy for ${m.title}`}
                 >
@@ -175,7 +175,7 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
                       deleteMandate(m.id);
                     }
                   }}
-                  className="p-1 rounded text-[#899093] hover:text-[#A44A42] dark:hover:text-red-400 cursor-pointer transition-colors"
+                  className="p-1 rounded text-[#7D8589] hover:text-[#C66E52] dark:hover:text-[#E2937C] cursor-pointer transition-colors"
                   title="Delete mandate"
                   aria-label={`Delete mandate ${m.title}`}
                 >
@@ -383,7 +383,7 @@ export const AppLayout: React.FC = () => {
         
         {/* Desktop & Tablet Sidebar — fixed, does not scroll with content */}
         {!sidebarCollapsed && (
-          <aside className="hidden md:flex flex-col w-64 lg:w-72 shrink-0 border-r border-[#D8D5CE] dark:border-[#263544] bg-[#EDEBE5] dark:bg-[#141F2C] p-4.5 fixed top-[60px] md:top-[64px] left-0 bottom-0 z-30 overflow-y-auto transition-all duration-200">
+          <aside className="hidden md:flex flex-col w-64 lg:w-72 shrink-0 border-r border-[#E2E8F0] dark:border-[#334155] bg-[#F1F5F9] dark:bg-[#0F172A] p-4.5 fixed top-[60px] md:top-[64px] left-0 bottom-0 z-30 overflow-y-auto transition-all duration-200">
             <SidebarContent
               savedOutreachList={savedOutreachList}
               onDeleteSaved={deleteSavedOutreach}
@@ -395,7 +395,7 @@ export const AppLayout: React.FC = () => {
         {/* Workspace content block — shifts right when sidebar is open */}
         <div className={`flex-1 flex flex-col min-w-0 transition-all duration-200 ${!sidebarCollapsed ? 'md:ml-64 lg:ml-72' : ''}`}>
           {/* Horizontal Workflow Stepper - Sticky beneath header on scroll */}
-          <div className="sticky top-[60px] md:top-16 z-30 shrink-0 bg-[#EDEBE5] dark:bg-[#111B27]">
+          <div className="sticky top-[60px] md:top-16 z-30 shrink-0 bg-[#FFFFFF] dark:bg-[#0F172A]">
             <WorkflowStepper
               mandateApproved={mandateApproved}
             />
@@ -410,17 +410,17 @@ export const AppLayout: React.FC = () => {
           </main>
 
           {/* Footer - Visible upon scrolling */}
-          <footer className="w-full py-6 border-t border-[#D8D5CE] dark:border-[#263544] bg-[#EDEBE5]/70 dark:bg-[#141F2C] text-center text-secondary text-sm mt-auto">
-            <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#626A6D] dark:text-[#9AA9B8]">
-              <div className="flex items-center gap-2 font-bold text-[#202A2E] dark:text-[#F1F5F9]">
+          <footer className="w-full py-6 border-t border-[#E2E8F0] dark:border-[#334155] bg-[#F8FAFC] dark:bg-[#0B0F17] text-center text-secondary text-sm mt-auto">
+            <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#64748B] dark:text-[#94A3B8]">
+              <div className="flex items-center gap-2 font-bold text-[#0F172A] dark:text-[#F8FAFC]">
                 <span>&copy; {new Date().getFullYear()} DEAL SOURCING</span>
                 <span>&bull;</span>
-                <span className="text-secondary font-normal">All rights reserved.</span>
+                <span className="text-[#64748B] font-normal">All rights reserved.</span>
               </div>
               <div className="flex items-center gap-3 font-semibold">
                 <span>Enterprise M&A Platform</span>
                 <span>&bull;</span>
-                <span className="text-brand-primary font-bold">Confidential & Verified</span>
+                <span className="text-[#14532D] dark:text-[#4ADE80] font-bold">Confidential & Verified</span>
               </div>
             </div>
           </footer>
@@ -436,7 +436,7 @@ export const AppLayout: React.FC = () => {
             onClick={() => setMobileDrawerOpen(false)}
           />
           {/* Drawer content panel */}
-          <div className="relative w-80 max-w-[85vw] h-full bg-[#EDEBE5] dark:bg-[#141F2C] border-r border-[#D8D5CE] dark:border-[#263544] flex flex-col p-6 animate-slideIn text-left shadow-2xl">
+          <div className="relative w-80 max-w-[85vw] h-full bg-[#F3EFE7] dark:bg-[#172025] border-r border-[#DED9D0] dark:border-[#2E3D47] flex flex-col p-6 animate-slideIn text-left shadow-2xl">
             <div className="flex justify-between items-center mb-6">
               <span className="text-base font-black text-primary">DEAL SOURCING</span>
               <button
