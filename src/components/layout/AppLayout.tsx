@@ -355,6 +355,14 @@ export const AppLayout: React.FC = () => {
     checkApprovals();
   }, [location.pathname, refreshTrigger, checkApprovals]);
 
+  // Auto-close the mandate sidebar when entering Outreach for optimal full-width spacing
+  useEffect(() => {
+    if (location.pathname.startsWith('/outreach')) {
+      setSidebarCollapsed(true);
+      setMobileDrawerOpen(false);
+    }
+  }, [location.pathname]);
+
   // Monitor URL hash changes to trigger help modal
   useEffect(() => {
     if (location.hash === '#help') {

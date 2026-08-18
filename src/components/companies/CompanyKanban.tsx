@@ -213,17 +213,17 @@ export const CompanyKanban: React.FC<CompanyKanbanProps> = ({
                         <div className="flex justify-between items-start gap-2">
                           <h4
                             onClick={() => onView(c.id)}
-                            className="font-extrabold text-sm text-[#202A2E] dark:text-[#F1F5F9] group-hover:text-[#A65F3F] dark:group-hover:text-[#C27A56] hover:underline cursor-pointer transition-colors leading-snug line-clamp-1"
+                            className="font-extrabold text-[15px] text-[#202A2E] dark:text-[#F1F5F9] group-hover:text-[#A65F3F] dark:group-hover:text-[#C27A56] hover:underline cursor-pointer transition-colors leading-snug line-clamp-1"
                             title={c.name}
                           >
                             {c.name}
                           </h4>
-                          <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-[#E3ECE6] text-[#35624A] dark:bg-[#173529] dark:text-[#8FBEA1] shrink-0 border border-[#B7CCBC] dark:border-[#39634D]">
+                          <span className="text-[11px] font-black px-2 py-0.5 rounded bg-[#E3ECE6] text-[#35624A] dark:bg-[#173529] dark:text-[#8FBEA1] shrink-0 border border-[#B7CCBC] dark:border-[#39634D]">
                             {(c.fitScore ?? c.confidenceScore ?? 85).toFixed(0)}%
                           </span>
                         </div>
 
-                        <div className="text-[11px] text-[#626A6D] dark:text-[#9AA9B8] font-semibold mt-1 flex items-center gap-1 truncate">
+                        <div className="text-xs text-[#626A6D] dark:text-[#9AA9B8] font-semibold mt-1 flex items-center gap-1 truncate">
                           <span>{c.location.split(',')[0]}</span>
                           <span>•</span>
                           <span className="truncate">{c.industry}</span>
@@ -231,18 +231,18 @@ export const CompanyKanban: React.FC<CompanyKanbanProps> = ({
                       </div>
 
                       {/* ─── PRIORITY SELECTOR (HIGH / MEDIUM / LOW) ─── */}
-                      <div className="p-2 rounded-lg bg-[#F1EFEA]/80 dark:bg-[#141F2C] border border-[#D8D5CE] dark:border-[#2D4053] flex flex-col gap-1.5">
+                      <div className="p-2.5 rounded-lg bg-[#F1EFEA]/80 dark:bg-[#141F2C] border border-[#D8D5CE] dark:border-[#2D4053] flex flex-col gap-1.5">
                         <div className="flex items-center justify-between">
-                          <span className="text-[9.5px] font-black uppercase tracking-wider text-[#626A6D] dark:text-[#9AA9B8]">
+                          <span className="text-[10px] font-black uppercase tracking-wider text-[#626A6D] dark:text-[#9AA9B8]">
                             Priority Tier
                           </span>
-                          <span className={`text-[9px] font-black px-1.5 py-0.5 rounded border uppercase tracking-wider ${getPriorityBadgeClass(currentPriority)}`}>
+                          <span className={`text-[10px] font-black px-2 py-0.5 rounded border uppercase tracking-wider ${getPriorityBadgeClass(currentPriority)}`}>
                             {currentPriority} Priority
                           </span>
                         </div>
 
                         {/* Interactive Toggle Buttons for High / Medium / Low */}
-                        <div className="grid grid-cols-3 gap-1 pt-0.5">
+                        <div className="grid grid-cols-3 gap-1.5 pt-0.5">
                           {(['HIGH', 'MEDIUM', 'LOW'] as PriorityLevel[]).map((p) => {
                             const isActive = currentPriority === p;
                             return (
@@ -252,7 +252,7 @@ export const CompanyKanban: React.FC<CompanyKanbanProps> = ({
                                   e.stopPropagation();
                                   handlePriorityChange(c.id, p);
                                 }}
-                                className={`py-1 text-[10px] font-bold rounded transition-all cursor-pointer border text-center ${
+                                className={`py-1.5 text-xs font-bold rounded transition-all cursor-pointer border text-center ${
                                   isActive
                                     ? p === 'HIGH'
                                       ? 'bg-[#35624A] text-white border-[#35624A] shadow-xs'
@@ -270,28 +270,28 @@ export const CompanyKanban: React.FC<CompanyKanbanProps> = ({
                       </div>
 
                       {/* Financial & Scale Snapshot */}
-                      <div className="grid grid-cols-2 gap-2 text-[11px] bg-[#F1EFEA]/50 dark:bg-[#141F2C]/60 p-2 rounded border border-[#E5E2DC] dark:border-[#263544]">
+                      <div className="grid grid-cols-2 gap-2 text-xs bg-[#F1EFEA]/50 dark:bg-[#141F2C]/60 p-2.5 rounded border border-[#E5E2DC] dark:border-[#263544]">
                         <div>
-                          <span className="text-[9.5px] text-[#899093] dark:text-[#9AA9B8] font-bold uppercase block">Revenue</span>
-                          <span className="font-extrabold text-[#202A2E] dark:text-[#F1F5F9] truncate block mt-0.5">{c.revenueRange}</span>
+                          <span className="text-[10px] text-[#899093] dark:text-[#9AA9B8] font-bold uppercase block">Revenue</span>
+                          <span className="font-extrabold text-xs md:text-[13px] text-[#202A2E] dark:text-[#F1F5F9] truncate block mt-0.5">{c.revenueRange}</span>
                         </div>
                         <div>
-                          <span className="text-[9.5px] text-[#899093] dark:text-[#9AA9B8] font-bold uppercase block">Employees</span>
-                          <span className="font-extrabold text-[#202A2E] dark:text-[#F1F5F9] truncate block mt-0.5">{c.employeeRange}</span>
+                          <span className="text-[10px] text-[#899093] dark:text-[#9AA9B8] font-bold uppercase block">Employees</span>
+                          <span className="font-extrabold text-xs md:text-[13px] text-[#202A2E] dark:text-[#F1F5F9] truncate block mt-0.5">{c.employeeRange}</span>
                         </div>
                       </div>
 
                       {/* Founder / Key Contact */}
-                      <div className="text-[11px] text-[#626A6D] dark:text-[#9AA9B8] truncate flex items-center gap-1.5">
-                        <Users className="h-3.5 w-3.5 text-[#899093] dark:text-[#9AA9B8] shrink-0" />
+                      <div className="text-xs text-[#626A6D] dark:text-[#9AA9B8] truncate flex items-center gap-1.5">
+                        <Users className="h-4 w-4 text-[#899093] dark:text-[#9AA9B8] shrink-0" />
                         <span className="truncate font-semibold">{founderName}</span>
                       </div>
 
                       {/* Card Footer: Quick Advance Stage & View Details */}
-                      <div className="flex items-center justify-between gap-1 pt-2 border-t border-[#D8D5CE]/60 dark:border-[#263544] mt-0.5">
+                      <div className="flex items-center justify-between gap-1 pt-2.5 border-t border-[#D8D5CE]/60 dark:border-[#263544] mt-0.5">
                         <button
                           onClick={() => onView(c.id)}
-                          className="text-[11px] font-bold text-[#A65F3F] dark:text-[#C27A56] hover:underline cursor-pointer"
+                          className="text-xs font-bold text-[#A65F3F] dark:text-[#C27A56] hover:underline cursor-pointer"
                         >
                           View Details
                         </button>
@@ -302,11 +302,11 @@ export const CompanyKanban: React.FC<CompanyKanbanProps> = ({
                               e.stopPropagation();
                               handleStageChange(c.id, PIPELINE_STAGES[colIndex + 1].id);
                             }}
-                            className="flex items-center gap-1 text-[10.5px] font-bold text-[#35624A] dark:text-[#8FBEA1] hover:underline cursor-pointer"
+                            className="flex items-center gap-1 text-xs font-bold text-[#35624A] dark:text-[#8FBEA1] hover:underline cursor-pointer"
                             title={`Advance to ${PIPELINE_STAGES[colIndex + 1].label}`}
                           >
                             <span>Advance</span>
-                            <ChevronRight className="h-3 w-3" />
+                            <ChevronRight className="h-3.5 w-3.5" />
                           </button>
                         )}
                       </div>
