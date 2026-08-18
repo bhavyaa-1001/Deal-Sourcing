@@ -47,7 +47,7 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
 
   return (
     <div className="w-full bg-[#EDEBE5] dark:bg-[#111B27] border-b border-[#D8D5CE] dark:border-[#263544] shadow-[0_1px_3px_rgba(32,42,46,0.04)] transition-colors duration-200">
-      <div className="max-w-7xl mx-auto px-6 py-2.5">
+      <div className="max-w-7xl mx-auto px-6 py-3">
         {/* Desktop and Tablet Stepper Layout */}
         <nav aria-label="Progress Stepper" className="hidden md:block">
           <ol className="flex items-center justify-between w-full">
@@ -65,15 +65,15 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
                     onClick={() => handleStepClick(step)}
                     disabled={!isUnlocked}
                     className={`
-                      flex items-center gap-2 text-left focus-ring rounded-lg px-2.5 py-1.5 transition-all cursor-pointer
+                      flex items-center gap-2.5 text-left focus-ring rounded-xl px-3.5 py-2 transition-all cursor-pointer
                       disabled:cursor-not-allowed disabled:opacity-40 hover:bg-[#F1EFEA] dark:hover:bg-[#233447] shrink-0
-                      ${isActive ? 'bg-white dark:bg-[#1D2B3A] shadow-[0_1px_3px_rgba(32,42,46,0.06)] border border-[#D8D5CE] dark:border-[#756C36]' : ''}
+                      ${isActive ? 'bg-white dark:bg-[#1D2B3A] shadow-[0_1px_3px_rgba(32,42,46,0.08)] border border-[#D8D5CE] dark:border-[#756C36]' : ''}
                     `}
                   >
                     {/* Circle Indicator */}
                     <span
                       className={`
-                        w-6.5 h-6.5 rounded-full flex items-center justify-center font-black text-[11px] border
+                        w-7.5 h-7.5 rounded-full flex items-center justify-center font-black text-xs md:text-[13px] border
                         transition-all duration-200 shrink-0
                         ${isCompleted
                           ? 'bg-[#E3ECE6] text-[#35624A] border-[#B7CCBC] dark:bg-[#173529] dark:text-[#8FBEA1] dark:border-[#39634D]'
@@ -83,16 +83,16 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
                         }
                       `}
                     >
-                      {isCompleted ? <Check className="h-3.5 w-3.5 stroke-[3px] text-[#35624A] dark:text-[#8FBEA1]" /> : `0${step.number}`}
+                      {isCompleted ? <Check className="h-4 w-4 stroke-[3px] text-[#35624A] dark:text-[#8FBEA1]" /> : `0${step.number}`}
                     </span>
 
-                    {/* Step Label only — clear high contrast */}
-                    <span className={`text-[13px] leading-tight whitespace-nowrap ${
+                    {/* Step Label only — clear high contrast, larger font */}
+                    <span className={`text-sm md:text-[15px] leading-tight whitespace-nowrap ${
                       isActive 
                         ? 'font-black text-[#A65F3F] dark:text-[#E0D77F]' 
                         : isCompleted
                           ? 'font-bold text-[#35624A] dark:text-[#9FC9AC]'
-                          : 'font-semibold text-[#626A6D] dark:text-[#91A0AF]'
+                          : 'font-bold text-[#626A6D] dark:text-[#91A0AF]'
                     }`}>
                       {step.label}
                     </span>
@@ -102,11 +102,11 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
                   {idx !== STEPS.length - 1 && (
                     <div
                       className={`
-                        flex-1 h-[2px] mx-2 rounded-full transition-colors duration-300
+                        flex-1 h-[2.5px] mx-2.5 rounded-full transition-colors duration-300
                         ${isCompleted 
                           ? 'bg-[#35624A] dark:bg-[#47705A]' 
                           : isStepUnlocked(step.number + 1) 
-                            ? 'bg-[#A65F3F]/30 dark:bg-[#756C36]/50' 
+                            ? 'bg-[#A65F3F]/40 dark:bg-[#756C36]/50' 
                             : 'bg-[#D8D5CE] dark:bg-[#263544]'
                         }
                       `}
