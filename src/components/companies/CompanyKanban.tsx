@@ -158,7 +158,7 @@ export const CompanyKanban: React.FC<CompanyKanbanProps> = ({
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4 items-stretch min-h-[640px] text-left">
+    <div className="flex items-start gap-5 min-h-[640px] text-left overflow-x-auto pb-6 pt-1 scrollbar-thin">
       {PIPELINE_STAGES.map((col, colIndex) => {
         const columnCompanies = companies.filter(c => (localStages[c.id] || c.pipelineStage || 'shortlisted') === col.id);
         const isOver = dragOverColumn === col.id;
@@ -169,32 +169,32 @@ export const CompanyKanban: React.FC<CompanyKanbanProps> = ({
             onDragOver={(e) => handleDragOver(e, col.id)}
             onDragLeave={handleDragLeave}
             onDrop={(e) => handleDrop(e, col.id)}
-            className={`flex flex-col rounded-xl border p-3.5 transition-all duration-200 min-h-[520px] bg-slate-50/50 dark:bg-[#141F2C]/60 ${
+            className={`w-[320px] md:w-[340px] shrink-0 flex flex-col rounded-2xl border p-4.5 transition-all duration-200 min-h-[560px] bg-[#EDEBE5]/60 dark:bg-[#141F2C]/60 ${
               isOver
                 ? 'border-[#202A2E] dark:border-[#C5B76A] border-dashed border-2 bg-white dark:bg-[#1D2B3A] shadow-md'
                 : 'border-[#D8D5CE] dark:border-[#2D4053]'
             }`}
           >
             {/* Column Header */}
-            <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#D8D5CE] dark:border-[#263544]">
-              <div className="flex items-center gap-2 min-w-0">
-                <span className={`w-2 h-2 rounded-full ${col.dotColor} shrink-0`} />
-                <h3 className="font-extrabold text-xs text-[#202A2E] dark:text-[#F1F5F9] uppercase tracking-wider truncate">
+            <div className="flex items-center justify-between pb-3.5 mb-3.5 border-b border-[#D8D5CE] dark:border-[#263544]">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <span className={`w-2.5 h-2.5 rounded-full ${col.dotColor} shrink-0`} />
+                <h3 className="font-extrabold text-xs md:text-[13px] text-[#202A2E] dark:text-[#F1F5F9] uppercase tracking-wider truncate">
                   {col.label}
                 </h3>
               </div>
-              <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${col.badgeBg} ${col.badgeText} border ${col.borderColor} shrink-0`}>
+              <span className={`text-[11px] font-black px-2.5 py-0.5 rounded-full ${col.badgeBg} ${col.badgeText} border ${col.borderColor} shrink-0`}>
                 {columnCompanies.length}
               </span>
             </div>
 
             {/* Droppable Area Container */}
-            <div className="flex-1 flex flex-col gap-3 overflow-y-auto max-h-[75vh] pr-1 scrollbar-thin">
+            <div className="flex-1 flex flex-col gap-3.5 overflow-y-auto max-h-[75vh] pr-1 scrollbar-thin">
               {columnCompanies.length === 0 ? (
-                <div className="flex-1 flex flex-col items-center justify-center border border-dashed border-[#D8D5CE] dark:border-[#344658] rounded-xl py-10 px-3 text-center bg-white/40 dark:bg-[#182536]/30">
-                  <AlertCircle className="h-6 w-6 text-[#899093] dark:text-[#626A6D] mb-1.5 opacity-60" />
-                  <p className="text-xs text-[#626A6D] dark:text-[#9AA9B8] font-semibold">No candidates in this stage</p>
-                  <p className="text-[10px] text-[#899093] dark:text-[#626A6D] mt-0.5">Drag & drop here to update deal progress</p>
+                <div className="flex-1 flex flex-col items-center justify-center border border-dashed border-[#D8D5CE] dark:border-[#344658] rounded-xl py-12 px-4 text-center bg-white/40 dark:bg-[#182536]/30">
+                  <AlertCircle className="h-7 w-7 text-[#899093] dark:text-[#626A6D] mb-2 opacity-60" />
+                  <p className="text-xs md:text-sm text-[#626A6D] dark:text-[#9AA9B8] font-bold">No candidates in this stage</p>
+                  <p className="text-xs text-[#899093] dark:text-[#626A6D] mt-1">Drag & drop cards here to advance deal</p>
                 </div>
               ) : (
                 columnCompanies.map(c => {
@@ -206,32 +206,32 @@ export const CompanyKanban: React.FC<CompanyKanbanProps> = ({
                       key={c.id}
                       draggable
                       onDragStart={(e) => handleDragStart(e, c.id)}
-                      className="group bg-white dark:bg-[#182536] border border-[#D8D5CE] dark:border-[#344658] hover:border-[#202A2E] dark:hover:border-[#C5B76A] rounded-xl p-3.5 shadow-xs hover:shadow-md transition-all duration-200 cursor-grab active:cursor-grabbing flex flex-col gap-3"
+                      className="group bg-white dark:bg-[#182536] border border-[#D8D5CE] dark:border-[#344658] hover:border-[#202A2E] dark:hover:border-[#C5B76A] rounded-xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-md transition-all duration-200 cursor-grab active:cursor-grabbing flex flex-col gap-3.5"
                     >
                       {/* Top Row: Company Name & Fit score */}
                       <div>
-                        <div className="flex justify-between items-start gap-2">
+                        <div className="flex justify-between items-start gap-2.5">
                           <h4
                             onClick={() => onView(c.id)}
-                            className="font-extrabold text-[15px] text-[#202A2E] dark:text-[#F1F5F9] group-hover:text-[#A65F3F] dark:group-hover:text-[#C27A56] hover:underline cursor-pointer transition-colors leading-snug line-clamp-1"
+                            className="font-extrabold text-base text-[#202A2E] dark:text-[#F1F5F9] group-hover:text-[#A65F3F] dark:group-hover:text-[#C27A56] hover:underline cursor-pointer transition-colors leading-snug line-clamp-2"
                             title={c.name}
                           >
                             {c.name}
                           </h4>
-                          <span className="text-[11px] font-black px-2 py-0.5 rounded bg-[#E3ECE6] text-[#35624A] dark:bg-[#173529] dark:text-[#8FBEA1] shrink-0 border border-[#B7CCBC] dark:border-[#39634D]">
+                          <span className="text-xs font-black px-2 py-0.5 rounded-md bg-[#E3ECE6] text-[#35624A] dark:bg-[#173529] dark:text-[#8FBEA1] shrink-0 border border-[#B7CCBC] dark:border-[#39634D]">
                             {(c.fitScore ?? c.confidenceScore ?? 85).toFixed(0)}%
                           </span>
                         </div>
 
-                        <div className="text-xs text-[#626A6D] dark:text-[#9AA9B8] font-semibold mt-1 flex items-center gap-1 truncate">
-                          <span>{c.location.split(',')[0]}</span>
+                        <div className="text-xs text-[#626A6D] dark:text-[#9AA9B8] font-semibold mt-1.5 flex items-center gap-1.5 flex-wrap">
+                          <span>{c.location}</span>
                           <span>•</span>
-                          <span className="truncate">{c.industry}</span>
+                          <span>{c.industry}</span>
                         </div>
                       </div>
 
                       {/* ─── PRIORITY SELECTOR (HIGH / MEDIUM / LOW) ─── */}
-                      <div className="p-2.5 rounded-lg bg-[#F1EFEA]/80 dark:bg-[#141F2C] border border-[#D8D5CE] dark:border-[#2D4053] flex flex-col gap-1.5">
+                      <div className="p-3 rounded-xl bg-[#F1EFEA]/80 dark:bg-[#141F2C] border border-[#D8D5CE] dark:border-[#2D4053] flex flex-col gap-2">
                         <div className="flex items-center justify-between">
                           <span className="text-[10px] font-black uppercase tracking-wider text-[#626A6D] dark:text-[#9AA9B8]">
                             Priority Tier
@@ -252,13 +252,13 @@ export const CompanyKanban: React.FC<CompanyKanbanProps> = ({
                                   e.stopPropagation();
                                   handlePriorityChange(c.id, p);
                                 }}
-                                className={`py-1.5 text-xs font-bold rounded transition-all cursor-pointer border text-center ${
+                                className={`py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer border text-center ${
                                   isActive
                                     ? p === 'HIGH'
-                                      ? 'bg-[#35624A] text-white border-[#35624A] shadow-xs'
+                                      ? 'bg-[#35624A] text-white border-[#35624A] shadow-xs font-extrabold'
                                       : p === 'MEDIUM'
-                                      ? 'bg-[#9A7535] text-white border-[#9A7535] shadow-xs'
-                                      : 'bg-[#626A6D] text-white border-[#626A6D] shadow-xs'
+                                      ? 'bg-[#9A7535] text-white border-[#9A7535] shadow-xs font-extrabold'
+                                      : 'bg-[#626A6D] text-white border-[#626A6D] shadow-xs font-extrabold'
                                     : 'bg-white dark:bg-[#182536] text-[#626A6D] dark:text-[#9AA9B8] border-[#D8D5CE] dark:border-[#344658] hover:bg-[#F1EFEA] dark:hover:bg-[#1D2B3A]'
                                 }`}
                               >
@@ -270,28 +270,28 @@ export const CompanyKanban: React.FC<CompanyKanbanProps> = ({
                       </div>
 
                       {/* Financial & Scale Snapshot */}
-                      <div className="grid grid-cols-2 gap-2 text-xs bg-[#F1EFEA]/50 dark:bg-[#141F2C]/60 p-2.5 rounded border border-[#E5E2DC] dark:border-[#263544]">
+                      <div className="grid grid-cols-2 gap-3 text-xs bg-[#F1EFEA]/60 dark:bg-[#141F2C]/60 p-3 rounded-xl border border-[#E5E2DC] dark:border-[#263544]">
                         <div>
                           <span className="text-[10px] text-[#899093] dark:text-[#9AA9B8] font-bold uppercase block">Revenue</span>
-                          <span className="font-extrabold text-xs md:text-[13px] text-[#202A2E] dark:text-[#F1F5F9] truncate block mt-0.5">{c.revenueRange}</span>
+                          <span className="font-extrabold text-xs md:text-[13px] text-[#202A2E] dark:text-[#F1F5F9] block mt-0.5">{c.revenueRange}</span>
                         </div>
                         <div>
                           <span className="text-[10px] text-[#899093] dark:text-[#9AA9B8] font-bold uppercase block">Employees</span>
-                          <span className="font-extrabold text-xs md:text-[13px] text-[#202A2E] dark:text-[#F1F5F9] truncate block mt-0.5">{c.employeeRange}</span>
+                          <span className="font-extrabold text-xs md:text-[13px] text-[#202A2E] dark:text-[#F1F5F9] block mt-0.5">{c.employeeRange}</span>
                         </div>
                       </div>
 
                       {/* Founder / Key Contact */}
-                      <div className="text-xs text-[#626A6D] dark:text-[#9AA9B8] truncate flex items-center gap-1.5">
+                      <div className="text-xs md:text-[13px] text-[#626A6D] dark:text-[#9AA9B8] flex items-center gap-2">
                         <Users className="h-4 w-4 text-[#899093] dark:text-[#9AA9B8] shrink-0" />
-                        <span className="truncate font-semibold">{founderName}</span>
+                        <span className="font-bold truncate">{founderName}</span>
                       </div>
 
                       {/* Card Footer: Quick Advance Stage & View Details */}
-                      <div className="flex items-center justify-between gap-1 pt-2.5 border-t border-[#D8D5CE]/60 dark:border-[#263544] mt-0.5">
+                      <div className="flex items-center justify-between gap-1 pt-3 border-t border-[#D8D5CE]/70 dark:border-[#263544] mt-0.5">
                         <button
                           onClick={() => onView(c.id)}
-                          className="text-xs font-bold text-[#A65F3F] dark:text-[#C27A56] hover:underline cursor-pointer"
+                          className="text-xs md:text-[13px] font-bold text-[#A65F3F] dark:text-[#C27A56] hover:underline cursor-pointer"
                         >
                           View Details
                         </button>
@@ -302,11 +302,11 @@ export const CompanyKanban: React.FC<CompanyKanbanProps> = ({
                               e.stopPropagation();
                               handleStageChange(c.id, PIPELINE_STAGES[colIndex + 1].id);
                             }}
-                            className="flex items-center gap-1 text-xs font-bold text-[#35624A] dark:text-[#8FBEA1] hover:underline cursor-pointer"
+                            className="flex items-center gap-1.5 text-xs md:text-[13px] font-bold text-[#35624A] dark:text-[#8FBEA1] hover:underline cursor-pointer"
                             title={`Advance to ${PIPELINE_STAGES[colIndex + 1].label}`}
                           >
                             <span>Advance</span>
-                            <ChevronRight className="h-3.5 w-3.5" />
+                            <ChevronRight className="h-4 w-4" />
                           </button>
                         )}
                       </div>
