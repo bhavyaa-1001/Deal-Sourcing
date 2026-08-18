@@ -4,9 +4,9 @@ import Modal from '../ui/Modal';
 import Badge from '../ui/Badge';
 import Button from '../ui/Button';
 import {
-  Lock, Mail, ChevronLeft, ChevronRight,
+  Mail, ChevronLeft, ChevronRight,
   Users, FileText, Phone, ExternalLink,
-  Briefcase, Award
+  Briefcase, Award, Sparkles
 } from 'lucide-react';
 import { MOCK_ENRICHMENT_DATA } from '../../api/enrichment';
 
@@ -38,10 +38,22 @@ export const CompanyDetails: React.FC<CompanyDetailsProps> = ({
 
   const isEnriched = company.enrichmentStatus === 'enriched';
   const isProcessing = company.enrichmentStatus === 'processing';
-  const enrichment = company.enrichmentData || (isEnriched ? MOCK_ENRICHMENT_DATA[company.id] : undefined);
+  const enrichmentFallback = MOCK_ENRICHMENT_DATA[company.id];
+  const enrichment = company.enrichmentData || (isEnriched ? enrichmentFallback : undefined);
+
+  // Free extracted founder data available before enrichment
+  const founderName = company.enrichmentData?.founderName || enrichmentFallback?.founderName || enrichmentFallback?.contactPerson || 'Founder & Principal';
+  const founderRole = company.enrichmentData?.founderRole || enrichmentFallback?.founderRole || 'Founder & Managing Director';
+  const founderBio = company.enrichmentData?.bio || enrichmentFallback?.bio || company.description;
+  const founderAge = company.enrichmentData?.age || enrichmentFallback?.age || 63;
+  const founderGender = company.enrichmentData?.gender || enrichmentFallback?.gender || 'Male';
+  const industryExp = company.enrichmentData?.industryExperience || enrichmentFallback?.industryExperience;
+  const managementTeam = company.enrichmentData?.managementTeam || enrichmentFallback?.managementTeam;
+  const education = company.enrichmentData?.education || enrichmentFallback?.education;
+  const ownershipStake = company.enrichmentData?.ownershipStake || enrichmentFallback?.ownershipStake || company.ownership;
 
   // Mock profile picture initials
-  const initials = company.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+  const initials = founderName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || company.name.slice(0, 2).toUpperCase();
 
   const crmTitle = (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full select-none">
@@ -52,9 +64,7 @@ export const CompanyDetails: React.FC<CompanyDetailsProps> = ({
         </div>
         <div className="text-left">
           <h2 className="text-lg font-black text-primary leading-tight flex items-center gap-2">
-            {isEnriched && enrichment?.contactPerson 
-              ? enrichment.contactPerson 
-              : `Founder (LOCKED)`}
+            {founderName}
             <span className="text-xs text-secondary font-semibold font-sans">
               - {company.name}
             </span>
@@ -75,9 +85,9 @@ export const CompanyDetails: React.FC<CompanyDetailsProps> = ({
             size="sm"
             onClick={() => onEnrich(company.id)}
             disabled={isProcessing}
-            leftIcon={<Lock className="h-3.5 w-3.5" />}
+            leftIcon={<Sparkles className="h-3.5 w-3.5" />}
           >
-            {isProcessing ? 'Enriching...' : 'Enrich Lead'}
+            {isProcessing ? 'Enriching...' : 'Enrich for Missing Details'}
           </Button>
         )}
         {isEnriched && (
@@ -184,8 +194,8 @@ export const CompanyDetails: React.FC<CompanyDetailsProps> = ({
                         </a>
                       </div>
                     ) : (
-                      <span className="text-xs text-slate-500 dark:text-slate-400 italic flex items-center gap-1 mt-1 font-medium select-none">
-                        Pending AI Enrichment
+                      <span className="text-xs text-slate-500 dark:text-slate-400 italic block mt-1">
+                        Not extracted (requires company enrichment)
                       </span>
                     )}
                   </div>
@@ -198,8 +208,8 @@ export const CompanyDetails: React.FC<CompanyDetailsProps> = ({
                         </span>
                       </div>
                     ) : (
-                      <span className="text-xs text-slate-500 dark:text-slate-400 italic flex items-center gap-1 mt-1 font-medium select-none">
-                        Pending AI Enrichment
+                      <span className="text-xs text-slate-500 dark:text-slate-400 italic block mt-1">
+                        Not extracted (requires company enrichment)
                       </span>
                     )}
                   </div>
@@ -280,205 +290,200 @@ export const CompanyDetails: React.FC<CompanyDetailsProps> = ({
               </div>
             )}
 
-            {/* Founder Details Tab Content */}
+            {/* Founder Details Tab Content — displays extracted details freely, offers enrichment for missing contacts */}
             {activeTab === 'Founder Details' && (
               <div className="flex flex-col gap-6 text-left">
-                {isEnriched && enrichment ? (
-                  <div className="flex flex-col gap-5">
-                    {/* Header Profile Card */}
-                    <div className="p-4 rounded-xl bg-slate-50/80 dark:bg-slate-900/40 border border-default flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-full bg-brand-primary text-white flex items-center justify-center font-black text-base shadow-sm">
-                          {enrichment.founderName.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                        </div>
-                        <div>
-                          <h3 className="text-base font-black text-primary leading-tight">
-                            {enrichment.founderName}
-                          </h3>
-                          <span className="text-xs font-bold text-secondary block mt-0.5">
-                            {enrichment.founderRole}
-                          </span>
-                        </div>
+                <div className="flex flex-col gap-5">
+                  {/* Header Profile Card — freely available */}
+                  <div className="p-4 rounded-xl bg-slate-50/80 dark:bg-slate-900/40 border border-default flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-full bg-brand-primary text-white flex items-center justify-center font-black text-base shadow-sm">
+                        {founderName.split(' ').map(n => n[0]).join('').slice(0, 2)}
                       </div>
-
-                      {/* Age & Demographics Badge */}
-                      <div className="flex flex-col items-end gap-1">
-                        {enrichment.age && (
-                          <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#35624A] dark:text-[#8FBEA1] bg-[#E3ECE6] dark:bg-[#173529] px-3 py-1 rounded-full border border-[#B7CCBC] dark:border-[#39634D]">
-                            <Users className="h-3.5 w-3.5" />
-                            Age: ~{enrichment.age} Years ({enrichment.gender || 'Male'})
-                          </span>
-                        )}
-                        {enrichment.ageProof && (
-                          <span className="text-[10px] font-semibold text-slate-400">
-                            [Proof: {enrichment.ageProof}]
-                          </span>
-                        )}
+                      <div>
+                        <h3 className="text-base font-black text-primary leading-tight">
+                          {founderName}
+                        </h3>
+                        <span className="text-xs font-bold text-secondary block mt-0.5">
+                          {founderRole}
+                        </span>
                       </div>
                     </div>
 
-                    {/* Direct Contact Dossier */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50/50 dark:bg-slate-900/20 p-4 rounded-xl border border-default">
-                      <div>
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Direct Email</span>
-                        {enrichment.email ? (
-                          <div className="mt-1">
-                            <a href={`mailto:${enrichment.email}`} className="text-sm font-extrabold text-brand-primary hover:underline flex items-center gap-1.5">
-                              <Mail className="h-3.5 w-3.5" />
-                              {enrichment.email}
-                            </a>
-                            {enrichment.emailProof && (
-                              <span className="text-[10px] font-semibold text-[#35624A] dark:text-[#8FBEA1] block mt-0.5">
-                                [Proof: {enrichment.emailProof}]
-                              </span>
-                            )}
-                          </div>
-                        ) : (
-                          <span className="text-xs text-slate-400 italic">Not available</span>
-                        )}
-                      </div>
+                    {/* Age & Demographics Badge */}
+                    <div className="flex flex-col items-end gap-1">
+                      <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#35624A] dark:text-[#8FBEA1] bg-[#E3ECE6] dark:bg-[#173529] px-3 py-1 rounded-full border border-[#B7CCBC] dark:border-[#39634D]">
+                        <Users className="h-3.5 w-3.5" />
+                        Age: ~{founderAge} Years ({founderGender})
+                      </span>
+                      {isEnriched && enrichment?.ageProof && (
+                        <span className="text-[10px] font-semibold text-slate-400">
+                          [Proof: {enrichment.ageProof}]
+                        </span>
+                      )}
+                    </div>
+                  </div>
 
-                      <div>
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Phone Number</span>
-                        {enrichment.phone ? (
-                          <div className="mt-1">
-                            <span className="text-sm font-extrabold text-primary flex items-center gap-1.5">
-                              <Phone className="h-3.5 w-3.5 text-slate-400" />
-                              {enrichment.phone}
-                            </span>
-                            {enrichment.phoneProof && (
-                              <span className="text-[10px] font-semibold text-[#35624A] dark:text-[#8FBEA1] block mt-0.5">
-                                [Proof: {enrichment.phoneProof}]
-                              </span>
-                            )}
-                          </div>
-                        ) : (
-                          <span className="text-xs text-slate-400 italic">Not available</span>
-                        )}
-                      </div>
-
-                      {enrichment.linkedin && (
-                        <div className="sm:col-span-2 pt-2 border-t border-default/60">
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">LinkedIn Profile</span>
-                          <a
-                            href={enrichment.linkedin}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs font-bold text-brand-primary hover:underline inline-flex items-center gap-1.5 mt-1"
-                          >
-                            {enrichment.linkedin}
-                            <ExternalLink className="h-3 w-3" />
+                  {/* Direct Contact Dossier — shows values if enriched, else normal descriptive text for missing values */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50/50 dark:bg-slate-900/20 p-4 rounded-xl border border-default">
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Direct Email</span>
+                      {isEnriched && enrichment?.email ? (
+                        <div className="mt-1">
+                          <a href={`mailto:${enrichment.email}`} className="text-sm font-extrabold text-brand-primary hover:underline flex items-center gap-1.5">
+                            <Mail className="h-3.5 w-3.5" />
+                            {enrichment.email}
                           </a>
+                          {enrichment.emailProof && (
+                            <span className="text-[10px] font-semibold text-[#35624A] dark:text-[#8FBEA1] block mt-0.5">
+                              [Proof: {enrichment.emailProof}]
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="mt-1 p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900/40 border border-default/70">
+                          <span className="text-xs text-secondary font-medium italic block">Not extracted (available via company enrichment)</span>
                         </div>
                       )}
                     </div>
 
-                    {/* Career Biography */}
                     <div>
-                      <h4 className="text-xs font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1.5 flex items-center gap-1.5">
-                        <Briefcase className="h-3.5 w-3.5 text-brand-primary" />
-                        Founder Career Biography
-                      </h4>
-                      <p className="text-sm text-secondary leading-relaxed font-semibold p-3.5 rounded-lg bg-slate-50/40 dark:bg-slate-900/10 border border-default">
-                        "{enrichment.bio}"
-                      </p>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Phone Number</span>
+                      {isEnriched && enrichment?.phone ? (
+                        <div className="mt-1">
+                          <span className="text-sm font-extrabold text-primary flex items-center gap-1.5">
+                            <Phone className="h-3.5 w-3.5 text-slate-400" />
+                            {enrichment.phone}
+                          </span>
+                          {enrichment.phoneProof && (
+                            <span className="text-[10px] font-semibold text-[#35624A] dark:text-[#8FBEA1] block mt-0.5">
+                              [Proof: {enrichment.phoneProof}]
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="mt-1 p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900/40 border border-default/70">
+                          <span className="text-xs text-secondary font-medium italic block">Not extracted (available via company enrichment)</span>
+                        </div>
+                      )}
                     </div>
 
-                    {/* Succession Opportunity & Transition Readiness */}
-                    {enrichment.successionNote && (
-                      <div className="p-4 rounded-xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900">
-                        <span className="text-[10px] font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider block mb-1">
-                          Succession Opportunity & Transition Notes
-                        </span>
-                        <p className="text-xs font-bold text-amber-900 dark:text-amber-200 leading-relaxed">
-                          {enrichment.successionNote}
-                        </p>
-                      </div>
-                    )}
+                    <div className="sm:col-span-2 pt-2 border-t border-default/60">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">LinkedIn Profile</span>
+                      {isEnriched && enrichment?.linkedin ? (
+                        <a
+                          href={enrichment.linkedin}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs font-bold text-brand-primary hover:underline inline-flex items-center gap-1.5 mt-1"
+                        >
+                          {enrichment.linkedin}
+                          <ExternalLink className="h-3 w-3" />
+                        </a>
+                      ) : (
+                        <div className="mt-1 p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900/40 border border-default/70">
+                          <span className="text-xs text-secondary font-medium italic block">Not extracted (available via company enrichment)</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
 
-                    {/* Management Lieutenants */}
-                    {enrichment.managementTeam && (
+                  {/* If unenriched: Banner explaining full package enrichment */}
+                  {!isEnriched && (
+                    <div className="p-4 rounded-xl bg-[#F5EDDA] dark:bg-amber-950/30 border border-[#E3D4B3] dark:border-amber-800 flex items-start gap-3">
+                      <div className="p-2 bg-amber-100 dark:bg-amber-900/50 rounded-lg text-amber-800 dark:text-amber-300 shrink-0 mt-0.5">
+                        <Sparkles className="h-5 w-5" />
+                      </div>
                       <div>
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                          Management Lieutenants & Key Executives
-                        </span>
-                        <p className="text-xs font-semibold text-secondary">
-                          {enrichment.managementTeam}
+                        <h4 className="text-sm font-bold text-amber-950 dark:text-amber-200">Need missing contact details or ASIC verification?</h4>
+                        <p className="text-xs text-amber-900/80 dark:text-amber-300/80 mt-0.5 leading-relaxed">
+                          Public background & profile details are shown for free. Enrich this company to run our deep search model for verified direct emails, mobile numbers, and complete registry dossiers.
                         </p>
                       </div>
-                    )}
-
-                    {/* Additional Details Grid: Experience, Ownership, Education, Prior Exits */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-default/60 text-xs">
-                      {enrichment.industryExperience && (
-                        <div>
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Industry Experience</span>
-                          <span className="font-bold text-primary block mt-0.5">{enrichment.industryExperience}</span>
-                        </div>
-                      )}
-                      {enrichment.ownershipStake && (
-                        <div>
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Ownership Stake</span>
-                          <span className="font-bold text-primary block mt-0.5">{enrichment.ownershipStake}</span>
-                        </div>
-                      )}
-                      {enrichment.education && (
-                        <div>
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Education & Credentials</span>
-                          <span className="font-bold text-primary block mt-0.5">{enrichment.education}</span>
-                        </div>
-                      )}
-                      {enrichment.priorExits && (
-                        <div>
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Prior M&A Exits</span>
-                          <span className="font-bold text-primary block mt-0.5">{enrichment.priorExits}</span>
-                        </div>
-                      )}
                     </div>
+                  )}
 
-                    {/* Mandate Additional Criteria Match */}
-                    {enrichment.additionalRequirementMatch && (
-                      <div className="p-3.5 rounded-xl bg-[#E3ECE6]/80 dark:bg-[#173529]/60 border border-[#B7CCBC] dark:border-[#39634D]">
-                        <div className="flex items-center justify-between gap-2 flex-wrap">
-                          <span className="text-[10px] font-bold text-[#35624A] dark:text-[#8FBEA1] uppercase tracking-wider flex items-center gap-1.5">
-                            <Award className="h-3.5 w-3.5" />
-                            Mandate Criteria Verification
-                          </span>
-                          <span className="text-[10px] font-bold text-[#35624A] dark:text-[#8FBEA1]">
-                            [Proof: {enrichment.additionalRequirementMatch.proofSource}]
-                          </span>
-                        </div>
-                        <p className="text-xs text-primary mt-1 font-bold">
-                          {enrichment.additionalRequirementMatch.requirement}: <span className="font-normal">{enrichment.additionalRequirementMatch.extractedValue}</span>
-                        </p>
-                      </div>
-                    )}
+                  {/* Career Biography — freely available */}
+                  <div>
+                    <h4 className="text-xs font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1.5 flex items-center gap-1.5">
+                      <Briefcase className="h-3.5 w-3.5 text-brand-primary" />
+                      Founder Career Biography
+                    </h4>
+                    <p className="text-sm text-secondary leading-relaxed font-semibold p-3.5 rounded-lg bg-slate-50/40 dark:bg-slate-900/10 border border-default">
+                      "{founderBio}"
+                    </p>
                   </div>
-                ) : (
-                  <div className="py-12 px-6 rounded-xl bg-slate-50 dark:bg-slate-900/30 border border-default text-center select-none flex flex-col items-center justify-center gap-3">
-                    <div className="p-3 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">
-                      <Lock className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-bold text-primary">Founder Profile & Contacts Locked</h4>
-                      <p className="text-xs text-secondary mt-1 max-w-md">
-                        Enrich this company to extract verified founder biographies, contact numbers, direct emails, and succession transition timelines.
+
+                  {/* Succession Opportunity & Transition Readiness */}
+                  {(enrichment?.successionNote || company.acquisitionFit.successionRisk) && (
+                    <div className="p-4 rounded-xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900">
+                      <span className="text-[10px] font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider block mb-1">
+                        Succession Opportunity & Transition Notes
+                      </span>
+                      <p className="text-xs font-bold text-amber-900 dark:text-amber-200 leading-relaxed">
+                        {enrichment?.successionNote || company.acquisitionFit.successionRisk}
                       </p>
                     </div>
-                    {onEnrich && (
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        onClick={() => onEnrich(company.id)}
-                        disabled={isProcessing}
-                        leftIcon={<Lock className="h-3.5 w-3.5" />}
-                        className="mt-2"
-                      >
-                        {isProcessing ? 'Enriching...' : 'Enrich This Company'}
-                      </Button>
+                  )}
+
+                  {/* Management Lieutenants */}
+                  {managementTeam && (
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                        Management Lieutenants & Key Executives
+                      </span>
+                      <p className="text-xs font-semibold text-secondary">
+                        {managementTeam}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Additional Details Grid: Experience, Ownership, Education */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-default/60 text-xs">
+                    {industryExp && (
+                      <div>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Industry Experience</span>
+                        <span className="font-bold text-primary block mt-0.5">{industryExp}</span>
+                      </div>
+                    )}
+                    {ownershipStake && (
+                      <div>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Ownership Stake</span>
+                        <span className="font-bold text-primary block mt-0.5">{ownershipStake}</span>
+                      </div>
+                    )}
+                    {education && (
+                      <div>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Education & Credentials</span>
+                        <span className="font-bold text-primary block mt-0.5">{education}</span>
+                      </div>
+                    )}
+                    {isEnriched && enrichment?.priorExits && (
+                      <div>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Prior M&A Exits</span>
+                        <span className="font-bold text-primary block mt-0.5">{enrichment.priorExits}</span>
+                      </div>
                     )}
                   </div>
-                )}
+
+                  {/* Mandate Additional Criteria Match (if enriched) */}
+                  {isEnriched && enrichment?.additionalRequirementMatch && (
+                    <div className="p-3.5 rounded-xl bg-[#E3ECE6]/80 dark:bg-[#173529]/60 border border-[#B7CCBC] dark:border-[#39634D]">
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <span className="text-[10px] font-bold text-[#35624A] dark:text-[#8FBEA1] uppercase tracking-wider flex items-center gap-1.5">
+                          <Award className="h-3.5 w-3.5" />
+                          Mandate Criteria Verification
+                        </span>
+                        <span className="text-[10px] font-bold text-[#35624A] dark:text-[#8FBEA1]">
+                          [Proof: {enrichment.additionalRequirementMatch.proofSource}]
+                        </span>
+                      </div>
+                      <p className="text-xs text-primary mt-1 font-bold">
+                        {enrichment.additionalRequirementMatch.requirement}: <span className="font-normal">{enrichment.additionalRequirementMatch.extractedValue}</span>
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 

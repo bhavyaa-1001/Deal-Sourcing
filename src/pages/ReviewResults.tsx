@@ -517,18 +517,28 @@ export const ReviewResults: React.FC = () => {
       </div>
 
       {/* 2. Enrichment benefits info bar */}
-      <div className="bg-[#F5EDDA] dark:bg-amber-950/20 border border-[#E3D4B3] dark:border-amber-800 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+      <div className="bg-[#F5EDDA] dark:bg-amber-950/20 border border-[#E3D4B3] dark:border-amber-800 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-[#9A7535] dark:text-amber-300 shrink-0">
-          <Lock className="h-5 w-5" />
-          <span className="font-bold text-sm">Enrich to unlock:</span>
+          <Sparkles className="h-5 w-5" />
+          <span className="font-bold text-sm">Free profiles extracted below. Need missing details?</span>
         </div>
-        <div className="flex flex-wrap gap-3 text-sm text-[#9A7535] dark:text-amber-300 font-semibold">
-          {['Founder Name & Role', 'Management Team', 'Direct Email', 'Phone Number', 'LinkedIn Profile'].map(b => (
-            <span key={b} className="flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#9A7535] shrink-0" />
-              {b}
-            </span>
-          ))}
+        <div className="flex flex-wrap items-center gap-3 text-xs md:text-sm text-[#9A7535] dark:text-amber-300 font-semibold">
+          <span className="flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#9A7535] shrink-0" />
+            Direct Verified Emails
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#9A7535] shrink-0" />
+            Mobile Numbers
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#9A7535] shrink-0" />
+            Executive LinkedIn
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#9A7535] shrink-0" />
+            ASIC Verified Proofs
+          </span>
         </div>
       </div>
 
@@ -741,8 +751,8 @@ export const ReviewResults: React.FC = () => {
                             <div className="flex items-center justify-between border-b border-default pb-3">
                               <div className="flex items-center gap-2">
                                 <span className="text-sm font-extrabold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                                  {!isEnriched && <Lock className="h-4 w-4 text-[#8A6A3D]" />}
-                                  {isEnriched ? 'Enriched Company Intelligence' : 'Company Intelligence (Locked)'}
+                                  <Sparkles className="h-4 w-4 text-brand-primary" />
+                                  {isEnriched ? 'Deep Intelligence & Verified Proofs' : 'Public Founder & Business Intelligence'}
                                 </span>
                               </div>
                               {isEnriched ? (
@@ -750,7 +760,7 @@ export const ReviewResults: React.FC = () => {
                               ) : isProcessing ? (
                                 <Badge variant="warning">ENRICHING...</Badge>
                               ) : (
-                                <Badge variant="neutral">LOCKED</Badge>
+                                <Badge variant="neutral">STANDARD</Badge>
                               )}
                             </div>
 
