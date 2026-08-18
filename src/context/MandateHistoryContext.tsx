@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import type { ChatMessage, MandateCriteria } from '../api/researchAgent';
 import { initialCriteria } from '../api/researchAgent';
+import { mockCompanies } from '../data/mockCompanies';
 
 export interface HistoryMandate {
   id: string;
@@ -302,6 +303,19 @@ export const MandateHistoryProvider: React.FC<{ children: React.ReactNode }> = (
     setActiveId(newId);
     localStorage.setItem('dealsourcing_mandates_history', JSON.stringify(updated));
     localStorage.setItem('dealsourcing_mandates_active_id', newId);
+
+    // Initialize clean locked un-enriched storage for this new mandate
+    const freshCompanies = mockCompanies.map(c => ({
+      ...c,
+      enrichmentStatus: 'locked' as const,
+      enrichmentData: undefined,
+    }));
+    localStorage.setItem(`dealsourcing_companies_${newId}`, JSON.stringify(freshCompanies));
+    localStorage.setItem(`dealsourcing_enriched_ids_${newId}`, JSON.stringify([]));
+    localStorage.setItem(`dealsourcing_selected_ids_${newId}`, JSON.stringify([]));
+    localStorage.setItem(`dealsourcing_user_fit_levels_${newId}`, JSON.stringify({}));
+    localStorage.setItem(`dealsourcing_lead_statuses_${newId}`, JSON.stringify({}));
+    localStorage.removeItem(`dealsourcing_strategy_${newId}`);
     
     syncToActiveMandate(newMandateObj);
     triggerRefresh();
@@ -363,6 +377,14 @@ export const MandateHistoryProvider: React.FC<{ children: React.ReactNode }> = (
       return updatedList;
     });
 
+    // Clean up mandate specific storage
+    localStorage.removeItem(`dealsourcing_companies_${id}`);
+    localStorage.removeItem(`dealsourcing_enriched_ids_${id}`);
+    localStorage.removeItem(`dealsourcing_selected_ids_${id}`);
+    localStorage.removeItem(`dealsourcing_user_fit_levels_${id}`);
+    localStorage.removeItem(`dealsourcing_lead_statuses_${id}`);
+    localStorage.removeItem(`dealsourcing_strategy_${id}`);
+
     // Also clean up any saved outreach connected to this deleted mandate
     const savedKey = 'dealsourcing_saved_outreach';
     const stored = localStorage.getItem(savedKey);
@@ -414,8 +436,20 @@ export const MandateHistoryProvider: React.FC<{ children: React.ReactNode }> = (
           currentWorkflowStep: 1
         };
         syncToActiveMandate(reset);
-        // Clear strategy data for this mandate so stepper locks
+        
+        // Reset mandate specific company and strategy data
+        const freshCompanies = mockCompanies.map(c => ({
+          ...c,
+          enrichmentStatus: 'locked' as const,
+          enrichmentData: undefined,
+        }));
+        localStorage.setItem(`dealsourcing_companies_${m.id}`, JSON.stringify(freshCompanies));
+        localStorage.setItem(`dealsourcing_enriched_ids_${m.id}`, JSON.stringify([]));
+        localStorage.setItem(`dealsourcing_selected_ids_${m.id}`, JSON.stringify([]));
+        localStorage.setItem(`dealsourcing_user_fit_levels_${m.id}`, JSON.stringify({}));
+        localStorage.setItem(`dealsourcing_lead_statuses_${m.id}`, JSON.stringify({}));
         localStorage.removeItem(`dealsourcing_strategy_${m.id}`);
+
         return reset;
       });
       localStorage.setItem('dealsourcing_mandates_history', JSON.stringify(updatedList));

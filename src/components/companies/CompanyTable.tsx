@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import type { Company } from '../../types';
 import Button from '../ui/Button';
 import { MapPin, ExternalLink } from 'lucide-react';
@@ -8,28 +8,17 @@ interface CompanyTableProps {
   onView: (id: string) => void;
 }
 
+const getFitCategory = (score: number, levelText?: string) => {
+  if (score >= 80 || levelText?.includes('HIGH')) {
+    return { label: 'High', style: 'text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800' };
+  }
+  if (score >= 50 || levelText?.includes('MEDIUM')) {
+    return { label: 'Medium', style: 'text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 border-amber-200 dark:border-amber-800' };
+  }
+  return { label: 'Low', style: 'text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/50 border-rose-200 dark:border-rose-800' };
+};
+
 export const CompanyTable: React.FC<CompanyTableProps> = ({ companies, onView }) => {
-  const [userFitLevels, setUserFitLevels] = useState<Record<string, 'HIGH' | 'MEDIUM' | 'LOW'>>(() => {
-    const saved = localStorage.getItem('dealsourcing_user_fit_levels');
-    if (saved) {
-      try { return JSON.parse(saved); } catch { /* ignore */ }
-    }
-    return {
-      'comp-1': 'HIGH',
-      'comp-2': 'HIGH',
-      'comp-3': 'HIGH',
-      'comp-4': 'MEDIUM',
-      'comp-5': 'MEDIUM',
-      'comp-6': 'LOW',
-    };
-  });
-
-  const handleSetFitLevel = (companyId: string, level: 'HIGH' | 'MEDIUM' | 'LOW') => {
-    const next = { ...userFitLevels, [companyId]: level };
-    setUserFitLevels(next);
-    localStorage.setItem('dealsourcing_user_fit_levels', JSON.stringify(next));
-  };
-
   return (
     <div className="w-full overflow-x-auto rounded-lg border border-default shadow-sm bg-card">
       <table className="w-full border-collapse text-left text-base">
@@ -38,16 +27,18 @@ export const CompanyTable: React.FC<CompanyTableProps> = ({ companies, onView })
             <th className="px-5 py-4">Company Name</th>
             <th className="px-5 py-4">Location</th>
             <th className="px-5 py-4">Industry</th>
-            <th className="px-5 py-4">Fit Level (User Decision)</th>
-            <th className="px-5 py-4">Confidence</th>
+            <th className="px-5 py-4">Fit Rate</th>
             <th className="px-5 py-4">Revenue</th>
             <th className="px-5 py-4">Employees</th>
+            <th className="px-5 py-4">Confidence</th>
             <th className="px-5 py-4 text-right">Actions</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-default text-primary">
           {companies.map(company => {
-            const currentFit = userFitLevels[company.id] || (company.fitLevel === 'HIGH FIT' ? 'HIGH' : company.fitLevel === 'MEDIUM FIT' ? 'MEDIUM' : 'LOW');
+            const fitScore = company.fitScore ?? (company.fitLevel === 'HIGH FIT' ? 90 : company.fitLevel === 'MEDIUM FIT' ? 70 : 40);
+            const fitCategory = getFitCategory(fitScore, company.fitLevel);
+            const confidenceScore = company.confidenceScore ?? 80;
 
             return (
               <tr
@@ -88,41 +79,11 @@ export const CompanyTable: React.FC<CompanyTableProps> = ({ companies, onView })
                   {company.industry}
                 </td>
 
-                {/* User Decided Fit Level Selector */}
+                {/* Fit Rate (Percentage with level in bracket) */}
                 <td className="px-5 py-4">
-                  <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/90 p-1 rounded-lg border border-default select-none w-fit">
-                    {(['HIGH', 'MEDIUM', 'LOW'] as const).map(level => {
-                      const isSelected = currentFit === level;
-                      const activeClass =
-                        level === 'HIGH'
-                          ? 'bg-emerald-600 text-white shadow-xs'
-                          : level === 'MEDIUM'
-                          ? 'bg-amber-600 text-white shadow-xs'
-                          : 'bg-rose-600 text-white shadow-xs';
-
-                      return (
-                        <button
-                          key={level}
-                          type="button"
-                          onClick={() => handleSetFitLevel(company.id, level)}
-                          className={`px-2 py-0.5 rounded text-[10px] font-black uppercase transition-all cursor-pointer ${
-                            isSelected
-                              ? activeClass
-                              : 'text-secondary hover:text-primary hover:bg-slate-200/60 dark:hover:bg-slate-700/60'
-                          }`}
-                          title={`Mark ${company.name} as ${level} Fit`}
-                        >
-                          {level}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </td>
-
-                {/* Confidence */}
-                <td className="px-5 py-4">
-                  <span className="text-sm font-bold text-slate-700 dark:text-slate-350">
-                    {(company.confidenceScore ?? 0).toFixed(1)}%
+                  <span className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-md border ${fitCategory.style}`}>
+                    <span>{fitScore.toFixed(0)}%</span>
+                    <span className="font-semibold">({fitCategory.label})</span>
                   </span>
                 </td>
 
@@ -134,6 +95,13 @@ export const CompanyTable: React.FC<CompanyTableProps> = ({ companies, onView })
                 {/* Employees */}
                 <td className="px-5 py-4 text-secondary font-semibold text-sm">
                   {company.employeeRange}
+                </td>
+
+                {/* Confidence */}
+                <td className="px-5 py-4">
+                  <span className="text-sm font-bold text-slate-700 dark:text-slate-300">
+                    {confidenceScore.toFixed(0)}%
+                  </span>
                 </td>
 
                 {/* Actions */}

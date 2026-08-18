@@ -23,7 +23,7 @@ export const CompanyDiscovery: React.FC = () => {
     clearFilters,
   } = useCompanies();
 
-  const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
+  const [viewMode, setViewMode] = useState<'cards' | 'table'>('table');
   const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
 
   const handleBack = () => navigate('/mandate');
@@ -63,16 +63,8 @@ export const CompanyDiscovery: React.FC = () => {
           </p>
         </div>
 
-        {/* Toggle Grid/Table view */}
+        {/* Toggle Grid/Table view (Table on left, Cards on right) */}
         <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-md border border-default self-start md:self-auto select-none">
-          <button
-            onClick={() => setViewMode('cards')}
-            className={`flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded cursor-pointer transition-colors ${viewMode === 'cards' ? 'bg-card text-brand-primary shadow-sm' : 'text-secondary hover:text-primary'}`}
-            aria-label="Cards view mode"
-          >
-            <LayoutGrid className="h-4 w-4" />
-            <span>Cards</span>
-          </button>
           <button
             onClick={() => setViewMode('table')}
             className={`flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded cursor-pointer transition-colors ${viewMode === 'table' ? 'bg-card text-brand-primary shadow-sm' : 'text-secondary hover:text-primary'}`}
@@ -80,6 +72,14 @@ export const CompanyDiscovery: React.FC = () => {
           >
             <Table className="h-4 w-4" />
             <span>Table</span>
+          </button>
+          <button
+            onClick={() => setViewMode('cards')}
+            className={`flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded cursor-pointer transition-colors ${viewMode === 'cards' ? 'bg-card text-brand-primary shadow-sm' : 'text-secondary hover:text-primary'}`}
+            aria-label="Cards view mode"
+          >
+            <LayoutGrid className="h-4 w-4" />
+            <span>Cards</span>
           </button>
         </div>
       </div>

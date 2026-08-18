@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCompanies } from '../hooks/useCompanies';
 import { MOCK_ENRICHMENT_DATA } from '../api/enrichment';
@@ -12,6 +12,8 @@ import {
   CheckCircle2, RefreshCw, Cpu, GraduationCap, Briefcase,
   Tag
 } from 'lucide-react';
+
+import { useMandateHistory } from '../context/MandateHistoryContext';
 
 export type LeadStatus = 'active' | 'contact_future' | 'junk_lead' | 'follow_up';
 
@@ -59,6 +61,10 @@ export const LEAD_STATUS_CONFIG: Record<LeadStatus, {
 
 export const DiscoverFounders: React.FC = () => {
   const navigate = useNavigate();
+  const { activeId } = useMandateHistory();
+  const activeMandateId = activeId || localStorage.getItem('dealsourcing_mandates_active_id') || 'mandate-101';
+  const STATUS_KEY = `dealsourcing_lead_statuses_${activeMandateId}`;
+
   const {
     companies,
     enrichedIds,
@@ -78,26 +84,25 @@ export const DiscoverFounders: React.FC = () => {
   const [enrichingId, setEnrichingId] = useState<string | null>(null);
   const [batchEnriching, setBatchEnriching] = useState(false);
 
-  // Lead Status State per company / founder
+  // Lead Status State per company / founder (mandate-isolated)
   const [leadStatuses, setLeadStatuses] = useState<Record<string, LeadStatus>>(() => {
-    const saved = localStorage.getItem('dealsourcing_lead_statuses');
+    const saved = localStorage.getItem(STATUS_KEY);
     if (saved) {
       try { return JSON.parse(saved); } catch { /* ignore */ }
     }
-    return {
-      'comp-1': 'active',
-      'comp-2': 'active',
-      'comp-3': 'contact_future',
-      'comp-4': 'active',
-      'comp-5': 'junk_lead',
-      'comp-6': 'active',
-    };
+    return {};
   });
+
+  // Reload when mandate changes
+  useEffect(() => {
+    const saved = localStorage.getItem(STATUS_KEY);
+    setLeadStatuses(saved ? JSON.parse(saved) : {});
+  }, [STATUS_KEY]);
 
   const handleUpdateLeadStatus = (companyId: string, status: LeadStatus) => {
     const next = { ...leadStatuses, [companyId]: status };
     setLeadStatuses(next);
-    localStorage.setItem('dealsourcing_lead_statuses', JSON.stringify(next));
+    localStorage.setItem(STATUS_KEY, JSON.stringify(next));
   };
 
   const handleBack = () => navigate('/discover');

@@ -393,8 +393,8 @@ export const AppLayout: React.FC = () => {
 
         {/* Workspace content block — shifts right when sidebar is open */}
         <div className={`flex-1 flex flex-col min-w-0 transition-all duration-200 ${!sidebarCollapsed ? 'md:ml-64 lg:ml-72' : ''}`}>
-          {/* Horizontal Workflow Stepper */}
-          <div className="shrink-0">
+          {/* Horizontal Workflow Stepper - Sticky beneath header on scroll */}
+          <div className="sticky top-[60px] md:top-16 z-30 shrink-0 bg-[#EDEBE5] dark:bg-[#111B27]">
             <WorkflowStepper
               mandateApproved={mandateApproved}
             />

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import type { Company } from '../../types';
 import Card from '../ui/Card';
 import { Database } from 'lucide-react';
@@ -9,32 +9,24 @@ interface CompanyCardProps {
   onView: () => void;
 }
 
-export const CompanyCard: React.FC<CompanyCardProps> = ({ company, onView }) => {
-  const [fitLevel, setFitLevel] = useState<'HIGH' | 'MEDIUM' | 'LOW'>(() => {
-    const saved = localStorage.getItem('dealsourcing_user_fit_levels');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (parsed[company.id]) return parsed[company.id];
-      } catch { /* ignore */ }
-    }
-    return company.fitLevel === 'HIGH FIT' ? 'HIGH' : company.fitLevel === 'MEDIUM FIT' ? 'MEDIUM' : 'LOW';
-  });
+const getFitCategory = (score: number, levelText?: string) => {
+  if (score >= 80 || levelText?.includes('HIGH')) {
+    return { label: 'High', style: 'text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800' };
+  }
+  if (score >= 50 || levelText?.includes('MEDIUM')) {
+    return { label: 'Medium', style: 'text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 border-amber-200 dark:border-amber-800' };
+  }
+  return { label: 'Low', style: 'text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/50 border-rose-200 dark:border-rose-800' };
+};
 
-  const handleSetFitLevel = (level: 'HIGH' | 'MEDIUM' | 'LOW') => {
-    setFitLevel(level);
-    let savedObj: Record<string, string> = {};
-    const saved = localStorage.getItem('dealsourcing_user_fit_levels');
-    if (saved) {
-      try { savedObj = JSON.parse(saved); } catch { /* ignore */ }
-    }
-    savedObj[company.id] = level;
-    localStorage.setItem('dealsourcing_user_fit_levels', JSON.stringify(savedObj));
-  };
+export const CompanyCard: React.FC<CompanyCardProps> = ({ company, onView }) => {
+  const fitScore = company.fitScore ?? (company.fitLevel === 'HIGH FIT' ? 90 : company.fitLevel === 'MEDIUM FIT' ? 70 : 40);
+  const fitCategory = getFitCategory(fitScore, company.fitLevel);
+  const confidenceScore = company.confidenceScore ?? 80;
 
   return (
     <Card className="text-left flex flex-col gap-4 border border-default bg-card rounded shadow-none p-5">
-      {/* 1. Header: Name, Match & User-decided Fit Level */}
+      {/* 1. Header: Name, Match & Fit Level */}
       <div className="flex justify-between items-start gap-4">
         <div className="min-w-0">
           <h3
@@ -50,38 +42,15 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, onView }) => 
           </div>
         </div>
 
-        {/* User Fit Level Toggle */}
-        <div className="shrink-0 flex flex-col items-end gap-1.5">
-          <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/90 p-1 rounded-lg border border-default select-none">
-            {(['HIGH', 'MEDIUM', 'LOW'] as const).map(level => {
-              const isSelected = fitLevel === level;
-              const activeClass =
-                level === 'HIGH'
-                  ? 'bg-emerald-600 text-white shadow-xs'
-                  : level === 'MEDIUM'
-                  ? 'bg-amber-600 text-white shadow-xs'
-                  : 'bg-rose-600 text-white shadow-xs';
+        {/* Fit Rate & Confidence */}
+        <div className="shrink-0 flex flex-col items-end gap-1">
+          <span className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-md border ${fitCategory.style}`}>
+            <span>{fitScore.toFixed(0)}%</span>
+            <span className="font-semibold">({fitCategory.label})</span>
+          </span>
 
-              return (
-                <button
-                  key={level}
-                  type="button"
-                  onClick={() => handleSetFitLevel(level)}
-                  className={`px-2 py-0.5 rounded text-[10px] font-black uppercase transition-all cursor-pointer ${
-                    isSelected
-                      ? activeClass
-                      : 'text-secondary hover:text-primary hover:bg-slate-200/60 dark:hover:bg-slate-700/60'
-                  }`}
-                  title={`Mark as ${level} Fit`}
-                >
-                  {level}
-                </button>
-              );
-            })}
-          </div>
-
-          <span className="text-xs font-bold text-[#9A8056] mt-0.5 block text-right">
-            {(company.confidenceScore ?? 0).toFixed(1)}% Match
+          <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5 block text-right">
+            Confidence: {confidenceScore.toFixed(0)}%
           </span>
         </div>
       </div>

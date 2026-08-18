@@ -65,8 +65,14 @@ const ProofTag: React.FC<{ proof: string; label?: string; url?: string; classNam
   );
 };
 
+import { useMandateHistory } from '../context/MandateHistoryContext';
+
 export const ReviewResults: React.FC = () => {
   const navigate = useNavigate();
+  const { activeId } = useMandateHistory();
+  const activeMandateId = activeId || localStorage.getItem('dealsourcing_mandates_active_id') || 'mandate-101';
+  const STATUS_KEY = `dealsourcing_lead_statuses_${activeMandateId}`;
+
   const {
     companies,
     allCompaniesRaw,
@@ -98,42 +104,25 @@ export const ReviewResults: React.FC = () => {
 
   // Lead Status State per company / founder
   const [leadStatuses, setLeadStatuses] = useState<Record<string, LeadStatus>>(() => {
-    const saved = localStorage.getItem('dealsourcing_lead_statuses');
+    const saved = localStorage.getItem(STATUS_KEY);
     if (saved) {
       try { return JSON.parse(saved); } catch { /* ignore */ }
     }
-    return {
-      'comp-1': 'active',
-      'comp-2': 'active',
-      'comp-3': 'contact_future',
-      'comp-4': 'active',
-      'comp-5': 'junk_lead',
-      'comp-6': 'active',
-    };
+    return {};
   });
 
   const [leadStatusFilter, setLeadStatusFilter] = useState<'all' | LeadStatus>('all');
 
-  // User Fit Levels State (User decided priority in Discover Companies)
-  const [userFitLevels] = useState<Record<string, 'HIGH' | 'MEDIUM' | 'LOW'>>(() => {
-    const saved = localStorage.getItem('dealsourcing_user_fit_levels');
-    if (saved) {
-      try { return JSON.parse(saved); } catch { /* ignore */ }
-    }
-    return {
-      'comp-1': 'HIGH',
-      'comp-2': 'HIGH',
-      'comp-3': 'HIGH',
-      'comp-4': 'MEDIUM',
-      'comp-5': 'MEDIUM',
-      'comp-6': 'LOW',
-    };
-  });
+  // Reload when mandate changes
+  useEffect(() => {
+    const savedStatus = localStorage.getItem(STATUS_KEY);
+    setLeadStatuses(savedStatus ? JSON.parse(savedStatus) : {});
+  }, [STATUS_KEY]);
 
   const handleUpdateLeadStatus = (companyId: string, status: LeadStatus) => {
     const next = { ...leadStatuses, [companyId]: status };
     setLeadStatuses(next);
-    localStorage.setItem('dealsourcing_lead_statuses', JSON.stringify(next));
+    localStorage.setItem(STATUS_KEY, JSON.stringify(next));
   };
 
   const rawDisplayCompanies = allCompaniesRaw.length > 0 ? allCompaniesRaw : companies;
@@ -612,10 +601,10 @@ export const ReviewResults: React.FC = () => {
                 <th className="px-3 py-3">Company</th>
                 <th className="px-3 py-3">Location</th>
                 <th className="px-3 py-3">Lead Status</th>
-                <th className="px-3 py-3">Fit Level</th>
-                <th className="px-3 py-3">Confidence</th>
+                <th className="px-3 py-3">Fit Rate</th>
                 <th className="px-3 py-3">Revenue</th>
                 <th className="px-3 py-3">Employees</th>
+                <th className="px-3 py-3">Confidence</th>
                 <th className="px-3 py-3 text-right pr-5">Actions</th>
               </tr>
             </thead>
@@ -627,7 +616,12 @@ export const ReviewResults: React.FC = () => {
                 const isExpanded = expandedCompanyIds.includes(company.id);
                 const leadStatus = leadStatuses[company.id] || 'active';
                 const statusConfig = LEAD_STATUS_CONFIG[leadStatus] || LEAD_STATUS_CONFIG.active;
-                const currentFit = userFitLevels[company.id] || (company.fitLevel === 'HIGH FIT' ? 'HIGH' : company.fitLevel === 'MEDIUM FIT' ? 'MEDIUM' : 'LOW');
+                const fitScore = company.fitScore ?? (company.fitLevel === 'HIGH FIT' ? 90 : company.fitLevel === 'MEDIUM FIT' ? 70 : 40);
+                const isHigh = fitScore >= 80 || company.fitLevel === 'HIGH FIT';
+                const isMed = fitScore >= 50 || company.fitLevel === 'MEDIUM FIT';
+                const fitLabel = isHigh ? 'High' : isMed ? 'Medium' : 'Low';
+                const fitBadgeVariant = isHigh ? 'success' : isMed ? 'warning' : 'danger';
+                const confidenceScore = company.confidenceScore ?? 80;
 
                 return (
                   <React.Fragment key={company.id}>
@@ -684,32 +678,20 @@ export const ReviewResults: React.FC = () => {
                         </select>
                       </td>
 
-                      {/* Deployed User-Decided Fit Level Badge */}
+                      {/* Fit Rate Badge with percentage and bracket level */}
                       <td className="px-3 py-3.5">
-                        {currentFit === 'HIGH' && (
-                          <Badge variant="success" className="text-[10px] px-2 py-0.5 font-bold uppercase">
-                            HIGH FIT
-                          </Badge>
-                        )}
-                        {currentFit === 'MEDIUM' && (
-                          <Badge variant="warning" className="text-[10px] px-2 py-0.5 font-bold uppercase">
-                            MEDIUM FIT
-                          </Badge>
-                        )}
-                        {currentFit === 'LOW' && (
-                          <Badge variant="danger" className="text-[10px] px-2 py-0.5 font-bold uppercase">
-                            LOW FIT
-                          </Badge>
-                        )}
-                      </td>
-
-                      <td className="px-3 py-3.5">
-                        <span className="text-xs md:text-sm font-bold text-brand-primary">{(company.confidenceScore ?? 0).toFixed(1)}%</span>
+                        <Badge variant={fitBadgeVariant} className="text-[10px] px-2 py-0.5 font-bold">
+                          {fitScore.toFixed(0)}% ({fitLabel})
+                        </Badge>
                       </td>
 
                       <td className="px-3 py-3.5 font-bold text-slate-800 dark:text-slate-200 text-xs md:text-sm whitespace-nowrap">{company.revenueRange}</td>
 
                       <td className="px-3 py-3.5 text-secondary font-semibold text-xs md:text-sm">{company.employeeRange}</td>
+
+                      <td className="px-3 py-3.5">
+                        <span className="text-xs md:text-sm font-bold text-slate-700 dark:text-slate-300">{confidenceScore.toFixed(0)}%</span>
+                      </td>
 
                       <td className="px-3 py-3.5 text-right pr-5">
                         <div className="inline-flex gap-1.5 justify-end items-center">

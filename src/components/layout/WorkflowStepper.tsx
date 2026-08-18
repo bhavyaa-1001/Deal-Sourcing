@@ -46,7 +46,7 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
   };
 
   return (
-    <div className="w-full bg-[#EDEBE5] dark:bg-[#111B27] border-b border-[#D8D5CE] dark:border-[#263544] sticky top-[60px] md:top-[64px] z-30 shadow-[0_1px_3px_rgba(32,42,46,0.04)] transition-colors duration-200">
+    <div className="w-full bg-[#EDEBE5] dark:bg-[#111B27] border-b border-[#D8D5CE] dark:border-[#263544] shadow-[0_1px_3px_rgba(32,42,46,0.04)] transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-6 py-2.5">
         {/* Desktop and Tablet Stepper Layout */}
         <nav aria-label="Progress Stepper" className="hidden md:block">
