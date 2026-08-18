@@ -99,12 +99,6 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
       <div className="flex flex-col gap-2.5 pr-0.5">
         {mandates.map((m) => {
           const isActive = m.id === activeId;
-          const dateStr = new Date(m.createdAt).toLocaleDateString([], {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric'
-          });
-          
           const confirmedCount = Object.values(m.confirmedCriteria).filter(Boolean).length;
           
           return (
@@ -122,38 +116,37 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
                 onClick={() => handleSelect(m.id)}
                 className="flex-1 cursor-pointer"
               >
-                <div className="flex justify-between items-center gap-2 pr-2">
-                  <span className={`font-bold text-[14px] leading-tight block truncate text-[#202A2E] dark:text-[#F1F5F9] ${isActive ? 'font-black' : ''}`}>
-                    {m.title}
-                  </span>
+                {/* Primary heading: Industry + Geography */}
+                <div className="flex justify-between items-start gap-2 pr-7">
+                  <div className="min-w-0">
+                    <span className={`font-extrabold text-[14px] leading-tight block text-[#202A2E] dark:text-[#F1F5F9] ${isActive ? 'text-[#A65F3F] dark:text-[#E0D77F]' : ''}`}>
+                      {m.criteria.targetIndustry || 'Unspecified Industry'}
+                    </span>
+                    {m.criteria.geography && m.criteria.geography !== 'Not specified' && (
+                      <span className="text-[12px] font-bold text-[#626A6D] dark:text-[#9AA9B8] block mt-0.5">
+                        {m.criteria.geography}
+                      </span>
+                    )}
+                  </div>
                   {isActive && (
-                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#F4E8E2] dark:bg-[#3A3520] text-[#A65F3F] dark:text-[#D5C76E] border border-[#A65F3F]/20 dark:border-[#625A2F] font-black uppercase tracking-wider shrink-0">
+                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#F4E8E2] dark:bg-[#3A3520] text-[#A65F3F] dark:text-[#D5C76E] border border-[#A65F3F]/20 dark:border-[#625A2F] font-black uppercase tracking-wider shrink-0 mt-0.5">
                       Active
                     </span>
                   )}
                 </div>
 
-                <div className="text-[11px] text-[#626A6D] dark:text-[#9AA9B8] mt-1 leading-snug pr-2 font-medium">
-                  <span>{m.criteria.targetIndustry || 'Unspecified Industry'}</span>
-                  {m.criteria.geography && m.criteria.geography !== 'Not specified' && (
-                    <span> · {m.criteria.geography}</span>
-                  )}
-                </div>
-
-                <div className="flex justify-between items-center text-[10px] text-[#899093] dark:text-[#9AA9B8] mt-2 font-semibold">
-                  <span>{dateStr}</span>
-                  <div className="flex items-center gap-1.5">
-                    <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider border shrink-0
-                      ${m.status === 'Approved' || m.status === 'Confirmed'
-                        ? 'border-[#B7CCBC] bg-[#E3ECE6] text-[#35624A] dark:bg-[#173529] dark:text-[#8FBEA1] dark:border-[#39634D]'
-                        : 'border-[#D8D5CE] bg-[#F1EFEA] text-[#626A6D] dark:bg-[#141F2C] dark:text-[#9AA9B8] dark:border-[#2D4053]'
-                      }
-                    `}>
-                      {m.status === 'Approved' || m.status === 'Confirmed' ? 'Confirmed' : 'Draft'}
-                    </span>
-                    <span>•</span>
-                    <span>{confirmedCount}/9</span>
-                  </div>
+                {/* Footer: Status badge + criteria count */}
+                <div className="flex items-center gap-1.5 mt-2.5">
+                  <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider border shrink-0
+                    ${m.status === 'Approved' || m.status === 'Confirmed'
+                      ? 'border-[#B7CCBC] bg-[#E3ECE6] text-[#35624A] dark:bg-[#173529] dark:text-[#8FBEA1] dark:border-[#39634D]'
+                      : 'border-[#D8D5CE] bg-[#F1EFEA] text-[#626A6D] dark:bg-[#141F2C] dark:text-[#9AA9B8] dark:border-[#2D4053]'
+                    }
+                  `}>
+                    {m.status === 'Approved' || m.status === 'Confirmed' ? 'Confirmed' : 'Draft'}
+                  </span>
+                  <span className="text-[10px] font-bold text-[#899093] dark:text-[#9AA9B8]">•</span>
+                  <span className="text-[10px] font-bold text-[#899093] dark:text-[#9AA9B8]">{confirmedCount}/9</span>
                 </div>
               </div>
 
