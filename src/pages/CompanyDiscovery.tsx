@@ -27,7 +27,7 @@ export const CompanyDiscovery: React.FC = () => {
   const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
 
   const handleBack = () => navigate('/mandate');
-  const handleContinue = () => navigate('/founders');
+  const handleContinue = () => navigate('/review');
 
   const displayCompanies = companies;
   const activeCompany = displayCompanies.find(c => c.id === selectedCompanyId) || null;
@@ -178,9 +178,9 @@ export const CompanyDiscovery: React.FC = () => {
           onClick={handleContinue}
           rightIcon={<ArrowRight className="h-5 w-5" />}
           className="min-w-[220px]"
-          id="continue-to-founders-btn"
+          id="continue-to-review-btn"
         >
-          Continue to Discover Founders
+          Continue to Review Results
         </Button>
       </div>
     </div>

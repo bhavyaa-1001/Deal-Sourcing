@@ -12,9 +12,8 @@ interface Step {
 const STEPS: Step[] = [
   { number: 1, label: 'Define Mandate', description: 'Describe what you want to acquire', path: '/mandate' },
   { number: 2, label: 'Discover Companies', description: 'Explore matching opportunities', path: '/discover' },
-  { number: 3, label: 'Discover Founders', description: 'Identify & enrich founder profiles', path: '/founders' },
-  { number: 4, label: 'Review Results', description: 'Shortlist and compare deals', path: '/review' },
-  { number: 5, label: 'Outreach', description: 'Create personalized messages for selected contacts', path: '/outreach' },
+  { number: 3, label: 'Review Results', description: 'Shortlist and compare deals', path: '/review' },
+  { number: 4, label: 'Outreach', description: 'Create personalized messages for selected contacts', path: '/outreach' },
 ];
 
 interface WorkflowStepperProps {
@@ -123,7 +122,7 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
           <div className="flex items-center justify-between mb-2">
             <div>
               <span className="text-[11px] font-black uppercase tracking-wider text-[#A65F3F] dark:text-[#E0D77F]">
-                Step {currentStep} of 5
+                Step {currentStep} of 4
               </span>
               <h2 className="text-base font-bold text-[#202A2E] dark:text-[#F1F5F9] tracking-tight">
                 {STEPS[currentStep - 1]?.label}
@@ -141,7 +140,7 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
               </button>
               <button
                 onClick={() => handleStepClick(STEPS[currentStep])}
-                disabled={currentStep === 5 || !isStepUnlocked(currentStep + 1)}
+                disabled={currentStep === 4 || !isStepUnlocked(currentStep + 1)}
                 className="px-2.5 py-1 text-xs font-bold rounded border border-[#D8D5CE] dark:border-[#344658] bg-white dark:bg-[#182536] text-[#202A2E] dark:text-[#F1F5F9] disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Next
@@ -153,7 +152,7 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
           <div className="w-full bg-[#E5E2DC] dark:bg-[#293746] h-1.5 rounded-full overflow-hidden">
             <div
               className="bg-[#A65F3F] dark:bg-[#5F8F70] h-full transition-all duration-300"
-              style={{ width: `${(currentStep / 5) * 100}%` }}
+              style={{ width: `${(currentStep / 4) * 100}%` }}
             />
           </div>
         </div>
@@ -161,4 +160,5 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
     </div>
   );
 };
+
 export default WorkflowStepper;

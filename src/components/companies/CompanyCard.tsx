@@ -1,8 +1,9 @@
 import React from 'react';
 import type { Company } from '../../types';
 import Card from '../ui/Card';
-import { Database } from 'lucide-react';
+import { Database, Users, Mail, Phone } from 'lucide-react';
 import Button from '../ui/Button';
+import { MOCK_ENRICHMENT_DATA } from '../../api/enrichment';
 
 interface CompanyCardProps {
   company: Company;
@@ -23,6 +24,8 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, onView }) => 
   const fitScore = company.fitScore ?? (company.fitLevel === 'HIGH FIT' ? 90 : company.fitLevel === 'MEDIUM FIT' ? 70 : 40);
   const fitCategory = getFitCategory(fitScore, company.fitLevel);
   const confidenceScore = company.confidenceScore ?? 80;
+  const isEnriched = company.enrichmentStatus === 'enriched';
+  const founderInfo = company.enrichmentData || MOCK_ENRICHMENT_DATA[company.id];
 
   return (
     <Card className="text-left flex flex-col gap-4 border border-default bg-card rounded shadow-none p-5">
@@ -81,23 +84,70 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company, onView }) => 
 
       <div className="border-t border-default/70 my-1" />
 
-      {/* 3. Fit Description Rationale */}
+      {/* 3. Founder Details Section */}
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <span className="font-bold text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+            <Users className="h-3.5 w-3.5 text-brand-primary" />
+            Founder & Leadership Profile
+          </span>
+          {founderInfo?.age && (
+            <span className="text-[11px] font-bold text-[#35624A] dark:text-[#8FBEA1] bg-[#E3ECE6] dark:bg-[#173529] px-2 py-0.5 rounded border border-[#B7CCBC] dark:border-[#39634D]">
+              Age: ~{founderInfo.age}y
+            </span>
+          )}
+        </div>
+
+        {founderInfo ? (
+          <div className="bg-slate-50/70 dark:bg-slate-900/30 border border-default rounded-lg p-3 flex flex-col gap-1.5">
+            <div className="flex items-center justify-between flex-wrap gap-1">
+              <span className="text-sm font-extrabold text-primary">{founderInfo.founderName}</span>
+              <span className="text-xs font-semibold text-secondary">{founderInfo.founderRole}</span>
+            </div>
+            <p className="text-xs text-secondary leading-relaxed font-semibold line-clamp-2">
+              "{founderInfo.bio}"
+            </p>
+            {isEnriched && founderInfo.email && (
+              <div className="flex items-center gap-3 pt-1 border-t border-default/60 mt-0.5 text-xs text-brand-primary font-bold">
+                <span className="flex items-center gap-1 truncate">
+                  <Mail className="h-3 w-3" />
+                  {founderInfo.email}
+                </span>
+                {founderInfo.phone && (
+                  <span className="flex items-center gap-1 text-primary font-semibold">
+                    <Phone className="h-3 w-3 text-slate-400" />
+                    {founderInfo.phone}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="bg-slate-50/50 dark:bg-slate-900/20 border border-dashed border-default rounded-lg p-2.5 text-center select-none">
+            <span className="text-xs text-slate-400 font-medium">Founder profile details available upon dossier inspection</span>
+          </div>
+        )}
+      </div>
+
+      <div className="border-t border-default/70 my-1" />
+
+      {/* 4. Fit Description Rationale */}
       <div className="flex-1 text-sm">
         <span className="font-bold text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">
           Acquisition Alignment
         </span>
-        <p className="text-base text-secondary leading-relaxed line-clamp-3">
+        <p className="text-base text-secondary leading-relaxed line-clamp-2">
           {company.whyItMatches}
         </p>
       </div>
 
-      {/* 4. Footer info */}
+      {/* 5. Footer info */}
       <div className="flex items-center gap-1.5 text-sm text-slate-500 border-t border-default/60 pt-2.5">
         <Database className="h-3.5 w-3.5 shrink-0" />
         <span className="truncate">Source: {company.sourceName}</span>
       </div>
 
-      {/* 5. CTA Action Button */}
+      {/* 6. CTA Action Button */}
       <div className="mt-1">
         <Button
           variant="outline"
